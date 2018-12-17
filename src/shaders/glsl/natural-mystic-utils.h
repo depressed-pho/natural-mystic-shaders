@@ -26,3 +26,20 @@ vec3 applyShadow(vec3 frag, float torch, float sun) {
 
     return mix(frag, shadowColor, shadowLevel);
 }
+
+/* Calculate and apply the torch color on the original fragment
+ * "frag". The argument "torch" should be the torch light level [0, 1]
+ * and "sun" should be the sunlight level [0, 1].
+ */
+vec3 applyTorchColor(vec3 frag, float torch, float sun) {
+    const vec3 torchColor = vec3(0.8, 0.3, -0.2);
+    const float torchIntensity = 0.6; // [0, 1]
+    const float sunlightCutOff = 0.1; // [0, 1]
+
+    /* The sunlight should prevent torches from affecting the color.
+     */
+    float torchLevel = max(0.0, torch - torchIntensity) *
+        mix(1.0, sunlightCutOff, smoothstep(0.7, 0.9, sun));
+
+    return min(frag + torchColor * torchLevel, 1.0);
+}

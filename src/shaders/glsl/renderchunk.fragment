@@ -89,6 +89,7 @@ vec4 inColor = color;
 #endif
 
 	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y);
+	diffuse.rgb = applyTorchColor(diffuse.rgb, uv1.x, uv1.y);
 
 	gl_FragColor = diffuse;
 	
