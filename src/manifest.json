@@ -1,0 +1,18 @@
+{
+    "format_version": 1,
+    "header": {
+        "description": "Shaders dedicated for reality",
+        "name": "Natural Mystic",
+        "uuid": "fcc05930-01f9-11e9-8a3f-000c2990bea9",
+        "version": [0, 1, 0],
+        "min_engine_version": [1, 8, 0]
+    },
+    "modules": [
+        {
+            "description": "Shaders dedicated for reality",
+            "type": "resources",
+            "uuid": "65013067-01fa-11e9-8a3f-000c2990bea9",
+            "version": [0, 1, 0]
+        }
+    ]
+}
