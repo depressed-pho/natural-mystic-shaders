@@ -90,6 +90,9 @@ vec4 inColor = color;
 
 	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y);
 	diffuse.rgb = applyTorchColor(diffuse.rgb, uv1.x, uv1.y);
+	diffuse.rgb = uncharted2ToneMap(diffuse.rgb);
+	diffuse.rgb = acesFilmicToneMap(diffuse.rgb);
+	diffuse.rgb = hdrFilter(diffuse.rgb, 1.05, 3.0, 2.0);
 
 	gl_FragColor = diffuse;
 	
