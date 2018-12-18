@@ -46,9 +46,11 @@ vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight) {
 /* Calculate and apply the torch color on the original fragment
  * "frag". The argument "torchLevel" should be the torch light level
  * [0, 1], "sunLevel" should be the terrain-dependent sunlight level
- * [0, 1], and "daylight" should be the time-dependent daylight level.
+ * [0, 1], and "daylight" should be the time-dependent daylight
+ * level. The "time" is the in-game time, used for the flickering
+ * effect.
  */
-vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight) {
+vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight, float time) {
     const vec3 torchColor = vec3(0.8, 0.3, -0.2);
     const float torchDecay = 0.55; // [0, 1]
     const float sunlightCutOff = 0.1; // [0, 1]
@@ -58,6 +60,13 @@ vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight
      */
     float amount = max(0.0, torchLevel - torchDecay);
     amount *= mix(1.0, sunlightCutOff, smoothstep(0.65, 0.875, sunLevel) * daylight);
+
+    /* The flicker is the sum of several sine waves with varying freq,
+     * phase, and amp.
+     */
+    float flicker = sin(time * 11.0      ) * 0.03;
+    flicker      += sin(time *  3.0 + 0.2) * 0.06;
+    amount *= flicker + 1.0;
 
     return frag + torchColor * amount;
 }

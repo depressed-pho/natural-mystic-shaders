@@ -27,6 +27,7 @@ varying vec4 fogColor;
 #endif
 
 #include "uniformShaderConstants.h"
+#include "uniformPerFrameConstants.h"
 #include "util.h"
 #include "natural-mystic-utils.h"
 
@@ -90,7 +91,7 @@ vec4 inColor = color;
 
 	diffuse.rgb = applyAmbientLight(diffuse.rgb);
 	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y, daylight);
-	diffuse.rgb = applyTorchColor(diffuse.rgb, uv1.x, uv1.y, daylight);
+	diffuse.rgb = applyTorchColor(diffuse.rgb, uv1.x, uv1.y, daylight, TIME);
 	diffuse.rgb = applySunlight(diffuse.rgb, uv1.y, daylight);
 	diffuse.rgb = applySkylight(diffuse.rgb, uv1.y, daylight);
 	diffuse.rgb = applyMoonlight(diffuse.rgb, uv1.x, uv1.y, daylight);
