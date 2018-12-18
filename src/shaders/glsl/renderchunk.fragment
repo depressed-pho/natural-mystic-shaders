@@ -84,15 +84,24 @@ vec4 inColor = color;
 	diffuse.a = 1.0;
 #endif
 
+	/* Fetch the level of daylight (i.e. the one which darkens at
+	 * night) from the light map passed by the upstream. */
+	float daylight = min(1.0, (texture2D(TEXTURE_1, vec2(0.0, 1.0)).r - 0.5) / 0.5);
+
+	diffuse.rgb = applyAmbientLight(diffuse.rgb);
+	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y);
+	diffuse.rgb = applyTorchColor(diffuse.rgb, uv1.x, uv1.y);
+	diffuse.rgb = applySunlight(diffuse.rgb, uv1.y, daylight);
+	diffuse.rgb = applyDaylight(diffuse.rgb, uv1.y, daylight);
+	// FIXME: applyMoonlight
+	diffuse.rgb = contrastFilter(diffuse.rgb, 1.05);
+	diffuse.rgb = hdrExposure(diffuse.rgb, 4.0, 3.0);
+	diffuse.rgb = uncharted2ToneMap(diffuse.rgb, 4.0);
+	//diffuse.rgb = acesFilmicToneMap(diffuse.rgb);
+
 #ifdef FOG
 	diffuse.rgb = mix( diffuse.rgb, fogColor.rgb, fogColor.a );
 #endif
-
-	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y);
-	diffuse.rgb = applyTorchColor(diffuse.rgb, uv1.x, uv1.y);
-	diffuse.rgb = uncharted2ToneMap(diffuse.rgb);
-	diffuse.rgb = acesFilmicToneMap(diffuse.rgb);
-	diffuse.rgb = hdrFilter(diffuse.rgb, 1.05, 3.0, 2.0);
 
 	gl_FragColor = diffuse;
 	
@@ -101,4 +110,5 @@ vec4 inColor = color;
 
 // Local Variables:
 // mode: glsl
+// indent-tabs-mode: t
 // End:
