@@ -81,6 +81,26 @@ vec3 applySkylight(vec3 frag, float sunLevel, float daylight) {
     return frag + skyColor * amount;
 }
 
+/* Apply the moonlight on a fragment "frag" based on the
+ * time-dependent daylight level "daylight" [0,1]. The argument
+ * "torchLevel" should be the torch light level [0,1], and the
+ * argument "sunLevel" should be the terrain-dependent sunlight level
+ * [0,1]. The moonlight is purple-ish white.
+ */
+vec3 applyMoonlight(vec3 frag, float torchLevel, float sunLevel, float daylight) {
+    const vec3 moonColor = vec3(0.4, 0.7, 0.9);
+    const float moonLevel = 0.95;
+
+    /* The reason why we take into account the torch light level is
+     * that the intensity of the torch light is far higher than that
+     * of moonlight.
+     */
+    float amount = sunLevel * (1.0 - torchLevel) * moonLevel * (1.0 - daylight);
+    float desaturated = dot(frag, vec3(0.22, 0.707, 0.071));
+
+    return mix(frag, desaturated * moonColor, amount);
+}
+
 /* Apply Uncharted 2 tone mapping to the original fragment "frag".
  * See: http://filmicworlds.com/blog/filmic-tonemapping-operators/
  */
