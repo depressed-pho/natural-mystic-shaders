@@ -10,10 +10,11 @@ vec3 applyAmbientLight(vec3 frag) {
 }
 
 /* Calculate and apply a shadow on the original fragment "frag". The
- * argument "torchLevel" should be the torch light level [0, 1] and
- * "sunLevel" should be the sunlight level [0, 1].
+ * argument "torchLevel" should be the torch light level [0, 1],
+ * "sunLevel" should be the terrain-dependent sunlight level [0, 1],
+ * and "daylight" should be the time-dependent daylight level.
  */
-vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel) {
+vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight) {
     const vec3 shadowColor = vec3(0.0);
     const float minShadow = 0.0;  // [0, 1]
     const float maxShadow = 0.45; // [0, 1]
@@ -33,22 +34,30 @@ vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel) {
     amount *= mix(1.0, torchLightCutOff,
                   smoothstep(0.5, 1.0, torchLevel));
 
+    /* Lack of daylight should also negate the effect of shadows,
+     * because sadly the light map passed by the upstream doesn't take
+     * torches into account.
+     */
+    amount *= mix(0.2, 1.0, daylight);
+
     return mix(frag, shadowColor, amount);
 }
 
 /* Calculate and apply the torch color on the original fragment
- * "frag". The argument "torchLevel" should be the torch light level [0, 1]
- * and "sunLevel" should be the sunlight level [0, 1].
+ * "frag". The argument "torchLevel" should be the torch light level
+ * [0, 1], "sunLevel" should be the terrain-dependent sunlight level
+ * [0, 1], and "daylight" should be the time-dependent daylight level.
  */
-vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel) {
+vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight) {
     const vec3 torchColor = vec3(0.8, 0.3, -0.2);
     const float torchDecay = 0.6; // [0, 1]
     const float sunlightCutOff = 0.1; // [0, 1]
 
-    /* The sunlight should prevent torches from affecting the color.
+    /* The sunlight should prevent torches from affecting the color,
+     * but we also have to take the daylight level into account.
      */
-    float amount = max(0.0, torchLevel - torchDecay) *
-        mix(1.0, sunlightCutOff, smoothstep(0.7, 0.9, sunLevel));
+    float amount = max(0.0, torchLevel - torchDecay);
+    amount *= mix(1.0, sunlightCutOff, smoothstep(0.7, 0.9, sunLevel) * daylight);
 
     return frag + torchColor * amount;
 }
@@ -56,10 +65,10 @@ vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel) {
 /* Apply the sunlight on a fragment "frag" based on the time-dependent
  * daylight level "daylight" [0,1]. The argument "sunLevel" should be
  * the terrain-dependent sunlight level [0,1]. The sunlight is
- * yellow-ish.
+ * yellow-ish red.
  */
 vec3 applySunlight(vec3 frag, float sunLevel, float daylight) {
-    const vec3 sunColor = vec3(0.6, 0.3, 0.0);
+    const vec3 sunColor = vec3(0.7, 0.3, 0.0);
 
     float amount = (0.5 - abs(0.5 - daylight)) * sunLevel;
     float sunset = (frag.r + frag.g + frag.b) / 1.5;
