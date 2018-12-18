@@ -67,15 +67,16 @@ vec3 applySunlight(vec3 frag, float sunLevel, float daylight) {
     return mix(frag, sunset * sunColor, amount);
 }
 
-/* Apply the daylight (or sky light) on a fragment "frag" based on the
- * time-dependent daylight level "daylight" [0,1]. The argument
- * "sunLevel" should be the terrain-dependent sunlight level
- * [0,1]. The daylight is blue-ish white.
+/* Apply the skylight on a fragment "frag" based on the time-dependent
+ * daylight level "daylight" [0,1]. The argument "sunLevel" should be
+ * the terrain-dependent sunlight level [0,1]. The skylight is
+ * blue-ish white.
  */
-vec3 applyDaylight(vec3 frag, float sunLevel, float daylight) {
-    const vec3 skyColor = vec3(0.7, 0.7, 1.0);
+vec3 applySkylight(vec3 frag, float sunLevel, float daylight) {
+    const vec3 skyColor = vec3(0.8, 0.8, 1.0);
+    const float skyLevel = 0.07;
 
-    float amount = sunLevel * 0.1 * daylight;
+    float amount = sunLevel * skyLevel * daylight;
 
     return frag + skyColor * amount;
 }
@@ -123,9 +124,9 @@ vec3 contrastFilter(vec3 frag, float contrast) {
     return (frag - 0.5) * max(contrast, 0.0) + 0.5;
 }
 
-/* Apply an HDR exposure and contrast filter to the original LDR
- * fragment "frag". The resulting image will be HDR, and needs to be
- * tone-mapped back to LDR at the last stage. */
+/* Apply an HDR exposure filter to the original LDR fragment
+ * "frag". The resulting image will be HDR, and need to be tone-mapped
+ * back to LDR at the last stage. */
 vec3 hdrExposure(vec3 frag, float overExposure, float underExposure) {
     vec3 overExposed   = frag / overExposure;
     vec3 normalExposed = frag;

@@ -92,7 +92,7 @@ vec4 inColor = color;
 	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y);
 	diffuse.rgb = applyTorchColor(diffuse.rgb, uv1.x, uv1.y);
 	diffuse.rgb = applySunlight(diffuse.rgb, uv1.y, daylight);
-	diffuse.rgb = applyDaylight(diffuse.rgb, uv1.y, daylight);
+	diffuse.rgb = applySkylight(diffuse.rgb, uv1.y, daylight);
 	// FIXME: applyMoonlight
 	diffuse.rgb = contrastFilter(diffuse.rgb, 1.05);
 	diffuse.rgb = hdrExposure(diffuse.rgb, 4.0, 3.0);
