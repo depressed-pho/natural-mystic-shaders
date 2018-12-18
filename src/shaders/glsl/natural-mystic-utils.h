@@ -80,7 +80,7 @@ vec3 applySunlight(vec3 frag, float sunLevel, float daylight) {
     const vec3 sunColor = vec3(0.7, 0.3, 0.0);
 
     float amount = (0.5 - abs(0.5 - daylight)) * sunLevel;
-    float sunset = (frag.r + frag.g + frag.b) / 1.5;
+    float sunset = dot(frag, vec3(1.0)) / 1.5;
 
     return mix(frag, sunset * sunColor, amount);
 }
@@ -106,8 +106,8 @@ vec3 applySkylight(vec3 frag, float sunLevel, float daylight) {
  * [0,1]. The moonlight is purple-ish white.
  */
 vec3 applyMoonlight(vec3 frag, float torchLevel, float sunLevel, float daylight) {
-    const vec3 moonColor = vec3(0.4, 0.7, 0.9);
-    const float moonLevel = 0.95;
+    const vec3 moonColor = vec3(0.5, 0.8, 0.95);
+    const float moonLevel = 0.7;
 
     /* The reason why we take into account the torch light level is
      * that the intensity of the torch light is far higher than that
