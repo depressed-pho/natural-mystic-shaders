@@ -50,14 +50,14 @@ vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight) {
  */
 vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight) {
     const vec3 torchColor = vec3(0.8, 0.3, -0.2);
-    const float torchDecay = 0.6; // [0, 1]
+    const float torchDecay = 0.55; // [0, 1]
     const float sunlightCutOff = 0.1; // [0, 1]
 
     /* The sunlight should prevent torches from affecting the color,
      * but we also have to take the daylight level into account.
      */
     float amount = max(0.0, torchLevel - torchDecay);
-    amount *= mix(1.0, sunlightCutOff, smoothstep(0.7, 0.9, sunLevel) * daylight);
+    amount *= mix(1.0, sunlightCutOff, smoothstep(0.65, 0.875, sunLevel) * daylight);
 
     return frag + torchColor * amount;
 }
