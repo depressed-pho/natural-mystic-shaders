@@ -81,11 +81,16 @@ vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight
     if (amount > 0.0) {
         amount *= mix(1.0, sunlightCutOff, smoothstep(0.65, 0.875, sunLevel * daylight));
 
-        /* The flicker is the sum of several sine waves with varying freq,
-         * phase, and amp.
+        /* The flicker is the sum of several sine waves with varying
+         * frequently, phase, and amplitude. The reason for the final
+         * "/ 10.0" is to avoid underflows.
+         *
+         * Invariant: 0 <= flicker <= 1.0 (or Bad Things will happen)
          */
-        float flicker = sin(time * 11.0      ) * 0.03;
-        flicker      += sin(time *  3.0 + 0.2) * 0.06;
+        float flicker =
+            ( sin(time * 11.0      ) * 0.3 + // fast wave
+              sin(time *  3.0 + 0.3) * 0.6   // slow wave
+            ) / 10.0;
         amount *= flicker + 1.0;
 
         return frag + torchColor * amount;
