@@ -34,12 +34,15 @@ vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight) {
     amount *= mix(1.0, torchLightCutOff,
                   smoothstep(0.5, 1.0, torchLevel));
 
-    /* Lack of daylight should also negate the effect of shadows,
-     * because sadly the light map passed by the upstream doesn't take
-     * torches into account.
+    /* NOTE: Lack of daylight should also negate the effect of
+     * shadows, because sadly the light map passed by the upstream
+     * doesn't take torches into account. But we can't, because if we
+     * reduce "amount" depending on "daylight", caves will get
+     * brighter at night. We could possibly overcome the issue by
+     * completely disabling the vanilla lighting (i.e. diffuse *=
+     * texture2D(TEXTURE_1, uv1)) and replacing it with an HDR
+     * lighting.
      */
-    amount *= mix(0.2, 1.0, daylight);
-
     return mix(frag, shadowColor, amount);
 }
 
@@ -53,13 +56,14 @@ vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight) {
 vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight, float time) {
     const vec3 torchColor = vec3(0.8, 0.3, -0.2);
     const float torchDecay = 0.55; // [0, 1]
+    const float torchIntensity = 1.0; // [0, 1]
     const float sunlightCutOff = 0.1; // [0, 1]
 
     /* The sunlight should prevent torches from affecting the color,
      * but we also have to take the daylight level into account.
      */
-    float amount = max(0.0, torchLevel - torchDecay);
-    amount *= mix(1.0, sunlightCutOff, smoothstep(0.65, 0.875, sunLevel) * daylight);
+    float amount = max(0.0, torchLevel - torchDecay) * torchIntensity;
+    amount *= mix(1.0, sunlightCutOff, smoothstep(0.65, 0.875, sunLevel * daylight));
 
     /* The flicker is the sum of several sine waves with varying freq,
      * phase, and amp.
