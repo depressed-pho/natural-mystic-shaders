@@ -1,0 +1,47 @@
+# -*- sh -*-
+# -----------------------------------------------------------------------------
+# Configuration file for ./Build
+
+# -----------------------------------------------------------------------------
+# The installation prefix, defaulting to "/usr/local". You can later
+# refer to the prefix by a variable named "prefix".
+#
+setPrefix "/usr/local"
+
+# -----------------------------------------------------------------------------
+# The PATH environment variable to be set during the build. (Default:
+# "/usr/bin:/bin")
+#
+setPath PATH \
+    "/usr/pkg/bin" \
+    "/usr/bin" \
+    "/bin"
+
+# -----------------------------------------------------------------------------
+# The PKG_CONFIG_PATH environment variable to be set during the
+# build. (Default: empty)
+#
+setPath PKG_CONFIG_PATH \
+    "/usr/pkg/lib/pkgconfig"
+
+# -----------------------------------------------------------------------------
+# The extra arguments to be passed to "./configure".
+#
+setConfigArgs \
+    --enable-maintainer-mode
+
+# -----------------------------------------------------------------------------
+# The name of "make" target called by "./Build" or "./Build
+# build". (Default: "all")
+#
+setBuildTarget "all"
+
+# -----------------------------------------------------------------------------
+# The name of subdirectory in which the source tree of documentation
+# resides, and the name of "make" target to build it. (Default: target
+# "all" in the top_builddir)
+#
+setDocDirectory "."
+setDocTarget "all"
+
+# -----------------------------------------------------------------------------

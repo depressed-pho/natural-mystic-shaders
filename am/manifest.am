@@ -1,0 +1,25 @@
+CLEANFILES += manifest.json
+EXTRA_DIST += $(MANIFEST_SRC)
+
+manifest.json: $(MANIFEST_SRC) Makefile
+	$(AM_V_GEN)
+	$(AM_V_at)set -eu; \
+	\
+	OIFS="$$IFS"; \
+	IFS="."; \
+	tmp=$(PACKAGE_VERSION); \
+	set -- $$tmp; \
+	IFS="$$OIFS"; \
+	\
+	if [ $$# -eq 3 ]; then \
+		semver_triple="[$$1, $$2, $$3]"; \
+	else \
+		echo >&2 "$(PACKAGE_VERSION) is not a semver"; \
+		exit 1; \
+	fi; \
+	\
+	rm -f $@ $@.tmp; \
+	$(SED) \
+		-e "s|@SEMVER_TRIPLE[@]|$${semver_triple}|g" \
+		< $< > $@.tmp; \
+	mv $@.tmp $@

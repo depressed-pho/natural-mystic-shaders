@@ -1,0 +1,33 @@
+pack_base  = $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+pack_name  = $(pack_base).mcpack
+pack_files = $(MCPACK_FILES:%.yaml=%.json)
+
+noinst_DATA += $(pack_name)
+CLEANFILES  += $(pack_name)
+EXTRA_DIST  += $(filter-out manifest.json,$(filter-out manifest.yaml,$(MCPACK_FILES)))
+
+$(pack_name): $(pack_files)
+	$(AM_V_GEN)
+	$(AM_V_at)rm -rf $(pack_base)
+	$(AM_V_at)$(MKDIR_P) $(pack_base)
+# This is the hardest part... Here we build a staging directory but
+# the problem is that $(pack_files) can either be relative to
+# $(srcdir) or $(builddir).
+	$(AM_V_at)for f in $^; do \
+			case "$$f" in \
+				$(srcdir)/*) \
+					echo "-C $(srcdir)"; \
+					echo "$$f" | sed 's|^$(srcdir)/||';; \
+				*) \
+					echo "-C $(builddir)"; \
+					echo "$$f";; \
+			esac; \
+		done | \
+		tar -cf - -T - | tar -xf - -C $(pack_base)
+# We don't need the root directory for .mcpack files.
+	@if $(AM_V_P); then \
+		(cd $(pack_base) && $(ZIP) -rv ../$@ *); \
+	else \
+		(cd $(pack_base) && $(ZIP) -rq ../$@ *); \
+	fi
+	$(AM_V_at)rm -rf $(pack_base)

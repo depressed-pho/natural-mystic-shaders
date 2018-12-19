@@ -4,7 +4,7 @@
         "description": "Shaders aiming to be as realistic as possible.",
         "name": "Natural Mystic",
         "uuid": "fcc05930-01f9-11e9-8a3f-000c2990bea9",
-        "version": [0, 1, 0],
+        "version": @SEMVER_TRIPLE@,
         "min_engine_version": [1, 8, 0]
     },
     "modules": [
@@ -12,7 +12,7 @@
             "description": "Shaders aiming to be as realistic as possible.",
             "type": "resources",
             "uuid": "65013067-01fa-11e9-8a3f-000c2990bea9",
-            "version": [0, 1, 0]
+            "version": @SEMVER_TRIPLE@
         }
     ]
 }

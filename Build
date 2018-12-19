@@ -1,0 +1,282 @@
+#!/usr/bin/env bash
+#-----------------------------------------------------------------------------#
+#     THIS SCRIPT IS AUTOMATICALLY GENERATED FROM SEVERAL SOURCE FILES.       #
+#          DO NOT EDIT THIS BY HAND, OR YOU WILL REGRET IT LATER.             #
+#-----------------------------------------------------------------------------#
+#                                                                             #
+#     "Build" -- an automation script designed to work with autotools.        #
+#                                                                             #
+#     Author / Maintainer:                                                    #
+#          PHO <pho@cielonegro.org>                                           #
+#                                                                             #
+#     Master repository:                                                      #
+#          git://git.cielonegro.org/autobuild.git                             #
+#            (but it might be moved to GitHub in the future)                  #
+#                                                                             #
+#     License:                                                                #
+#          CC0 Public Domain Dedication                                       #
+#                                                                             #
+#     Bug tracker:                                                            #
+#          Not currently available.                                           #
+#                                                                             #
+#     Please report any bugs, feature requests, and pull requests (the        #
+#     most preferred!) to the maintainer presented above.                     #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+#     To the extent possible under law, the author(s) have dedicated          #
+#     all copyright and related and neighboring rights to this                #
+#     software to the public domain worldwide. This software is               #
+#     distributed without any warranty.                                       #
+#                                                                             #
+#     You should have received a copy of the CC0 Public Domain                #
+#     Dedication along with this software. If not, see                        #
+#     <http://creativecommons.org/publicdomain/zero/1.0/>.                    #
+#-----------------------------------------------------------------------------#
+set -e
+
+function detectNumCPUs () {
+    if sysctl -n "hw.ncpu" 2>/dev/null; then
+        # This works for most BSDs.
+        :
+    elif grep -qF processor /proc/cpuinfo 2>/dev/null; then
+        # Linux sucks...
+        grep -cF processor /proc/cpuinfo
+    else
+        echo -n "WARNING: $0 doesn't know how to detect the number of" >&2
+        echo -n "processors on this platform. Assuming we have just one..." >&2
+        echo 1
+    fi
+}
+
+function run () {
+    if (( $# == 0 )); then
+        echo "run: Usage: run CMD [ARG...]" >&2
+        return 1
+    fi
+
+    # Is the /dev/stdout opened to a tty?
+    if [[ -t 1 ]]; then
+        # Bold + Green
+        echo -ne "\e[1;32m"
+        echo "$@"
+        echo -ne "\e[0m"
+    else
+        echo "$@"
+    fi
+
+    "$@"
+}
+
+function setPath () {
+    if (( $# == 0 )); then
+        echo "Usage: $0 VAR [PATH, ...]" >&2
+        return 1
+    fi
+
+    local -r var="$1"
+    local paths=("${@:2}")
+
+    case ${#paths[@]} in
+        0)
+            unset $var;;
+        1)
+            export $var="$paths";;
+        *)
+            export $var="${paths[0]}"
+            local path
+            for path in "${paths[@]:1}"; do
+                local val=$(eval echo \$$var)
+                export $var="$val:$path"
+            done
+    esac
+
+    case "$var" in
+        "PATH")
+            # THINKME: Special case for PATH: we prepend "$prefix/bin"
+            # to it.
+            PATH="$prefix/bin:$PATH";;
+        "PKG_CONFIG_PATH")
+            # THINKME: Special case for PKG_CONFIG_PATH: we prepend
+            # "$prefix/lib/pkgconfig" to it.
+            PKG_CONFIG_PATH="$prefix/lib/pkgconfig:$PKG_CONFIG_PATH";;
+        *)
+            ;;
+    esac
+}
+
+declare prefix
+function setPrefix () {
+    if (( $# != 1 )); then
+        echo "Usage: $0 PREFIX" >&2
+        return 1
+    fi
+    prefix="$1"
+}
+
+declare -a configArgs
+function setConfigArgs () {
+    configArgs=( \
+        PATH="$PATH" \
+        PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
+        "$@" \
+        )
+}
+
+declare buildTarget
+function setBuildTarget () {
+    if (( $# != 1 )); then
+        echo "Usage: $0 TARGET" >&2
+        return 1
+    fi
+    buildTarget="$1"
+}
+
+declare docDirectory
+function setDocDirectory () {
+    if (( $# != 1 )); then
+        echo "Usage: $0 DIRECTORY" >&2
+        return 1
+    fi
+    docDirectory="$1"
+}
+
+declare docTarget
+function setDocTarget () {
+    if (( $# != 1 )); then
+        echo "Usage: $0 TARGET" >&2
+        return 1
+    fi
+    docTarget="$1"
+}
+
+setPrefix "/usr/local"
+setPath PATH "/usr/bin" "/bin"
+setConfigArgs
+setBuildTarget "all"
+setDocDirectory "."
+setDocTarget "all"
+
+if [[ -f "./Build.rc" ]]; then
+    . "./Build.rc"
+fi
+
+if [[ -f "./Build.rc.local" ]]; then
+    . "./Build.rc.local"
+fi
+
+function runMake () {
+    run gmake -w -j $(detectNumCPUs) "$@"
+}
+
+function autogen () {
+    run autoreconf -v -i -f
+}
+
+function configure () {
+    if [[ ! -f configure.ac && ! -f configure.in ]]; then
+        echo "ERROR: Neither configure.ac nor configure.in exists in the current directory." >&2
+        return 1
+    fi
+
+    if [[ ! -f configure ]]; then
+        autogen
+    fi
+
+    if [[ ! -f "_build/Makefile" ]]; then
+        run mkdir -p _build
+        run pushd _build
+        run ../configure --prefix="$prefix" "${configArgs[@]}"
+        run popd
+    fi
+}
+
+function build () {
+    configure
+    runMake -C "_build" $buildTarget
+}
+
+function doc () {
+    configure
+    runMake -C "_build/$docDirectory" $docTarget
+}
+
+function check () {
+    build
+    runMake -C "_build" check "$@"
+}
+
+function clean () {
+    run rm -rf "_build"
+}
+
+function dist () {
+    configure
+    runMake -C "_build" dist
+}
+
+function distcheck () {
+    configure
+    runMake -C "_build" distcheck DISTCHECK_CONFIGURE_FLAGS="${configArgs[*]}"
+}
+
+function install () {
+    build
+    runMake -C "_build" install "$@"
+}
+
+function other () {
+    runMake -C "_build" "$@"
+}
+
+function usage () {
+    cat <<EOF >&2
+Usage: $0 [COMMAND]
+
+This is an automation script designed to work with autotools. It creates a
+directory "./_build" and builds any files inside it. Its behaviour is
+somewhat configurable: See "./Build.rc" for details.
+
+If no COMMAND is given, it defaults to "build".
+
+Commands:
+    build          run "$0 configure" then make(1)
+    check [ARGS]   run "$0 build" then "make check [ARGS]"
+    autogen        run autoreconf(1)
+    configure      run "$0 autogen" and "./configure" if necessary
+    clean          run "rm -rf _build"
+    dist           run "make dist"
+    distcheck      run "$0 configure" then "make distcheck"
+    doc            similar to "$0 build" but only build the documentation
+    help           print this message
+    install [ARGS] run "$0 build" then "make install [ARGS]"
+    -- [ARGS]      run "make [ARGS]"
+
+Please report any bugs, feature requests, and pull requests (the most
+preferred!) to the maintainer presented in the preamble of the "$0" itself.
+EOF
+    return 1
+}
+
+function main () {
+    local cmd
+    case "$1" in
+        ""|"build" ) cmd="build"    ;;
+        "autogen"  ) cmd="autogen"  ;;
+        "configure") cmd="configure";;
+        "doc"      ) cmd="doc"      ;;
+        "check"    ) cmd="check"    ;;
+        "clean"    ) cmd="clean"    ;;
+        "dist"     ) cmd="dist"     ;;
+        "distcheck") cmd="distcheck";;
+        "help"     ) cmd="usage"    ;;
+        "install"  ) cmd="install"  ;;
+        "--"       ) cmd="other"    ;;
+        *)           cmd="usage"    ;;
+    esac
+    if (( $# > 0 )); then
+        shift
+    fi
+    "$cmd" "$@"
+}
+
+main "$@"
