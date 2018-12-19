@@ -25,25 +25,31 @@ vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight, fl
     float amount = mix(maxShadow, minShadow,
                        smoothstep(0.865, 0.875, sunLevel));
 
-    /* The existence of torch light should negate the effect of
-     * shadows. The higher the torch light level is, the less the
-     * shadow affects the color. However, we also don't want torches
-     * to completely drive away the shadow, since the intensity of the
-     * torch light wouldn't be comparable to that of sunlight.
-     */
-    amount *= mix(1.0, torchLightCutOff,
-                  smoothstep(0.5, 1.0, torchLevel));
+    if (amount > 0.0) {
+        /* The existence of torch light should negate the effect of
+         * shadows. The higher the torch light level is, the less the
+         * shadow affects the color. However, we also don't want
+         * torches to completely drive away the shadow, since the
+         * intensity of the torch light wouldn't be comparable to that
+         * of sunlight.
+         */
+        amount *= mix(1.0, torchLightCutOff,
+                      smoothstep(0.5, 1.0, torchLevel));
 
-    /* NOTE: Lack of daylight should also negate the effect of
-     * shadows, because sadly the light map passed by the upstream
-     * doesn't take torches into account. But we can't, because if we
-     * reduce "amount" depending on "daylight", caves will get
-     * brighter at night. We could possibly overcome the issue by
-     * completely disabling the vanilla lighting (i.e. diffuse *=
-     * texture2D(TEXTURE_1, uv1)) and replacing it with an HDR
-     * lighting.
-     */
-    return mix(frag, shadowColor, baseAmount * amount);
+        /* NOTE: Lack of daylight should also negate the effect of
+         * shadows, because sadly the light map passed by the upstream
+         * doesn't take torches into account. But we can't, because if
+         * we reduce "amount" depending on "daylight", caves will get
+         * brighter at night. We could possibly overcome the issue by
+         * completely disabling the vanilla lighting (i.e. diffuse *=
+         * texture2D(TEXTURE_1, uv1)) and replacing it with an HDR
+         * lighting.
+         */
+        return mix(frag, shadowColor, baseAmount * amount);
+    }
+    else {
+        return frag;
+    }
 }
 
 /* Calculate and apply the torch color on the original fragment
@@ -63,16 +69,21 @@ vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight
      * but we also have to take the daylight level into account.
      */
     float amount = max(0.0, torchLevel - torchDecay) * torchIntensity;
-    amount *= mix(1.0, sunlightCutOff, smoothstep(0.65, 0.875, sunLevel * daylight));
+    if (amount > 0.0) {
+        amount *= mix(1.0, sunlightCutOff, smoothstep(0.65, 0.875, sunLevel * daylight));
 
-    /* The flicker is the sum of several sine waves with varying freq,
-     * phase, and amp.
-     */
-    float flicker = sin(time * 11.0      ) * 0.03;
-    flicker      += sin(time *  3.0 + 0.2) * 0.06;
-    amount *= flicker + 1.0;
+        /* The flicker is the sum of several sine waves with varying freq,
+         * phase, and amp.
+         */
+        float flicker = sin(time * 11.0      ) * 0.03;
+        flicker      += sin(time *  3.0 + 0.2) * 0.06;
+        amount *= flicker + 1.0;
 
-    return frag + torchColor * amount;
+        return frag + torchColor * amount;
+    }
+    else {
+        return frag;
+    }
 }
 
 /* Apply the sunlight on a fragment "frag" based on the time-dependent
@@ -84,9 +95,13 @@ vec3 applySunlight(vec3 frag, float sunLevel, float daylight) {
     const vec3 sunColor = vec3(0.7, 0.3, 0.0);
 
     float amount = (0.5 - abs(0.5 - daylight)) * sunLevel;
-    float sunset = dot(frag, vec3(1.0)) / 1.5;
-
-    return mix(frag, sunset * sunColor, amount);
+    if (amount > 0.0) {
+        float sunset = dot(frag, vec3(1.0)) / 1.5;
+        return mix(frag, sunset * sunColor, amount);
+    }
+    else {
+        return frag;
+    }
 }
 
 /* Apply the skylight on a fragment "frag" based on the time-dependent
@@ -118,9 +133,13 @@ vec3 applyMoonlight(vec3 frag, float torchLevel, float sunLevel, float daylight)
      * of moonlight.
      */
     float amount = sunLevel * (1.0 - torchLevel) * moonLevel * (1.0 - daylight);
-    float desaturated = dot(frag, vec3(0.22, 0.707, 0.071));
-
-    return mix(frag, desaturated * moonColor, amount);
+    if (amount > 0.0) {
+        float desaturated = dot(frag, vec3(0.22, 0.707, 0.071));
+        return mix(frag, desaturated * moonColor, amount);
+    }
+    else {
+        return frag;
+    }
 }
 
 /* Apply Uncharted 2 tone mapping to the original fragment "frag".
