@@ -1,5 +1,14 @@
 // -*- glsl -*-
 
+/* Desaturate a color in linear RGB color space. The parameter
+ * "degree" should be in [0,1] where 0 being no desaturation and 1
+ * being full desaturation (completely gray).
+ */
+vec3 desaturate(vec3 color, float degree) {
+    float luma = dot(color, vec3(0.22, 0.707, 0.071));
+    return mix(color, vec3(luma), degree);
+}
+
 /* Apply the ambient light on the original fragment "frag". Without
  * this filter, objects getting no light will be rendered in complete
  * darkness, which isn't how the reality works.
@@ -134,8 +143,7 @@ vec3 applyMoonlight(vec3 frag, float torchLevel, float sunLevel, float daylight)
      */
     float amount = sunLevel * (1.0 - torchLevel) * moonLevel * (1.0 - daylight);
     if (amount > 0.0) {
-        float desaturated = dot(frag, vec3(0.22, 0.707, 0.071));
-        return mix(frag, desaturated * moonColor, amount);
+        return mix(frag, desaturate(frag, 0.8) * moonColor, amount);
     }
     else {
         return frag;
