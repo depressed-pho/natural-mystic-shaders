@@ -3,7 +3,8 @@ MANIFEST_SRC = manifest.json.in
 MCPACK_FILES = \
 	manifest.json \
 	shaders/glsl/natural-mystic-utils.h \
-	shaders/glsl/renderchunk.fragment
+	shaders/glsl/renderchunk.fragment \
+	shaders/glsl/renderchunk.vertex
 
 EXTRA_DIST=
 CLEANFILES=
