@@ -14,7 +14,7 @@ vec3 applyAmbientLight(vec3 frag) {
  * "sunLevel" should be the terrain-dependent sunlight level [0, 1],
  * and "daylight" should be the time-dependent daylight level.
  */
-vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight) {
+vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight, float baseAmount) {
     const vec3 shadowColor = vec3(0.0);
     const float minShadow = 0.0;  // [0, 1]
     const float maxShadow = 0.45; // [0, 1]
@@ -43,7 +43,7 @@ vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight) {
      * texture2D(TEXTURE_1, uv1)) and replacing it with an HDR
      * lighting.
      */
-    return mix(frag, shadowColor, amount);
+    return mix(frag, shadowColor, baseAmount * amount);
 }
 
 /* Calculate and apply the torch color on the original fragment

@@ -90,7 +90,14 @@ vec4 inColor = color;
 	float daylight = min(1.0, (texture2D(TEXTURE_1, vec2(0.0, 1.0)).r - 0.5) / 0.5);
 
 	diffuse.rgb = applyAmbientLight(diffuse.rgb);
-	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y, daylight);
+#ifdef FOG
+	/* we must reduce the amount of shadow in this case, as the
+	 * seafloor will get unacceptably dark otherwise. This is because
+	 * the terrain underwater is rendered with a fog. */
+	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y, daylight, fogColor.a);
+#else
+	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y, daylight, 1.0);
+#endif
 	diffuse.rgb = applyTorchColor(diffuse.rgb, uv1.x, uv1.y, daylight, TIME);
 	diffuse.rgb = applySunlight(diffuse.rgb, uv1.y, daylight);
 	diffuse.rgb = applySkylight(diffuse.rgb, uv1.y, daylight);
