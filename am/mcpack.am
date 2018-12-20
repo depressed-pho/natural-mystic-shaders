@@ -31,3 +31,12 @@ $(pack_name): $(pack_files)
 		(cd $(pack_base) && $(ZIP) -rq ../$@ *); \
 	fi
 	$(AM_V_at)rm -rf $(pack_base)
+
+install-data-local: $(pack_name)
+	@set -eu; \
+	if test -n "$(MCPACK_INSTALLATION_DIRECTORY)"; then \
+		if $(AM_V_P); then set -x; fi; \
+		rm -rf "$(MCPACK_INSTALLATION_DIRECTORY)"; \
+		mkdir -p "$(MCPACK_INSTALLATION_DIRECTORY)"; \
+		$(UNZIP) "$(pack_name)" -d "$(MCPACK_INSTALLATION_DIRECTORY)"; \
+	fi

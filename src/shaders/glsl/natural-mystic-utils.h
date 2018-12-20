@@ -14,6 +14,8 @@ vec3 desaturate(vec3 color, float degree) {
  * darkness, which isn't how the reality works.
  */
 vec3 applyAmbientLight(vec3 frag) {
+    // Objects that are already bright should not be affected, hence
+    // the "0.5 -".
     vec3 level = max(vec3(0.1), 0.5 - frag) * 1.2 + 1.0;
     return frag * level;
 }

@@ -14,3 +14,6 @@ missing
 # Built files
 *.mcpack
 manifest.json
+
+# Files that are intentionally uncommitted
+Build.rc.local

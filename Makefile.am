@@ -5,6 +5,7 @@ EXTRA_DIST = \
 	README.md
 
 AUTOMAKE_OPTIONS = foreign
+ACLOCAL_AMFLAGS = -I m4
 
 .PHONY: fixme
 fixme:
