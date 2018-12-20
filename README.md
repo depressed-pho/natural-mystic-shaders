@@ -1,6 +1,7 @@
 # Natural Mystic Shaders
 
-**Natural Mystic** is a shader pack aiming to be as realistic as possible.
+**Natural Mystic** is a shader pack for Minecraft Bedrock aiming to be
+as realistic as possible.
 
 ![](./img/day.jpg)
 ![](./img/night.jpg)
