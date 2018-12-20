@@ -63,6 +63,28 @@ vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight, fl
     }
 }
 
+/* Calculate the torch light flickering factor based on the in-game
+ * time.
+ */
+float torchLightFlicker(float time) {
+    /* The flicker is the sum of several sine waves with varying
+     * frequently, phase, and amplitude. The reason for the final
+     * "/ 10.0" is to avoid underflows.
+     *
+     * Invariant: -1 <= flicker <= 1 (or Bad Things will happen)
+     */
+    float flicker =
+        ( sin(time * 11.0      ) * 0.35 + // fast wave
+          sin(time *  3.0 + 0.3) * 0.7    // slow wave
+        ) / 10.0;
+
+    /* Workaround for MCPE-39749: the uniform TIME might not be a
+     * number. See https://bugs.mojang.com/browse/MCPE-39749
+     */
+    flicker = clamp(flicker, -1.0, 1.0);
+    return flicker;
+}
+
 /* Calculate and apply the torch color on the original fragment
  * "frag". The argument "torchLevel" should be the torch light level
  * [0, 1], "sunLevel" should be the terrain-dependent sunlight level
@@ -82,18 +104,7 @@ vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight
     float intensity = max(0.0, torchLevel - torchDecay) * baseIntensity;
     if (intensity > 0.0) {
         intensity *= mix(1.0, sunlightCutOff, smoothstep(0.65, 0.875, sunLevel * daylight));
-
-        /* The flicker is the sum of several sine waves with varying
-         * frequently, phase, and amplitude. The reason for the final
-         * "/ 10.0" is to avoid underflows.
-         *
-         * Invariant: 0 <= flicker <= 1.0 (or Bad Things will happen)
-         */
-        float flicker =
-            ( sin(time * 11.0      ) * 0.35 + // fast wave
-              sin(time *  3.0 + 0.3) * 0.7    // slow wave
-            ) / 10.0;
-        intensity *= flicker + 1.0;
+        intensity *= torchLightFlicker(time) + 1.0;
 
         return frag + torchColor * intensity;
     }

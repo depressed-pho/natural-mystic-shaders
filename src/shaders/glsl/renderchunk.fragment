@@ -89,11 +89,6 @@ vec4 inColor = color;
 	 * night) from the light map passed by the upstream. */
 	float daylight = min(1.0, (texture2D(TEXTURE_1, vec2(0.0, 1.0)).r - 0.5) / 0.5);
 
-	/* Workaround for MCPE-39749: the uniform TIME might not be a
-	 * number. See https://bugs.mojang.com/browse/MCPE-39749
-	 */
-	float time = isnan(TIME) || isinf(TIME) ? 0.0 : TIME;
-
 	diffuse.rgb = applyAmbientLight(diffuse.rgb);
 #if defined(FOG)
 	/* we must reduce the amount of shadow in this case, as the
@@ -103,7 +98,7 @@ vec4 inColor = color;
 #else
 	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y, daylight, 1.0);
 #endif
-	diffuse.rgb = applyTorchColor(diffuse.rgb, uv1.x, uv1.y, daylight, time);
+	diffuse.rgb = applyTorchColor(diffuse.rgb, uv1.x, uv1.y, daylight, TIME);
 	diffuse.rgb = applySunlight(diffuse.rgb, uv1.y, daylight);
 	diffuse.rgb = applySkylight(diffuse.rgb, uv1.y, daylight);
 	diffuse.rgb = applyMoonlight(diffuse.rgb, uv1.x, uv1.y, daylight);
