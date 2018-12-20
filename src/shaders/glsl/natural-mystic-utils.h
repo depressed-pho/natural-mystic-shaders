@@ -88,8 +88,8 @@ vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight
          * Invariant: 0 <= flicker <= 1.0 (or Bad Things will happen)
          */
         float flicker =
-            ( sin(time * 11.0      ) * 0.3 + // fast wave
-              sin(time *  3.0 + 0.3) * 0.6   // slow wave
+            ( sin(time * 11.0      ) * 0.35 + // fast wave
+              sin(time *  3.0 + 0.3) * 0.7    // slow wave
             ) / 10.0;
         amount *= flicker + 1.0;
 
