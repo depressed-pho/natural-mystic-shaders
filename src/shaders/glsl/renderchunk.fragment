@@ -95,7 +95,7 @@ vec4 inColor = color;
 	float time = isnan(TIME) || isinf(TIME) ? 0.0 : TIME;
 
 	diffuse.rgb = applyAmbientLight(diffuse.rgb);
-#ifdef FOG
+#if defined(FOG)
 	/* we must reduce the amount of shadow in this case, as the
 	 * seafloor will get unacceptably dark otherwise. This is because
 	 * the terrain underwater is rendered with a fog. */
