@@ -44,6 +44,7 @@ AS_IF([test "x$UNZIP" = x],
 
 AC_CONFIG_FILES([
     Makefile
+    img/Makefile
     src/Makefile
     orig/Makefile
 ])

@@ -1,4 +1,4 @@
-SUBDIRS = src orig
+SUBDIRS = img src orig
 
 EXTRA_DIST = \
 	LICENSE \
