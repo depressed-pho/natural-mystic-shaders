@@ -10,7 +10,7 @@ Features include:
 
 * Shadow
 * Improved torch light with flickering effect
-* Sunlight and moonlight colors
+* Sunlight and moonlight colors with desaturation
 * Exposure adjustment, contrast filter, and tone mapping
 
 ## Supported platforms
