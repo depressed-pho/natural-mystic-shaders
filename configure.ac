@@ -15,8 +15,24 @@ m4_pattern_forbid([^AX_])
 AM_MAINTAINER_MODE
 AM_SILENT_RULES([yes])
 
+# Generate a configuration header. It's intended to be included by
+# shaders, not C sources.
+AC_CONFIG_HEADERS([src/shaders/glsl/natural-mystic-config.h])
+AH_TOP([#if !defined(NATURAL_MYSTIC_CONFIG_H_INCLUDED)
+#define NATURAL_MYSTIC_CONFIG_H_INCLUDED 1])
+AH_BOTTOM([#endif /* NATURAL_MYSTIC_CONFIG_H_INCLUDED */])
+
 # Checks for options.
 AX_MCPACK_INSTALLATION_DIRECTORY([resource])
+
+AC_ARG_ENABLE(
+    [torch-flicker],
+    [AS_HELP_STRING(
+         [--disable-torch-flicker],
+         [disable torch flickering effect])])
+AS_IF([test ! x"$enable_torch_flicker" = x"no"],
+      [AC_DEFINE([TORCH_FLICKER_ENABLED], [1],
+                 [Define to enable torch light flickering effect])])
 
 # Checks for programs.
 AC_ARG_VAR([SED], [The sed command @<:@autodetected@:>@])

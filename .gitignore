@@ -12,8 +12,10 @@ install-sh
 missing
 
 # Built files
+_build
 *.mcpack
 manifest.json
+natural-mystic-config.h*
 
 # Files that are intentionally uncommitted
 Build.rc.local

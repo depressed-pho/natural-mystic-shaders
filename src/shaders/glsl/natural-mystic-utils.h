@@ -1,4 +1,8 @@
 // -*- glsl -*-
+#if !defined(NATURAL_MYSTIC_UTILS_H_INCLUDED)
+#define NATURAL_MYSTIC_UTILS_H_INCLUDED 1
+
+#include "natural-mystic-config.h"
 
 /* Desaturate a color in linear RGB color space. The parameter
  * "degree" should be in [0,1] where 0 being no desaturation and 1
@@ -104,8 +108,9 @@ vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight
     float intensity = max(0.0, torchLevel - torchDecay) * baseIntensity;
     if (intensity > 0.0) {
         intensity *= mix(1.0, sunlightCutOff, smoothstep(0.65, 0.875, sunLevel * daylight));
+#if defined(TORCH_FLICKER_ENABLED)
         intensity *= torchLightFlicker(time) + 1.0;
-
+#endif
         return frag + torchColor * intensity;
     }
     else {
@@ -221,3 +226,5 @@ vec3 hdrExposure(vec3 frag, float overExposure, float underExposure) {
 
     return mix(overExposed, underExposed, normalExposed);
 }
+
+#endif /* NATURAL_MYSTIC_UTILS_H_INCLUDED */

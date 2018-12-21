@@ -3,6 +3,7 @@ MANIFEST_SRC = manifest.json.in
 MCPACK_INSTALLATION_DIRECTORY = $(MCPACK_INSTALLATION_DIRECTORY_resource)
 MCPACK_FILES = \
 	manifest.json \
+	shaders/glsl/natural-mystic-config.h \
 	shaders/glsl/natural-mystic-utils.h \
 	shaders/glsl/renderchunk.fragment \
 	shaders/glsl/renderchunk.vertex \
