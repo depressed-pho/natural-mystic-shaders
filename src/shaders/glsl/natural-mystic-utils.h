@@ -86,6 +86,7 @@ float torchLightFlicker(float time) {
      * number. See https://bugs.mojang.com/browse/MCPE-39749
      */
     flicker = clamp(flicker, -1.0, 1.0);
+    flicker = isnan(flicker) || isinf(flicker) ? 0.0 : flicker;
     return flicker;
 }
 
