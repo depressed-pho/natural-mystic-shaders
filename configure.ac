@@ -66,6 +66,11 @@ AC_CHECK_PROGS([UNZIP], [unzip])
 AS_IF([test "x$UNZIP" = x],
       [AC_MSG_ERROR([You need to install the Info-Zip unzip command.])])
 
+AC_ARG_VAR([INKSCAPE], [The inkscape command @<:@autodetected@:>@])
+AC_CHECK_PROGS([INKSCAPE], [inkscape])
+AS_IF([test x"$INKSCAPE" = x],
+      [AC_MSG_WARN([You need to install Inkscape, or you won't be able to regenerate the pack icon.])])
+
 # Checks for libraries.
 
 # Checks for header files.
