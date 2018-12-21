@@ -30,9 +30,25 @@ AC_ARG_ENABLE(
     [AS_HELP_STRING(
          [--disable-torch-flicker],
          [disable torch flickering effect])])
-AS_IF([test ! x"$enable_torch_flicker" = x"no"],
+AS_IF([test x"$enable_torch_flicker" != x"no"],
       [AC_DEFINE([TORCH_FLICKER_ENABLED], [1],
                  [Define to enable torch light flickering effect])])
+
+AC_ARG_WITH(
+    [tone-mapping],
+    [AS_HELP_STRING(
+         [--with-tone-mapping=@<:@u2|aces@:>@],
+         [use tone mapping method u2: Uncharted2, aces: ACES Filmic @<:@default: u2@:>@])])
+AH_TEMPLATE(
+    [TONE_MAPPING_METHOD],
+    [Define to either 1 or 2 to choose a tone mapping method, or undefine to disable it. "1" denotes Uncharted 2, and "2" denotes ACES Filmic.])
+AS_CASE(
+    [$with_tone_mapping],
+    ["no"],          [],
+    ["yes"|""|"u2"], [AC_DEFINE([TONE_MAPPING_METHOD], 1)],
+    ["aces"],        [AC_DEFINE([TONE_MAPPING_METHOD], 2)],
+    [AC_MSG_ERROR(
+         [Unknown tone mapping method `$with_tone_mapping'. See `configure --help' for available methods.])])
 
 # Checks for programs.
 AC_ARG_VAR([SED], [The sed command @<:@autodetected@:>@])

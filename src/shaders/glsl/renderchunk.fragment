@@ -29,6 +29,7 @@ varying vec4 fogColor;
 #include "uniformShaderConstants.h"
 #include "uniformPerFrameConstants.h"
 #include "util.h"
+#include "natural-mystic-config.h"
 #include "natural-mystic-utils.h"
 
 LAYOUT_BINDING(0) uniform sampler2D TEXTURE_0;
@@ -103,9 +104,14 @@ vec4 inColor = color;
 	diffuse.rgb = applySkylight(diffuse.rgb, uv1.y, daylight);
 	diffuse.rgb = applyMoonlight(diffuse.rgb, uv1.x, uv1.y, daylight);
 	diffuse.rgb = contrastFilter(diffuse.rgb, 1.05);
+#if defined(TONE_MAPPING_METHOD)
 	diffuse.rgb = hdrExposure(diffuse.rgb, 4.0, 3.0);
+#  if TONE_MAPPING_METHOD == 1
 	diffuse.rgb = uncharted2ToneMap(diffuse.rgb, 4.0);
-	//diffuse.rgb = acesFilmicToneMap(diffuse.rgb);
+#  elif TONE_MAPPING_METHOD == 2
+	diffuse.rgb = acesFilmicToneMap(diffuse.rgb);
+#  endif
+#endif /* TONE_MAPPING_METHOD */
 
 #ifdef FOG
 	diffuse.rgb = mix( diffuse.rgb, fogColor.rgb, fogColor.a );
