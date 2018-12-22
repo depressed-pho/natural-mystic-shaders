@@ -13,6 +13,10 @@ Features include:
 * Sunlight and moonlight colors with night time desaturation
 * Exposure adjustment, contrast filter, and tone mapping
 
+## Download
+
+See [releases](https://github.com/depressed-pho/natural-mystic-shaders/releases).
+
 ## Supported platforms
 
 * iOS
