@@ -1,7 +1,7 @@
 # Natural Mystic Shaders
 
-**Natural Mystic** is a shader pack for Minecraft Bedrock aiming to be
-as realistic as possible.
+**Natural Mystic Shaders** is a shader pack for Minecraft Bedrock
+aiming to be as realistic as possible.
 
 ![](./img/day.jpg)
 ![](./img/night.jpg)
@@ -9,7 +9,7 @@ as realistic as possible.
 Features include:
 
 * Shadow
-* Improved torch light with flickering effect
+* Improved torch light with flickering effect (unstable in 1.8 due to vanilla bug)
 * Sunlight and moonlight colors with night time desaturation
 * Exposure adjustment, contrast filter, and tone mapping
 
