@@ -2,6 +2,7 @@ SUBDIRS = img src orig
 
 EXTRA_DIST = \
 	LICENSE \
+	NEWS.md \
 	README.md
 
 AUTOMAKE_OPTIONS = foreign
