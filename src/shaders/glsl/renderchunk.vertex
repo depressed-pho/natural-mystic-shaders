@@ -26,6 +26,8 @@
 #include "uniformPerFrameConstants.h"
 #include "uniformShaderConstants.h"
 #include "uniformRenderChunkConstants.h"
+#include "natural-mystic-config.h"
+#include "natural-mystic-hacks.h"
 
 attribute POS4 POSITION;
 attribute vec4 COLOR;
@@ -59,6 +61,21 @@ void main()
     uv0 = TEXCOORD_0;
     uv1 = TEXCOORD_1;
 	color = COLOR;
+#endif
+
+	/* Waves */
+#if !defined(BYPASS_PIXEL_SHADER) && defined(WAVES_ENABLED)
+	if (isLeaf(color)) {
+		POS3 posw = worldPos.xyz;
+		float wave = sin(TIME * 3.5 + 2.0 * posw.x + 2.0 * posw.z + posw.y) * sin(posw.z);
+		gl_Position.x += wave * 0.02;
+	}
+	else if (isWater(color)) {
+		POS3 posw = worldPos.xyz;
+		float wave = sin(TIME * 5.0 + 2.0 * posw.x + 2.0 * posw.z + posw.y) * sin(posw.z);
+		gl_Position.x += wave * 0.02;
+		gl_Position.y += wave * 0.04;
+	}
 #endif
 
 ///// find distance from the camera

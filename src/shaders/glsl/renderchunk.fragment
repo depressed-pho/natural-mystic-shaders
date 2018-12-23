@@ -124,6 +124,10 @@ vec4 inColor = color;
 		fogColor.a);
 #endif
 
+#if defined(SHOW_MATERIAL_COLOR)
+	diffuse = color;
+#endif
+
 	gl_FragColor = diffuse;
 	
 #endif // BYPASS_PIXEL_SHADER

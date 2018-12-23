@@ -5,6 +5,7 @@ MCPACK_FILES = \
 	manifest.json \
 	pack_icon.png \
 	shaders/glsl/natural-mystic-config.h \
+	shaders/glsl/natural-mystic-hacks.h \
 	shaders/glsl/natural-mystic-utils.h \
 	shaders/glsl/renderchunk.fragment \
 	shaders/glsl/renderchunk.vertex \

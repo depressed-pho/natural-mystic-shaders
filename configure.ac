@@ -32,7 +32,16 @@ AC_ARG_ENABLE(
          [disable torch flickering effect])])
 AS_IF([test x"$enable_torch_flicker" != x"no"],
       [AC_DEFINE([TORCH_FLICKER_ENABLED], [1],
-                 [Define to enable torch light flickering effect])])
+                 [Define to enable torch light flickering effect.])])
+
+AC_ARG_ENABLE(
+    [waves],
+    [AS_HELP_STRING(
+         [--disable-waves],
+         [disable waves of water and leaves])])
+AS_IF([test x"$enable_waves" != x"no"],
+      [AC_DEFINE([WAVES_ENABLED], [1],
+                 [Define to enable waves of water and leaves.])])
 
 AC_ARG_WITH(
     [tone-mapping],
