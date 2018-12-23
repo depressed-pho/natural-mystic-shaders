@@ -11,6 +11,7 @@ Features include:
 * Shadow
 * Improved torch light with flickering effect (unstable in 1.8 due to vanilla bug)
 * Sunlight and moonlight colors with night time desaturation
+* Desaturation under a bad weather condition
 * Exposure adjustment, contrast filter, and tone mapping
 
 ## Download
