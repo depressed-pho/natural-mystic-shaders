@@ -174,6 +174,20 @@ vec3 applyMoonlight(vec3 frag, float torchLevel, float sunLevel, float daylight)
     }
 }
 
+/* Compute the fog color based on a base fog color, and a camera
+ * distance. The resulting color should be mixed with the light color
+ * using the alpha of the result. [Currently unused]
+ */
+vec4 computeFogColor(vec3 baseFog, float dist) {
+    // See: http://in2gpu.com/2014/07/22/create-fog-shader/
+    const float density = 0.01;
+
+    float fogFactor = 1.0 / exp(pow(dist * density, 2.0));
+    fogFactor = clamp(fogFactor, 0.0, 1.0);
+
+    return vec4(baseFog, 1.0 - fogFactor);
+}
+
 /* Apply Uncharted 2 tone mapping to the original fragment "frag".
  * See: http://filmicworlds.com/blog/filmic-tonemapping-operators/
  */
