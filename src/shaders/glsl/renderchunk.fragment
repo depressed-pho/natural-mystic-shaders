@@ -116,7 +116,12 @@ vec4 inColor = color;
 #endif /* TONE_MAPPING_METHOD */
 
 #ifdef FOG
-	diffuse.rgb = mix( diffuse.rgb, fogColor.rgb, fogColor.a );
+	// During a bad weather everything should look dull. We do a
+	// desaturation for that. (#6)
+	diffuse.rgb = mix(
+		desaturate(diffuse.rgb, min(1.0, fogColor.a * 1.1)),
+		fogColor.rgb,
+		fogColor.a);
 #endif
 
 	gl_FragColor = diffuse;
