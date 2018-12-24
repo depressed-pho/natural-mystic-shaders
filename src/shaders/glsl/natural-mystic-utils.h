@@ -157,7 +157,7 @@ vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight
     float intensity = max(0.0, torchLevel - torchDecay) * baseIntensity;
     if (intensity > 0.0) {
         intensity *= mix(1.0, sunlightCutOff, smoothstep(0.65, 0.875, sunLevel * daylight));
-#if defined(TORCH_FLICKER_ENABLED)
+#if defined(ENABLE_TORCH_FLICKER)
         intensity *= torchLightFlicker(time) + 1.0;
 #endif
         return frag + torchColor * intensity;

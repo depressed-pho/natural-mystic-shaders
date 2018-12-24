@@ -3,6 +3,7 @@
 
 #include "fragmentVersionSimple.h"
 #include "uniformPerFrameConstants.h"
+#include "natural-mystic-config.h"
 #include "natural-mystic-utils.h"
 
 varying vec4 skyColor;
@@ -28,6 +29,8 @@ float clouds(float time, vec3 pos) {
 }
 
 void main() {
+#if defined(ENABLE_FBM_CLOUDS)
+
     /* The color of clouds resembles that of the sky, but is more
      * close to that of the fog. This way we will have something like
      * a sunlight-reflected-by-clouds effect (but more
@@ -39,6 +42,10 @@ void main() {
 
     float density = clouds(TIME, worldPos);
     gl_FragColor = mix(skyColor, cloudColor, density);
+
+#else
+    gl_FragColor = skyColor;
+#endif /* ENABLE_FBM_CLOUDS */
 }
 
 // Local Variables:

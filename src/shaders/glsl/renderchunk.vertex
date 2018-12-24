@@ -64,7 +64,7 @@ void main()
 #endif
 
 	/* Waves */
-#if !defined(BYPASS_PIXEL_SHADER) && defined(WAVES_ENABLED)
+#if !defined(BYPASS_PIXEL_SHADER) && defined(ENABLE_WAVES)
 	const float pi = 3.14159;
 	if (isLeaf(color)) {
 		POS3 posw = worldPos.xyz;

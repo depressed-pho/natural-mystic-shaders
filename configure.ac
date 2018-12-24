@@ -31,7 +31,7 @@ AC_ARG_ENABLE(
          [--disable-torch-flicker],
          [disable torch flickering effect])])
 AS_IF([test x"$enable_torch_flicker" != x"no"],
-      [AC_DEFINE([TORCH_FLICKER_ENABLED], [1],
+      [AC_DEFINE([ENABLE_TORCH_FLICKER], [1],
                  [Define to enable torch light flickering effect.])])
 
 AC_ARG_ENABLE(
@@ -40,8 +40,17 @@ AC_ARG_ENABLE(
          [--disable-waves],
          [disable waves of water and leaves])])
 AS_IF([test x"$enable_waves" != x"no"],
-      [AC_DEFINE([WAVES_ENABLED], [1],
+      [AC_DEFINE([ENABLE_WAVES], [1],
                  [Define to enable waves of water and leaves.])])
+
+AC_ARG_ENABLE(
+    [fbm-clouds],
+    [AS_HELP_STRING(
+         [--disable-fbm-clouds],
+         [disable shader-generated clouds])])
+AS_IF([test x"$enable_fbm_clouds" != x"no"],
+      [AC_DEFINE([ENABLE_FBM_CLOUDS], [1],
+                 [Define to enable shader-generated clouds.])])
 
 AC_ARG_WITH(
     [tone-mapping],

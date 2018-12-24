@@ -6,6 +6,7 @@
 #include "uniformWorldConstants.h"
 #include "uniformPerFrameConstants.h"
 #include "uniformShaderConstants.h"
+#include "natural-mystic-config.h"
 
 attribute mediump vec4 POSITION;
 attribute vec4 COLOR;
@@ -23,9 +24,18 @@ void main()
 	POS4 worldPos = WORLD * POSITION;
  	gl_Position = pos;
 
-    /* We completely disable the vanilla clouds. It's impossible to
-     * improve it. Instead we render clouds with sky shaders. */
-    color.a = 0.0;
+#if defined(ENABLE_FBM_CLOUDS)
+	/* We completely disable the vanilla clouds. It's impossible to
+	 * improve it. Instead we render clouds with sky shaders. */
+	color = vec4(0.0);
+#else
+	color = COLOR * CURRENT_COLOR;
+
+ 	float depth = length(worldPos.xyz) / RENDER_DISTANCE;
+ 	float fog = max(depth - fogNear, 0.0);
+
+ 	color.a *= 1.0 - fog;
+#endif
 }
 
 // Local Variables:
