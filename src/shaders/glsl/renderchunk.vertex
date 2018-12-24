@@ -65,14 +65,15 @@ void main()
 
 	/* Waves */
 #if !defined(BYPASS_PIXEL_SHADER) && defined(WAVES_ENABLED)
+	const float pi = 3.14159;
 	if (isLeaf(color)) {
 		POS3 posw = worldPos.xyz;
-		float wave = sin(TIME * 3.5 + 2.0 * posw.x + 2.0 * posw.z + posw.y) * sin(posw.z);
+		float wave = sin(mod(TIME * 3.5 + 2.0 * posw.x + 2.0 * posw.z + posw.y, 2.0 * pi)) * sin(posw.z);
 		gl_Position.x += wave * 0.02;
 	}
 	else if (isWater(color)) {
 		POS3 posw = worldPos.xyz;
-		float wave = sin(TIME * 5.0 + 2.0 * posw.x + 2.0 * posw.z + posw.y) * sin(posw.z);
+		float wave = sin(mod(TIME * 5.0 + 2.0 * posw.x + 2.0 * posw.z + posw.y, 2.0 * pi)) * sin(posw.z);
 		gl_Position.x += wave * 0.02;
 		gl_Position.y += wave * 0.04;
 	}

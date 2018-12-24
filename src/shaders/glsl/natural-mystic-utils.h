@@ -17,8 +17,9 @@ vec3 desaturate(vec3 color, float degree) {
  * https://thebookofshaders.com/13/
  */
 float random(vec2 st) {
+    const float pi = 3.14159;
     return fract(
-        sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+        sin(mod(dot(st.xy, vec2(12.9898,78.233)), 2.0 * pi)) * 43758.5453123);
 }
 
 /* Generate a perlin noise based on some 2D vector. Based on Morgan
@@ -123,9 +124,10 @@ float torchLightFlicker(float time) {
      *
      * Invariant: -1 <= flicker <= 1 (or Bad Things will happen)
      */
+    const float pi = 3.14159;
     float flicker =
-        ( sin(time * 11.0      ) * 0.35 + // fast wave
-          sin(time *  3.0 + 0.3) * 0.7    // slow wave
+        ( sin(mod(time * 11.0      , 2.0 * pi)) * 0.35 + // fast wave
+          sin(mod(time *  3.0 + 0.3, 2.0 * pi)) * 0.7    // slow wave
         ) / 10.0;
 
     /* Workaround for MCPE-39749: the uniform TIME might not be a

@@ -13,7 +13,7 @@ varying float cameraDist;
 float clouds(vec3 pos) {
     const vec2 resolution = vec2(0.8, 0.8);
     const int octaves = 6;
-    const float speed = 0.01;
+    const float speed = 0.005;
 
     vec2 st = pos.xz / resolution;
     st.x *= resolution.x / resolution.y;
@@ -33,16 +33,12 @@ void main() {
      * close to that of the fog. This way we will have something like
      * a sunlight-reflected-by-clouds effect (but more
      * lightgray-ish). */
+    float brightness = clamp(desaturate(FOG_COLOR.rgb, 1.0).r + 0.1, 0.0, 1.0);
     vec4 cloudColor = mix(skyColor, FOG_COLOR, 0.8);
-    cloudColor = mix(cloudColor, vec4(1.0), 0.4);
+    cloudColor     = mix(cloudColor, vec4(1.0), brightness);
     cloudColor.rgb = desaturate(cloudColor.rgb, 0.4);
 
-    vec4 result = mix(
-        skyColor,
-        cloudColor,
-        clamp(clouds(worldPos), 0.0, 1.0));
-
-    gl_FragColor = result;
+    gl_FragColor = mix(skyColor, cloudColor, clouds(worldPos));
 }
 
 // Local Variables:
