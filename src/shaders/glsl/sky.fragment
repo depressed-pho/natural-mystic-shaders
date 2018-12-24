@@ -8,6 +8,7 @@
 
 varying vec4 skyColor;
 varying vec3 worldPos;
+varying float camDist;
 
 /* Generate a pattern of clouds based on a world position. */
 float clouds(float time, vec3 pos) {
@@ -40,7 +41,12 @@ void main() {
     cloudColor       = mix(cloudColor, vec4(1.0), brightness);
     cloudColor.rgb   = desaturate(cloudColor.rgb, 0.4);
 
+    /* Clouds near the horizon should be blended back to the sky
+     * color, or otherwise the planar nature of the sky plane will be
+     * even more apparent. */
     float density = clouds(TIME, worldPos);
+    density = mix(density, 0.0, smoothstep(0.9, 1.0, camDist));
+
     gl_FragColor = mix(skyColor, cloudColor, density);
 
 #else

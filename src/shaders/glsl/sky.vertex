@@ -12,6 +12,7 @@ attribute vec4 COLOR;
 
 varying vec4 skyColor;
 varying vec3 worldPos;
+varying float camDist;
 
 const float fogNear = 0.3;
 
@@ -21,6 +22,7 @@ void main()
 
     skyColor = mix( CURRENT_COLOR, FOG_COLOR, COLOR.r );
     worldPos = POSITION.xyz;
+    camDist = length(worldPos);
 }
 
 // Local Variables:
