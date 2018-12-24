@@ -19,7 +19,7 @@ vec3 desaturate(vec3 color, float degree) {
 float random(vec2 st) {
     const float pi = 3.14159;
     return fract(
-        sin(mod(dot(st.xy, vec2(12.9898,78.233)), 2.0 * pi)) * 43758.5453123);
+        sin(mod(dot(st.xy, vec2(12.9898, 78.233)), 2.0 * pi)) * 43758.5453123);
 }
 
 /* Generate a perlin noise based on some 2D vector. Based on Morgan
