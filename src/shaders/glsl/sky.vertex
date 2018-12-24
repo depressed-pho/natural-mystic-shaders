@@ -1,0 +1,31 @@
+// __multiversion__
+// This signals the loading code to prepend either #version 100 or #version 300 es as apropriate.
+
+#include "vertexVersionSimple.h"
+
+#include "uniformWorldConstants.h"
+#include "uniformPerFrameConstants.h"
+#include "uniformShaderConstants.h"
+
+attribute mediump vec4 POSITION;
+attribute vec4 COLOR;
+
+varying vec4 skyColor;
+varying vec3 worldPos;
+varying float cameraDist;
+
+const float fogNear = 0.3;
+
+void main()
+{
+    gl_Position = WORLDVIEWPROJ * POSITION;
+
+    skyColor = mix( CURRENT_COLOR, FOG_COLOR, COLOR.r );
+    worldPos = POSITION.xyz;
+    cameraDist = length(worldPos);
+}
+
+// Local Variables:
+// mode: glsl
+// indent-tabs-mode: nil
+// End:
