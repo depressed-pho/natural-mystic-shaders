@@ -16,26 +16,26 @@ vec3 desaturate(vec3 color, float degree) {
 /* Generate a random scalar based on some 2D vector. See
  * https://thebookofshaders.com/13/
  */
-float random(vec2 st) {
-    const float pi = 3.14159;
+highp float random(highp vec2 st) {
+    st += 128.0; // The function has a bad characteristic near (0, 0).
     return fract(
-        sin(mod(dot(st.xy, vec2(12.9898, 78.233)), 2.0 * pi)) * 43758.5453123);
+        sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
 /* Generate a perlin noise based on some 2D vector. Based on Morgan
  * McGuire @morgan3d https://www.shadertoy.com/view/4dS3Wd
  */
-float perlinNoise(vec2 st) {
-    vec2 i = floor(st);
-    vec2 f = fract(st);
+highp float perlinNoise(highp vec2 st) {
+    highp vec2 i = floor(st);
+    highp vec2 f = fract(st);
 
-    // Four corners in 2D of a tile
-    float a = random(i);
-    float b = random(i + vec2(1.0, 0.0));
-    float c = random(i + vec2(0.0, 1.0));
-    float d = random(i + vec2(1.0, 1.0));
+    // Four corners in 2D of a tile.
+    highp float a = random(i);
+    highp float b = random(i + vec2(1.0, 0.0));
+    highp float c = random(i + vec2(0.0, 1.0));
+    highp float d = random(i + vec2(1.0, 1.0));
 
-    vec2 u = f * f * (3.0 - 2.0 * f);
+    highp vec2 u = f * f * (3.0 - 2.0 * f);
 
     return mix(a, b, u.x) +
         (c - a)* u.y * (1.0 - u.x) +
@@ -45,11 +45,10 @@ float perlinNoise(vec2 st) {
 /* Generate an fBM noise based on some 2D vector. See
  * https://thebookofshaders.com/13/
  */
-float fBM(int octaves, vec2 st) {
+highp float fBM(int octaves, highp vec2 st) {
     // Initial values
-    float value = 0.0;
-    float amplitude = 0.5;
-    float frequency = 0.0;
+    highp float value = 0.0;
+    highp float amplitude = 0.5;
 
     // Loop of octaves
     for (int i = 0; i < octaves; i++) {
@@ -117,17 +116,16 @@ vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight, fl
 /* Calculate the torch light flickering factor based on the in-game
  * time.
  */
-float torchLightFlicker(float time) {
+float torchLightFlicker(highp float time) {
     /* The flicker is the sum of several sine waves with varying
      * frequently, phase, and amplitude. The reason for the final
      * "/ 10.0" is to avoid underflows.
      *
      * Invariant: -1 <= flicker <= 1 (or Bad Things will happen)
      */
-    const float pi = 3.14159;
-    float flicker =
-        ( sin(mod(time * 11.0      , 2.0 * pi)) * 0.35 + // fast wave
-          sin(mod(time *  3.0 + 0.3, 2.0 * pi)) * 0.7    // slow wave
+    highp float flicker =
+        ( sin(time * 11.0      ) * 0.35 + // fast wave
+          sin(time *  3.0 + 0.3) * 0.7    // slow wave
         ) / 10.0;
 
     /* Workaround for MCPE-39749: the uniform TIME might not be a
@@ -145,7 +143,7 @@ float torchLightFlicker(float time) {
  * level. The "time" is the in-game time, used for the flickering
  * effect.
  */
-vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight, float time) {
+vec3 applyTorchColor(vec3 frag, float torchLevel, float sunLevel, float daylight, highp float time) {
     const vec3 torchColor = vec3(0.8, 0.3, -0.2);
     const float torchDecay = 0.55; // [0, 1]
     const float baseIntensity = 1.0; // [0, 1]

@@ -3,4 +3,5 @@ EXTRA_DIST = \
 	shaders/glsl/cloud.vertex \
 	shaders/glsl/renderchunk.fragment \
 	shaders/glsl/renderchunk.vertex \
-	shaders/glsl/sky.vertex
+	shaders/glsl/sky.vertex \
+	shaders/glsl/uniformPerFrameConstants.h

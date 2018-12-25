@@ -11,16 +11,26 @@ varying vec3 worldPos;
 varying float camDist;
 
 /* Generate a pattern of clouds based on a world position. */
-float clouds(float time, vec3 pos) {
-    const vec2 resolution = vec2(0.8, 0.8);
-    const int octaves = 8;
-    const float speed = 0.001;
+highp float clouds(highp float time, highp vec3 pos) {
+    /* Use of highp is essential here, as the uniform TIME in mediump
+     * starts to lose precision within 10 minutes.
+     */
+    const highp vec2 resolution = vec2(0.8, 0.8);
+    const int octaves = 6;
 
-    vec2 st = pos.xz / resolution;
+    highp vec2 st = pos.xz / resolution;
     st.x *= resolution.x / resolution.y;
-    st.y += time * speed;
+    /* The inverse of the speed (512) should be a power of two in
+     * order to avoid a precision loss.
+     */
+    st.y += time / 512.0;
 
-    float result = clamp(fBM(octaves, st * 3.0), 0.0, 1.0);
+    /* We intentionally throw away some
+     * of the precision so we get somewhat sparse noise.
+     */
+    highp float result = fBM(octaves, st * 3.0);
+    result = smoothstep(0.5, 1.0, result) * 4.0;
+    result = clamp(result, 0.0, 1.0);
 
     /* Workaround for MCPE-39749: the uniform TIME might not be a
      * number. See https://bugs.mojang.com/browse/MCPE-39749
@@ -44,7 +54,7 @@ void main() {
     /* Clouds near the horizon should be blended back to the sky
      * color, or otherwise the planar nature of the sky plane will be
      * even more apparent. */
-    float density = clouds(TIME, worldPos);
+    highp float density = clouds(TIME, worldPos);
     density = mix(density, 0.0, smoothstep(0.9, 1.0, camDist));
 
     gl_FragColor = mix(skyColor, cloudColor, density);

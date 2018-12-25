@@ -11,7 +11,7 @@ bool isLeaf(vec4 color) {
 /* Detect water based on the color of material. */
 bool isWater(vec4 color) {
     vec4 norm = normalize(color);
-    return norm.b >= 0.65 && norm.b <= 0.9;
+    return norm.b >= 0.60 && norm.b <= 0.9;
 }
 
 #endif /* NATURAL_MYSTIC_HACKS_H_INCLUDED */
