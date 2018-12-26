@@ -114,12 +114,16 @@ vec3 applyShadow(vec3 frag, float torchLevel, float sunLevel, float daylight, fl
     const vec3 shadowColor = vec3(0.0);
     const float minShadow = 0.0;  // [0, 1]
     const float maxShadow = 0.45; // [0, 1]
+    const float blur = 0.003; // The higher the more blur.
     const float torchLightCutOff = 0.1; // [0, 1]
 
     /* The less the sunlight level is, the darker the fragment will
      * be. */
     float density = mix(maxShadow, minShadow,
-                        smoothstep(0.865, 0.875, sunLevel));
+                        smoothstep(
+                            0.870 - blur,
+                            0.870 + blur,
+                            sunLevel));
 
     if (density > 0.0) {
         /* The existence of torch light should negate the effect of
