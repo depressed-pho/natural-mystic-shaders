@@ -13,21 +13,23 @@ vec3 desaturate(vec3 color, float degree) {
     return mix(color, vec3(luma), degree);
 }
 
-/* Convert linear RGB to HSV. */
+/* Convert linear RGB to HSV. The x component of the result will be
+ * the hue, y will be the saturation, and z will be the value. It does
+ * not change the alpha. */
 vec4 rgb2hsv(vec4 rgb) {
-    float rgbMax = max(rgb.r, max(rgb.g, rgb.b));
-    float rgbMin = min(rgb.r, min(rgb.g, rgb.b));
-    float h      = 0.0;
-    float s      = 0.0;
-    float v      = rgbMax;
-    float delta  = rgbMax - rgbMin;
+    highp float rgbMax = max(rgb.r, max(rgb.g, rgb.b));
+    highp float rgbMin = min(rgb.r, min(rgb.g, rgb.b));
+    highp float h      = 0.0;
+    highp float s      = 0.0;
+    highp float v      = rgbMax;
+    highp float delta  = rgbMax - rgbMin;
 
     if (delta != 0.0) {
         if (rgbMax == rgb.r) {
             // Between yellow and magenta.
             h = (rgb.g - rgb.b) / delta;
         }
-        else if (rgbMax == rgb.b) {
+        else if (rgbMax == rgb.g) {
             // Between cyan and yellow;
             h = 2.0 + (rgb.b - rgb.r) / delta;
         }

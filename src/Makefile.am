@@ -19,10 +19,9 @@ MCPACK_FILES = \
 EXTRA_DIST = \
 	natural-mystic-logo.svg
 
-pack_icon.png: Makefile natural-mystic-logo.svg
+pack_icon.png: natural-mystic-logo.svg
 	$(AM_V_GEN)
-	$(AM_V_at)$(INKSCAPE) --export-png="$@" --export-width=128 --export-height=128 \
-		"$(srcdir)/natural-mystic-logo.svg"
+	$(AM_V_at)$(INKSCAPE) --export-png="$@" --export-width=128 --export-height=128 "$<"
 
 CLEANFILES=
 noinst_DATA=
