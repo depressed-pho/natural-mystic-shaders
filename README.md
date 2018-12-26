@@ -20,6 +20,10 @@ Features include:
 
 See [releases](https://github.com/depressed-pho/natural-mystic-shaders/releases).
 
+## Release notes
+
+See [NEWS](NEWS.md).
+
 ## Supported platforms
 
 * iOS
