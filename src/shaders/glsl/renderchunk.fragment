@@ -124,6 +124,7 @@ vec4 inColor = color;
 		fogColor.a);
 #endif
 
+//#define SHOW_MATERIAL_COLOR 1
 #if defined(SHOW_MATERIAL_COLOR)
 	diffuse = color;
 #endif

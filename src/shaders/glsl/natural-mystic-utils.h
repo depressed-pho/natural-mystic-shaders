@@ -13,6 +13,39 @@ vec3 desaturate(vec3 color, float degree) {
     return mix(color, vec3(luma), degree);
 }
 
+/* Convert linear RGB to HSV. */
+vec4 rgb2hsv(vec4 rgb) {
+    float rgbMax = max(rgb.r, max(rgb.g, rgb.b));
+    float rgbMin = min(rgb.r, min(rgb.g, rgb.b));
+    float h      = 0.0;
+    float s      = 0.0;
+    float v      = rgbMax;
+    float delta  = rgbMax - rgbMin;
+
+    if (delta != 0.0) {
+        if (rgbMax == rgb.r) {
+            // Between yellow and magenta.
+            h = (rgb.g - rgb.b) / delta;
+        }
+        else if (rgbMax == rgb.b) {
+            // Between cyan and yellow;
+            h = 2.0 + (rgb.b - rgb.r) / delta;
+        }
+        else {
+            // Between magenta and syan.
+            h = 4.0 + (rgb.r - rgb.g) / delta;
+        }
+    }
+    h *= 60.0; // degree
+    h  = h < 0.0 ? h + 360.0 : h;
+
+    if (rgbMax != 0.0) {
+        s = delta / rgbMax;
+    }
+
+    return vec4(h, s, v, rgb.a);
+}
+
 /* Generate a random scalar based on some 2D vector. See
  * https://thebookofshaders.com/13/
  */

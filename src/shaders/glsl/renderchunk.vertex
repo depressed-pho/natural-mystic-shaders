@@ -71,9 +71,15 @@ void main()
 		gl_Position.x += wave * 0.015;
 	}
 	else if (isWater(color)) {
+		/* We want water to swell in proportion to its volume. The
+		 * more the vertex is close to the ground (i.e. integral
+		 * points in the world position), the less the vertex should
+		 * swell. Without this tweak the water will leave the ground a
+		 * bit.
+		 */
 		POS3 posw = worldPos.xyz;
 		highp float wave = sin(TIME * 5.0 + 2.0 * posw.x + 2.0 * posw.z + posw.y);
-		gl_Position.y += wave * 0.04;
+		gl_Position.y += wave * 0.04 * fract(POSITION.y);
 	}
 #endif
 
