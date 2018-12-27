@@ -90,7 +90,15 @@ vec4 inColor = color;
 	 * night) from the light map passed by the upstream. */
 	float daylight = min(1.0, (texture2D(TEXTURE_1, vec2(0.0, 1.0)).r - 0.5) / 0.5);
 
-	diffuse.rgb = applyAmbientLight(diffuse.rgb);
+	/* Calculate the color of the ambient light based on the fog
+	 * color. We'll use it at several places. */
+#if defined(FOG)
+	vec3 ambient = mix(vec3(1.0), ambientColor(fogColor.rgb), fogColor.a);
+#else
+	const vec3 ambient = vec3(1.0);
+#endif
+
+	diffuse.rgb = applyAmbientLight(diffuse.rgb, ambient);
 #if defined(FOG)
 	/* We must reduce the amount of shadow in this case, as the
 	 * seafloor will get unacceptably dark otherwise. This is because
@@ -119,13 +127,13 @@ vec4 inColor = color;
 	 * changes the fog color and breaks "render distance fog". */
 #ifdef FOG
 	/* During a bad weather everything should look dull. We do a
-	 * desaturation for that (#6). The reason for the outer mix() is
-	 * so fogs not only reduce saturation but also contrast.
+	 * desaturation for that (#6). The reason for the mix() is so fogs
+	 * not only reduce saturation but also contrast. Note that we must
+	 * not desaturate it too much, as the horizon in the ocean starts
+	 * to look bad.
 	 */
-	float fogDesat = fogColor.a * 1.1;
-	vec3 ambient   = mix(vec3(1.0), ambientColor(fogColor.rgb), fogColor.a);
 	diffuse.rgb = mix(
-		desaturate(diffuse.rgb, fogDesat) * ambient,
+		desaturate(diffuse.rgb, fogColor.a) * ambient,
 		fogColor.rgb,
 		fogColor.a);
 #endif

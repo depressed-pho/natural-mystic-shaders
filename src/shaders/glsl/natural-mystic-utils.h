@@ -111,12 +111,12 @@ highp float fBM(int octaves, highp vec2 st) {
  * this filter, objects getting no light will be rendered in complete
  * darkness, which isn't how the reality works.
  */
-vec3 applyAmbientLight(vec3 frag) {
-    // Objects that are already bright should not be affected, hence
-    // the "0.5 -".
-    // FIXME: I don't think that's how the reality works.
-    vec3 level = max(vec3(0.1), 0.5 - frag) * 1.2 + 1.0;
-    return frag * level;
+vec3 applyAmbientLight(vec3 frag, vec3 ambient) {
+    /* Objects that are already bright should not be affected, hence
+     * the "0.4 -".
+     */
+    vec3 intensity = max(vec3(0.1), 0.4 - frag) * 1.5;
+    return frag + intensity * frag * ambient;
 }
 
 /* Calculate and apply a shadow on the original fragment "frag". The
@@ -275,7 +275,8 @@ vec3 applyMoonlight(vec3 frag, float torchLevel, float sunLevel, float daylight)
 
 /* Compute the fog color based on a base fog color, and a camera
  * distance. The resulting color should be mixed with the light color
- * using the alpha of the result. [Currently unused]
+ * using the alpha of the result. This function produces better fogs
+ * than those of vanilla (#12). [Currently unused]
  */
 vec4 computeFogColor(vec3 baseFog, float dist) {
     // See: http://in2gpu.com/2014/07/22/create-fog-shader/
@@ -324,7 +325,8 @@ vec3 acesFilmicToneMap(vec3 x) {
     return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
 }
 
-/* Apply a contrast filter to the original fragment "frag".
+/* Apply a contrast filter to the original fragment "frag". The
+ * contrast must be a non-negative number.
  */
 vec3 contrastFilter(vec3 frag, float contrast) {
     return (frag - 0.5) * max(contrast, 0.0) + 0.5;
