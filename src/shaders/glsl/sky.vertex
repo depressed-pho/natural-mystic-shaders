@@ -6,11 +6,13 @@
 #include "uniformWorldConstants.h"
 #include "uniformPerFrameConstants.h"
 #include "uniformShaderConstants.h"
+#include "natural-mystic-utils.h"
 
 attribute mediump vec4 POSITION;
 attribute vec4 COLOR;
 
 varying vec4 skyColor;
+varying vec4 cloudColor;
 varying vec3 worldPos;
 varying float camDist;
 
@@ -23,6 +25,15 @@ void main()
     skyColor = mix( CURRENT_COLOR, FOG_COLOR, COLOR.r );
     worldPos = POSITION.xyz;
     camDist = length(worldPos);
+
+    /* The color of clouds resembles that of the sky, but is more
+     * close to that of the fog. This way we will have something like
+     * a sunlight-reflected-by-clouds effect (but more
+     * lightgray-ish). */
+    float brightness = clamp(desaturate(FOG_COLOR.rgb, 1.0).r + 0.05, 0.0, 1.0);
+    cloudColor     = mix(skyColor, FOG_COLOR, 0.8);
+    cloudColor     = mix(cloudColor, vec4(1.0), brightness);
+    cloudColor.rgb = desaturate(cloudColor.rgb, 0.4);
 }
 
 // Local Variables:

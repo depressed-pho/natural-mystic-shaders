@@ -5,6 +5,7 @@
 Bugfixes:
 
 * Lava pools in the Nether no longer look strangely whitish. (#30)
+* Performance improvement for clouds.
 
 ## 1.1.0
 

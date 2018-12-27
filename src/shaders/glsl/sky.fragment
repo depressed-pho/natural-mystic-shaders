@@ -7,6 +7,7 @@
 #include "natural-mystic-utils.h"
 
 varying vec4 skyColor;
+varying vec4 cloudColor;
 varying vec3 worldPos;
 varying float camDist;
 
@@ -41,15 +42,6 @@ highp float clouds(highp float time, highp vec3 pos) {
 
 void main() {
 #if defined(ENABLE_FBM_CLOUDS)
-
-    /* The color of clouds resembles that of the sky, but is more
-     * close to that of the fog. This way we will have something like
-     * a sunlight-reflected-by-clouds effect (but more
-     * lightgray-ish). */
-    float brightness = clamp(desaturate(FOG_COLOR.rgb, 1.0).r + 0.05, 0.0, 1.0);
-    vec4 cloudColor  = mix(skyColor, FOG_COLOR, 0.8);
-    cloudColor       = mix(cloudColor, vec4(1.0), brightness);
-    cloudColor.rgb   = desaturate(cloudColor.rgb, 0.4);
 
     /* Clouds near the horizon should be blended back to the sky
      * color, or otherwise the planar nature of the sky plane will be

@@ -115,10 +115,13 @@ vec4 inColor = color;
 #  endif
 #endif /* TONE_MAPPING_METHOD */
 
+	/* We can't apply fogs before doing tone mapping, because that
+	 * changes the fog color and breaks "render distance fog". */
 #ifdef FOG
-	// During a bad weather everything should look dull. We do a
-	// desaturation for that (#6). The reason for the outer mix() is
-	// so fogs not only reduce saturation but also contrast.
+	/* During a bad weather everything should look dull. We do a
+	 * desaturation for that (#6). The reason for the outer mix() is
+	 * so fogs not only reduce saturation but also contrast.
+	 */
 	float fogDesat = fogColor.a * 1.1;
 	vec3 ambient   = mix(vec3(1.0), ambientColor(fogColor.rgb), fogColor.a);
 	diffuse.rgb = mix(
