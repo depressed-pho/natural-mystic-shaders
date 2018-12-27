@@ -1,5 +1,11 @@
 # Release notes
 
+## 1.1.1
+
+Bugfixes:
+
+* Lava pools in the Nether no longer look strangely whitish. (#30)
+
 ## 1.1.0
 
 Enhancements:

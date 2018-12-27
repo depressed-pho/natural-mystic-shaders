@@ -6,11 +6,24 @@
 
 /* Desaturate a color in linear RGB color space. The parameter
  * "degree" should be in [0,1] where 0 being no desaturation and 1
- * being full desaturation (completely gray).
+ * being full desaturation (completely gray). Note that the result of
+ * the function is usually to be multiplied by the color of the
+ * ambient light, or otherwise a violation of the law of conservation
+ * of energy will happen (#30).
  */
-vec3 desaturate(vec3 color, float degree) {
-    float luma = dot(color, vec3(0.22, 0.707, 0.071));
-    return mix(color, vec3(luma), degree);
+vec3 desaturate(vec3 baseColor, float degree) {
+    float luma = dot(baseColor, vec3(0.22, 0.707, 0.071));
+    return mix(baseColor, vec3(luma), degree);
+}
+
+/* Calculate the color of the ambient light based on some color,
+ * usually the fog color, by normalizing the RGB components so at
+ * least one component becomes 1.0.
+ */
+vec3 ambientColor(vec3 baseColor) {
+    float rgbMax = max(baseColor.r, max(baseColor.g, baseColor.b));
+    float delta  = 1.0 - rgbMax;
+    return baseColor + delta;
 }
 
 /* Convert linear RGB to HSV. The x component of the result will be
@@ -101,6 +114,7 @@ highp float fBM(int octaves, highp vec2 st) {
 vec3 applyAmbientLight(vec3 frag) {
     // Objects that are already bright should not be affected, hence
     // the "0.5 -".
+    // FIXME: I don't think that's how the reality works.
     vec3 level = max(vec3(0.1), 0.5 - frag) * 1.2 + 1.0;
     return frag * level;
 }

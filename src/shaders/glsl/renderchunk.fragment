@@ -117,9 +117,12 @@ vec4 inColor = color;
 
 #ifdef FOG
 	// During a bad weather everything should look dull. We do a
-	// desaturation for that. (#6)
+	// desaturation for that (#6). The reason for the outer mix() is
+	// so fogs not only reduce saturation but also contrast.
+	float fogDesat = fogColor.a * 1.1;
+	vec3 ambient   = mix(vec3(1.0), ambientColor(fogColor.rgb), fogColor.a);
 	diffuse.rgb = mix(
-		desaturate(diffuse.rgb, min(1.0, fogColor.a * 1.1)),
+		desaturate(diffuse.rgb, fogDesat) * ambient,
 		fogColor.rgb,
 		fogColor.a);
 #endif
