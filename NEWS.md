@@ -1,6 +1,10 @@
 # Release notes
 
-## 1.1.1
+## 1.2.0
+
+Enhancements:
+
+* Added fake specular light for water and improved its wave. (#10)
 
 Bugfixes:
 

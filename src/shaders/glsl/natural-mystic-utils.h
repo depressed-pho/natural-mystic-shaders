@@ -70,7 +70,7 @@ highp float random(highp vec2 st) {
         sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-/* Generate a perlin noise based on some 2D vector. Based on Morgan
+/* Generate a 2D perlin noise based on some 2D vector. Based on Morgan
  * McGuire @morgan3d https://www.shadertoy.com/view/4dS3Wd
  */
 highp float perlinNoise(highp vec2 st) {
@@ -86,7 +86,7 @@ highp float perlinNoise(highp vec2 st) {
     highp vec2 u = f * f * (3.0 - 2.0 * f);
 
     return mix(a, b, u.x) +
-        (c - a)* u.y * (1.0 - u.x) +
+        (c - a) * u.y * (1.0 - u.x) +
         (d - b) * u.x * u.y;
 }
 

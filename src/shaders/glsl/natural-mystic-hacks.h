@@ -31,4 +31,10 @@ bool isWater(vec4 color) {
     return hsv.x >= 149.0 && hsv.x <= 270.0;
 }
 
+/* Detect a water plane based on the world position of a vertex. */
+bool isWaterPlane(highp vec4 wPos) {
+    highp float y = fract(wPos.y);
+    return y >= 0.7 && y <= 0.9;
+}
+
 #endif /* NATURAL_MYSTIC_HACKS_H_INCLUDED */

@@ -39,6 +39,48 @@ const float rB = 1.0;
 const vec3 UNIT_Y = vec3(0,1,0);
 const float DIST_DESATURATION = 56.0 / 255.0; //WARNING this value is also hardcoded in the water color, don'tchange
 
+highp float waterWave(highp vec3 wPos, highp float time) {
+	highp vec2 resolution = vec2(7.0, 1.6);
+	highp vec2 st = wPos.xz / resolution;
+	st.x -= time / 10.0;
+	st.y += time / 2.0;
+
+	highp float wave1  = perlinNoise(st) * 2.0 - 1.0;
+	highp float wave2  = sin(wave1 + 0.1) * 0.5;
+	highp float interp = sin(TIME * 5.0 + wPos.x + 2.0 * wPos.z + wPos.y);
+
+	return mix(wave1, wave2, interp);
+}
+
+vec4 waterColor(vec4 baseColor, highp vec3 relPos, highp float wave) {
+	/* We want to know the angle between the normal of the water plane
+	 * (or anything rendered similarly to water) and the camera. Note
+	 * that we assume the surface normal is always (0, 1, 0) and the
+	 * assumption can be wrong! When in doubt never use this
+	 * function. */
+	const highp vec3 surfNorm = vec3(0.0, 1.0, 0.0);
+	highp float cosTheta = abs(dot(surfNorm, normalize(-relPos))); // [0, 1]
+
+	/* Use the angle to calculate the color of surface. The more steep
+	 * the angle is, the less intensity of the supecular light will
+	 * be. And we also use the angle to determine the opacity, that
+	 * is, when the angle is wide the water plane behaves more like a
+	 * mirror than air.
+	 */
+	float opacity   = baseColor.a;
+	float lightness = 1.0 - baseColor.a;
+	vec4 surfColor  = vec4(baseColor.rgb, min(1.0, baseColor.a * 8.0));
+	vec4 nearColor  = vec4(baseColor.rgb * lightness, opacity);
+
+	/* Simulate the specular light. THINKME: Do a proper normal
+	 * mapping, possibly by calculating the derivation of the wave
+	 * function. Dunno if it's worth it tho. */
+	surfColor.rgb = max(surfColor.rgb, min(vec3(1.0), surfColor.rgb + wave * 0.2));
+	nearColor.rgb = max(nearColor.rgb, min(vec3(1.0), nearColor.rgb + wave * 0.02));
+
+	return mix(surfColor, nearColor, cosTheta);
+}
+
 void main()
 {
     POS4 worldPos;
@@ -63,6 +105,17 @@ void main()
 	color = COLOR;
 #endif
 
+///// find distance from the camera
+
+#if defined(FOG) || defined(BLEND) || defined(FANCY)
+	#ifdef FANCY
+		vec3 relPos = -worldPos.xyz;
+		float cameraDepth = length(relPos);
+	#else
+		float cameraDepth = pos.z;
+	#endif
+#endif
+
 	/* Waves */
 #if !defined(BYPASS_PIXEL_SHADER) && defined(ENABLE_WAVES)
 	if (isLeaf(color)) {
@@ -71,27 +124,28 @@ void main()
 		gl_Position.x += wave * 0.015;
 	}
 	else if (isWater(color)) {
-		/* We want water to swell in proportion to its volume. The
-		 * more the vertex is close to the ground (i.e. integral
-		 * points in the world position), the less the vertex should
-		 * swell. Without this tweak the water will leave the ground a
-		 * bit.
-		 */
 		POS3 posw = worldPos.xyz;
-		highp float wave = sin(TIME * 5.0 + 2.0 * posw.x + 2.0 * posw.z + posw.y);
-		gl_Position.y += wave * 0.04 * fract(POSITION.y);
+
+		/* We want water to swell in proportion to its volume. The more
+		 * the vertex is close to the ground (i.e. integral points in the
+		 * world position), the less the vertex should swell. Without this
+		 * tweak the water will leave the ground a bit. */
+		highp float wave = waterWave(posw, TIME);
+		gl_Position.y += wave * 0.08 * fract(POSITION.y);
+
+#  if defined(FANCY)
+		/* Reduce the base opacity here. We are going to increase it
+		 * depending on the angle between the water plane and the
+		 * camera.
+		 */
+		color.a /= 4.0;
+
+		/* When we know the surface norm we can do something advanced. */
+		if (isWaterPlane(POSITION)) {
+			color = waterColor(color, relPos, wave);
+		}
+#  endif
 	}
-#endif
-
-///// find distance from the camera
-
-#if defined(FOG) || defined(BLEND)
-	#ifdef FANCY
-		vec3 relPos = -worldPos.xyz;
-		float cameraDepth = length(relPos);
-	#else
-		float cameraDepth = pos.z;
-	#endif
 #endif
 
 ///// apply fog
@@ -114,7 +168,6 @@ void main()
 	if(shouldBecomeOpaqueInTheDistance) {
 		#ifdef FANCY  /////enhance water
 			float cameraDist = cameraDepth / FAR_CHUNKS_DISTANCE;
-			color = COLOR;
 		#else
 			// Completely insane, but if I don't have these two lines in here, the water doesn't render on a Nexus 6
 			vec4 surfColor = vec4(color.rgb, 1.0);
