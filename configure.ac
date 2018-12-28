@@ -87,7 +87,8 @@ AS_IF([test "x$UNZIP" = x],
 AC_ARG_VAR([INKSCAPE], [The inkscape command @<:@autodetected@:>@])
 AC_CHECK_PROGS([INKSCAPE], [inkscape])
 AS_IF([test x"$INKSCAPE" = x],
-      [AC_MSG_WARN([You need to install Inkscape, or you won't be able to regenerate the pack icon.])])
+      [AC_MSG_WARN([You need to install Inkscape, or you won't be able to regenerate the pack icon.])
+       INKSCAPE=false])
 
 # Checks for libraries.
 

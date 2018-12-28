@@ -44,10 +44,11 @@ void main()
 #else 
 
 #if USE_TEXEL_AA
-	vec4 diffuse = texture2D_AA(TEXTURE_0, uv0);
+	vec4 pigment = texture2D_AA(TEXTURE_0, uv0);
 #else
-	vec4 diffuse = texture2D(TEXTURE_0, uv0);
+	vec4 pigment = texture2D(TEXTURE_0, uv0);
 #endif
+	vec4 diffuse = pigment;
 	
 #ifdef SEASONS_FAR
 	diffuse.a = 1.0;
@@ -92,19 +93,16 @@ vec4 inColor = color;
 
 	/* Calculate the color of the ambient light based on the fog
 	 * color. We'll use it at several places. */
-#if defined(FOG)
-	vec3 ambient = mix(vec3(1.0), ambientColor(fogColor.rgb), fogColor.a);
-#else
-	const vec3 ambient = vec3(1.0);
-#endif
+	vec3 ambient = ambientColor(FOG_COLOR.rgb);
 
-	diffuse.rgb = applyAmbientLight(diffuse.rgb, ambient);
+	// FIXME: #32: intensity & fog
+	diffuse.rgb = applyAmbientLight(diffuse.rgb, pigment.rgb, ambient);
 #if defined(FOG)
 	/* We must reduce the amount of shadow in this case, as the
 	 * seafloor will get unacceptably dark otherwise. This is because
 	 * the terrain underwater is rendered with a fog. BUT THIS HAS A
 	 * SIDE EFFECT. When it rains shadows will completely
-	 * disappear... */
+	 * disappear. (#33) */
 	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y, daylight, fogColor.a);
 #else
 	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y, daylight, 1.0);
