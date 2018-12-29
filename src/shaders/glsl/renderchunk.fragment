@@ -92,10 +92,17 @@ vec4 inColor = color;
 	float daylight = min(1.0, (texture2D(TEXTURE_1, vec2(0.0, 1.0)).r - 0.5) / 0.5);
 
 	/* Calculate the color of the ambient light based on the fog
-	 * color. We'll use it at several places. */
-	vec3 ambient = ambientColor(FOG_COLOR.rgb);
+	 * color. We'll use it at several places. Note that the .a
+	 * component denotes the intensity. */
+#if defined(FOG)
+	/* The existence of fog should increase the intensity of ambient
+	 * light (#32). */
+	vec4 ambient = vec4(
+		mix(vec3(1.0), ambientColor(fogColor.rgb), fogColor.a), 0.1);
+#else
+	const vec4 ambient = vec4(vec3(1.0), 0.1);
+#endif
 
-	// FIXME: #32: intensity & fog
 	diffuse.rgb = applyAmbientLight(diffuse.rgb, pigment.rgb, ambient);
 #if defined(FOG)
 	/* We must reduce the amount of shadow in this case, as the
@@ -131,7 +138,7 @@ vec4 inColor = color;
 	 * to look bad.
 	 */
 	diffuse.rgb = mix(
-		desaturate(diffuse.rgb, fogColor.a) * ambient,
+		desaturate(diffuse.rgb, fogColor.a) * ambient.rgb,
 		fogColor.rgb,
 		fogColor.a);
 #endif

@@ -107,13 +107,13 @@ highp float fBM(int octaves, highp vec2 st) {
     return value;
 }
 
-/* Apply the ambient light on the original fragment "frag". Without
- * this filter, objects getting no light will be rendered in complete
- * darkness, which isn't how the reality works.
+/* Apply the ambient light on the original fragment "frag". The .a
+ * component denotes the intensity. Without this filter, objects
+ * getting no light will be rendered in complete darkness, which isn't
+ * how the reality works.
  */
-vec3 applyAmbientLight(vec3 frag, vec3 pigment, vec3 ambient) {
-    float intensity = 0.1;
-    return frag + intensity * pigment * ambient;
+vec3 applyAmbientLight(vec3 frag, vec3 pigment, vec4 ambient) {
+    return frag + ambient.a * pigment * ambient.rgb;
 }
 
 /* Calculate and apply a shadow on the original fragment "frag". The
