@@ -16,6 +16,9 @@ MCPACK_FILES = \
 	shaders/glsl/uniformPerFrameConstants.h \
 	splashes.json
 
+MCPACK_EXTRA_FILES = \
+	$(top_srcdir)/LICENSE
+
 EXTRA_DIST = \
 	natural-mystic-logo.svg
 

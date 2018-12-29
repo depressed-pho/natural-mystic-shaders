@@ -6,25 +6,26 @@ noinst_DATA += $(pack_name)
 CLEANFILES  += $(pack_name)
 EXTRA_DIST  += $(filter-out manifest.json,$(filter-out manifest.yaml,$(MCPACK_FILES)))
 
-$(pack_name): $(pack_files)
+$(pack_name): $(pack_files) $(MCPACK_EXTRA_FILES)
 	$(AM_V_GEN)
 	$(AM_V_at)rm -rf $(pack_base)
 	$(AM_V_at)$(MKDIR_P) $(pack_base)
 # This is the hardest part... Here we build a staging directory but
 # the problem is that $(pack_files) can either be relative to
 # $(srcdir) or $(builddir).
-	$(AM_V_at)for f in $^; do \
-			case "$$f" in \
-				$(srcdir)/*) \
-					echo "-C $(srcdir)"; \
-					echo "$$f" | sed 's|^$(srcdir)/||';; \
-				*) \
-					echo "-C $(builddir)"; \
-					echo "$$f";; \
-			esac; \
-		done | \
-		tar -cf - -T - | tar -xf - -C $(pack_base)
+	$(AM_V_at)for f in $(pack_files); do \
+		if test -f "$(srcdir)/$$f"; then \
+			echo "-C $(srcdir)"; \
+		else \
+			echo "-C $(builddir)"; \
+		fi; \
+		echo "$$f"; \
+	done | tar -cf - -T - | tar -xf - -C $(pack_base)
+	$(AM_V_at)for f in $(MCPACK_EXTRA_FILES); do \
+		cp "$$f" "$(pack_base)"; \
+	done
 # We don't need the root directory for .mcpack files.
+	$(AM_V_at)rm -f $@
 	@if $(AM_V_P); then \
 		(cd $(pack_base) && $(ZIP) -rv ../$@ *); \
 	else \

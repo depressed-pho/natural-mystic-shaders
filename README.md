@@ -3,8 +3,8 @@
 **Natural Mystic Shaders** is a shader pack for Minecraft Bedrock
 aiming to be as realistic as possible.
 
-![](./img/day.jpg)
-![](./img/night.jpg)
+![Screenshot during daytime](./img/day.jpg)
+![Screenshot during night-time](./img/night.jpg)
 
 Features include:
 
