@@ -4,7 +4,12 @@
 
 #include "natural-mystic-config.h"
 
-/* Desaturate a color in linear RGB color space. The parameter
+/* Calculate the luma of a color in the linear RGB color space. */
+float rgb2luma(vec3 color) {
+    return dot(color, vec3(0.22, 0.707, 0.071));
+}
+
+/* Desaturate a color in the linear RGB color space. The parameter
  * "degree" should be in [0,1] where 0 being no desaturation and 1
  * being full desaturation (completely gray). Note that the result of
  * the function is usually to be multiplied by the color of the
@@ -12,7 +17,7 @@
  * of energy will happen (#30).
  */
 vec3 desaturate(vec3 baseColor, float degree) {
-    float luma = dot(baseColor, vec3(0.22, 0.707, 0.071));
+    float luma = rgb2luma(baseColor);
     return mix(baseColor, vec3(luma), degree);
 }
 
