@@ -4,7 +4,9 @@
 
 Enhancements:
 
-* Added fake specular light for water and improved its wave. (#10)
+* Added fake specular light for water and improved its wave. The
+  opacity of water surface now changes depending on the angle between
+  the camera and the surface. (#10)
 
 Bugfixes:
 
