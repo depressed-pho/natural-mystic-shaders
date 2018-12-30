@@ -95,12 +95,9 @@ vec4 inColor = color;
 	 * color. We'll use it at several places. Note that the .a
 	 * component denotes the intensity. */
 #if defined(FOG)
-	/* The existence of fog should increase the intensity of ambient
-	 * light (#32). */
-	vec4 ambient = vec4(
-		mix(vec3(1.0), ambientColor(fogColor.rgb), fogColor.a), 0.1);
+	vec4 ambient = ambientLight(fogColor);
 #else
-	const vec4 ambient = vec4(vec3(1.0), 0.1);
+	vec4 ambient = ambientLight(vec4(0.0));
 #endif
 
 	diffuse.rgb = applyAmbientLight(diffuse.rgb, pigment.rgb, ambient);

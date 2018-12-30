@@ -52,7 +52,7 @@ highp float waterWave(highp vec3 wPos, highp float time) {
 	return mix(wave1, wave2, interp);
 }
 
-vec4 waterColor(vec4 baseColor, highp vec3 relPos, highp float wave) {
+vec4 waterColor(vec4 baseColor, vec4 ambient, highp vec3 relPos, highp float wave) {
 	/* We want to know the angle between the normal of the water plane
 	 * (or anything rendered similarly to water) and the camera. Note
 	 * that we assume the surface normal is always (0, 1, 0) and the
@@ -75,8 +75,11 @@ vec4 waterColor(vec4 baseColor, highp vec3 relPos, highp float wave) {
 	/* Simulate the specular light. THINKME: Do a proper normal
 	 * mapping, possibly by calculating the derivation of the wave
 	 * function. Dunno if it's worth it tho. */
-	surfColor.rgb = max(surfColor.rgb, min(vec3(1.0), surfColor.rgb + wave * 0.2));
-	nearColor.rgb = max(nearColor.rgb, min(vec3(1.0), nearColor.rgb + wave * 0.02));
+	surfColor.rgb = max(surfColor.rgb, min(vec3(1.0), surfColor.rgb + ambient.rgb * wave * 0.2));
+	nearColor.rgb = max(nearColor.rgb, min(vec3(1.0), nearColor.rgb + ambient.rgb * wave * 0.02));
+	/* NOTE: We currently don't use the intensity of the ambient
+	 * color. We probably should use it.
+	 */
 
 	return mix(surfColor, nearColor, cosTheta);
 }
@@ -116,6 +119,18 @@ void main()
 	#endif
 #endif
 
+///// apply fog
+
+#ifdef FOG
+	float len = cameraDepth / RENDER_DISTANCE;
+	#ifdef ALLOW_FADE
+		len += RENDER_CHUNK_FOG_ALPHA;
+	#endif
+
+    fogColor.rgb = FOG_COLOR.rgb;
+	fogColor.a = clamp((len - FOG_CONTROL.x) / (FOG_CONTROL.y - FOG_CONTROL.x), 0.0, 1.0);
+#endif
+
 	/* Waves */
 #if !defined(BYPASS_PIXEL_SHADER) && defined(ENABLE_WAVES)
 	if (isLeaf(color)) {
@@ -142,22 +157,15 @@ void main()
 
 		/* When we know the surface norm we can do something advanced. */
 		if (isWaterPlane(POSITION)) {
-			color = waterColor(color, relPos, wave);
+#if defined(FOG)
+			vec4 ambient = ambientLight(fogColor);
+#else
+			vec4 ambient = ambientLight(vec4(0.0));
+#endif
+			color = waterColor(color, ambient, relPos, wave);
 		}
 #  endif
 	}
-#endif
-
-///// apply fog
-
-#ifdef FOG
-	float len = cameraDepth / RENDER_DISTANCE;
-	#ifdef ALLOW_FADE
-		len += RENDER_CHUNK_FOG_ALPHA;
-	#endif
-
-    fogColor.rgb = FOG_COLOR.rgb;
-	fogColor.a = clamp((len - FOG_CONTROL.x) / (FOG_CONTROL.y - FOG_CONTROL.x), 0.0, 1.0);
 #endif
 
 ///// blended layer (mostly water) magic

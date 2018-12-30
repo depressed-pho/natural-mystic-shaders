@@ -16,16 +16,6 @@ vec3 desaturate(vec3 baseColor, float degree) {
     return mix(baseColor, vec3(luma), degree);
 }
 
-/* Calculate the color of the ambient light based on some color,
- * usually the fog color, by normalizing the RGB components so at
- * least one component becomes 1.0.
- */
-vec3 ambientColor(vec3 baseColor) {
-    float rgbMax = max(baseColor.r, max(baseColor.g, baseColor.b));
-    float delta  = 1.0 - rgbMax;
-    return baseColor + delta;
-}
-
 /* Convert linear RGB to HSV. The x component of the result will be
  * the hue, y will be the saturation, and z will be the value. It does
  * not change the alpha. */
@@ -105,6 +95,26 @@ highp float fBM(int octaves, highp vec2 st) {
         amplitude *= 0.5;
     }
     return value;
+}
+
+/* Calculate the color of the ambient light based on some color,
+ * usually the fog color, by normalizing the RGB components so at
+ * least one component becomes 1.0.
+ */
+vec3 ambientColor(vec3 baseColor) {
+    float rgbMax = max(baseColor.r, max(baseColor.g, baseColor.b));
+    float delta  = 1.0 - rgbMax;
+    return baseColor + delta;
+}
+
+/* Calculate the color and the intensity of the ambient light, based
+ * on the fog color. */
+vec4 ambientLight(vec4 fogColor) {
+    /* THINKME: The existence of fog should increase the intensity of
+     * ambient light (#32). */
+    return vec4(
+        mix(vec3(1.0), ambientColor(fogColor.rgb), fogColor.a),
+        0.1);
 }
 
 /* Apply the ambient light on the original fragment "frag". The .a
