@@ -8,6 +8,7 @@ Bugfixes:
 * Performance improvement for clouds.
 * Fixed the color and the intensity of ambient light being calculated
   incorrectly.
+* Shadows no longer disappear completely when it rains.
 
 ## 1.1.0
 
