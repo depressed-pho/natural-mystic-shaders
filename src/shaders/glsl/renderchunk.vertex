@@ -157,12 +157,6 @@ void main()
 		}
 
 #  if defined(FANCY)
-		/* Reduce the base opacity here. We are going to increase it
-		 * depending on the angle between the water plane and the
-		 * camera.
-		 */
-		color.a /= 4.0;
-
 		/* When we know the surface norm we can do something advanced. */
 		if (isWaterPlane(POSITION)) {
 #if defined(FOG)
@@ -170,7 +164,15 @@ void main()
 #else
 			vec4 ambient = ambientLight(vec4(0.0));
 #endif
+			/* Reduce the base opacity here. We are going to increase it
+			 * depending on the angle between the water plane and the
+			 * camera.
+			 */
+			color.a *= 0.25;
 			color = waterColor(color, ambient, relPos, wave);
+		}
+		else {
+			color.a *= 0.5;
 		}
 #  endif
 	}
