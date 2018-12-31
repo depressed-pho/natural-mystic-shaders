@@ -28,6 +28,8 @@
 #include "uniformRenderChunkConstants.h"
 #include "natural-mystic-config.h"
 #include "natural-mystic-hacks.h"
+#include "natural-mystic-light.h"
+#include "natural-mystic-noise.h"
 
 attribute POS4 POSITION;
 attribute vec4 COLOR;

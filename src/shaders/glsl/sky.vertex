@@ -6,7 +6,7 @@
 #include "uniformWorldConstants.h"
 #include "uniformPerFrameConstants.h"
 #include "uniformShaderConstants.h"
-#include "natural-mystic-utils.h"
+#include "natural-mystic-color.h"
 
 attribute mediump vec4 POSITION;
 attribute vec4 COLOR;

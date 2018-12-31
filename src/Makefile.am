@@ -6,9 +6,11 @@ MCPACK_FILES = \
 	materials/sky.material \
 	pack_icon.png \
 	shaders/glsl/cloud.vertex \
+	shaders/glsl/natural-mystic-color.h \
 	shaders/glsl/natural-mystic-config.h \
 	shaders/glsl/natural-mystic-hacks.h \
-	shaders/glsl/natural-mystic-utils.h \
+	shaders/glsl/natural-mystic-light.h \
+	shaders/glsl/natural-mystic-noise.h \
 	shaders/glsl/renderchunk.fragment \
 	shaders/glsl/renderchunk.vertex \
 	shaders/glsl/sky.fragment \

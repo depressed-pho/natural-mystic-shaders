@@ -4,7 +4,7 @@
 #include "fragmentVersionSimple.h"
 #include "uniformPerFrameConstants.h"
 #include "natural-mystic-config.h"
-#include "natural-mystic-utils.h"
+#include "natural-mystic-noise.h"
 
 varying vec4 skyColor;
 varying vec4 cloudColor;

@@ -2,7 +2,7 @@
 #if !defined(NATURAL_MYSTIC_HACKS_H_INCLUDED)
 #define NATURAL_MYSTIC_HACKS_H_INCLUDED 1
 
-#include "natural-mystic-utils.h"
+#include "natural-mystic-color.h"
 
 /* Detect leaves based on the color of material. */
 bool isLeaf(vec4 color) {

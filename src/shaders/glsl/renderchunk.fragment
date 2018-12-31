@@ -29,8 +29,9 @@ varying vec4 fogColor;
 #include "uniformShaderConstants.h"
 #include "uniformPerFrameConstants.h"
 #include "util.h"
+#include "natural-mystic-color.h"
 #include "natural-mystic-config.h"
-#include "natural-mystic-utils.h"
+#include "natural-mystic-light.h"
 
 LAYOUT_BINDING(0) uniform sampler2D TEXTURE_0;
 LAYOUT_BINDING(1) uniform sampler2D TEXTURE_1;
