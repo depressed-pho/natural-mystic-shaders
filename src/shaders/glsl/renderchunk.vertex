@@ -138,12 +138,16 @@ void main()
 	/* Waves */
 #if !defined(BYPASS_PIXEL_SHADER) && defined(ENABLE_WAVES)
 	if (isLeaf(color)) {
-		POS3 posw = worldPos.xyz;
+		POS3 posw = POSITION.xyz;
 		highp float wave = sin(TIME * 3.5 + 2.0 * posw.x + 2.0 * posw.z + posw.y);
 		gl_Position.x += wave * 0.015;
 	}
 	else if (isWater(color)) {
-		POS3 posw = worldPos.xyz;
+		/* THINKME: In theory this should be the position of the
+		 * vertex in the world coordinates without getting affected by
+		 * the view position, but actually it's not working as
+		 * expected. I don't know why. */
+		POS3 posw = worldPos.xyz + VIEW_POS;
 
 		/* We want water to swell in proportion to its volume. The more
 		 * the vertex is close to the ground (i.e. integral points in the
