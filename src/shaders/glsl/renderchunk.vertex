@@ -146,7 +146,7 @@ void main()
 		/* THINKME: In theory this should be the position of the
 		 * vertex in the world coordinates without getting affected by
 		 * the view position, but actually it's not working as
-		 * expected. I don't know why. */
+		 * expected. I don't know why. (#36) */
 		POS3 posw = worldPos.xyz + VIEW_POS;
 
 		/* We want water to swell in proportion to its volume. The more

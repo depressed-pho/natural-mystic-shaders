@@ -15,9 +15,11 @@ Bugfixes:
 * Performance improvement for clouds.
 * Fixed the color and the intensity of ambient light being calculated
   incorrectly.
-* Shadows no longer disappear completely when it rains.
+* Shadows no longer disappear completely when it rains. It still fades
+  suddenly and we're looking for a way to fix it.
 * The animation speed of leaves no longer accelerate when the camera
-  is moving. Water has the same issue but we don't know how to fix it.
+  is moving. Water still has the same issue but we don't know how to
+  fix it.
 
 ## 1.1.0
 
