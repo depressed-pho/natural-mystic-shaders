@@ -2,13 +2,35 @@
 #if !defined(NATURAL_MYSTIC_NOISE_H_INCLUDED)
 #define NATURAL_MYSTIC_NOISE_H_INCLUDED 1
 
-/* Generate a random scalar based on some 2D vector. See
+/* Generate a random scalar [0, 1) base on some scalar.
+ */
+highp float random(highp float st) {
+    st += 128.0; // The function has a bad characteristic near 0.
+    return fract(sin(st * 12.9898) * 43758.5453123);
+}
+
+/* Generate a random scalar [0, 1) based on some 2D vector. See
  * https://thebookofshaders.com/13/
  */
 highp float random(highp vec2 st) {
     st += 128.0; // The function has a bad characteristic near (0, 0).
     return fract(
         sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+/* Generate a 1D perlin noise based on some scalar.
+ */
+highp float perlinNoise(highp float st) {
+    highp float i = floor(st);
+    highp float f = fract(st);
+
+    // Two borders in an interval.
+    highp float a = random(i);
+    highp float b = random(i + 1.0);
+
+    highp float u = f * f * (3.0 - 2.0 * f);
+
+    return mix(a, b, u);
 }
 
 /* Generate a 2D perlin noise based on some 2D vector. Based on Morgan

@@ -1,5 +1,11 @@
 # Release notes
 
+## 1.3.0
+
+Enhancements:
+
+* Torches now flicker more randomly and slightly more intensely.
+
 ## 1.2.0
 
 Enhancements:
@@ -30,6 +36,6 @@ Enhancements:
   in the current rendering system. (#10, #11)
 * Replaced clouds with non-blocky, shader-generated one.
 
-## 1.0
+## 1.0.0
 
 The first release.
