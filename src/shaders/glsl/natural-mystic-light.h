@@ -87,7 +87,7 @@ vec3 applySunlight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
     if (intensity > 0.0) {
         /* The color of sunlight changes depending on the daylight
          * level to express dusk and dawn. */
-        vec3 sunColor = mix(setColor, dayColor, daylight);
+        vec3 sunColor = mix(setColor, dayColor, smoothstep(0.4, 1.0, daylight));
 
         /* Shadows reduce the amount of sunlight. */
         intensity *= mix(
