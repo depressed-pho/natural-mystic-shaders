@@ -10,7 +10,7 @@
  * on the fog color. */
 vec4 ambientLight(vec4 fogColor) {
     const vec3  baseColor = vec3(1.0);
-    const float intensity = 8.0;
+    const float intensity = 6.0;
 
     vec3 color = mix(baseColor, brighten(fogColor.rgb), fogColor.a);
     return vec4(color, intensity);
