@@ -140,13 +140,7 @@ vec4 inColor = color;
 	diffuse.rgb += pigment * vec3(1.0) * 60.0;
 #endif
 
-#if defined(TONE_MAPPING_METHOD)
-#  if TONE_MAPPING_METHOD == TONE_MAPPING_U2
 	diffuse.rgb = uncharted2ToneMap(diffuse.rgb, 112.0, 1.0);
-#  elif TONE_MAPPING_METHOD == TONE_MAPPING_ACES
-	diffuse.rgb = acesFilmicToneMap(diffuse.rgb);
-#  endif
-#endif /* TONE_MAPPING_METHOD */
 	diffuse.rgb = contrastFilter(diffuse.rgb, 1.25);
 
 	/* We can't apply fogs before doing tone mapping, because that

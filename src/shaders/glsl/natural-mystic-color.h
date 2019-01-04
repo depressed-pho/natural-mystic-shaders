@@ -100,9 +100,9 @@ vec3 uncharted2ToneMap(vec3 frag, float whiteLevel, float exposureBias) {
     return clamp(color, 0.0, 1.0);
 }
 
-/* Apply ACES filmic tone mapping to the original fragment "x".
- * See:
+/* Apply ACES filmic tone mapping to the original fragment "x". See:
  * https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
+ * [Currently unused]
  */
 vec3 acesFilmicToneMap(vec3 x) {
     const float a = 2.51;

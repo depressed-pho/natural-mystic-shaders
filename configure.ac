@@ -52,24 +52,6 @@ AS_IF([test x"$enable_fbm_clouds" != x"no"],
       [AC_DEFINE([ENABLE_FBM_CLOUDS], [1],
                  [Define to enable shader-generated clouds.])])
 
-AC_ARG_WITH(
-    [tone-mapping],
-    [AS_HELP_STRING(
-         [--with-tone-mapping=@<:@u2|aces@:>@],
-         [use tone mapping method u2: Uncharted2, aces: ACES Filmic @<:@default: u2@:>@])])
-AH_TOP([#define TONE_MAPPING_U2 1
-#define TONE_MAPPING_ACES 2])
-AH_TEMPLATE(
-    [TONE_MAPPING_METHOD],
-    [Define to either TONE_MAPPING_U2 or TONE_MAPPING_ACES to choose a tone mapping method.])
-AS_CASE(
-    [$with_tone_mapping],
-    ["no"],          [],
-    ["yes"|""|"u2"], [AC_DEFINE([TONE_MAPPING_METHOD], [TONE_MAPPING_U2])],
-    ["aces"],        [AC_DEFINE([TONE_MAPPING_METHOD], [TONE_MAPPING_ACES])],
-    [AC_MSG_ERROR(
-         [Unknown tone mapping method `$with_tone_mapping'. See `configure --help' for available methods.])])
-
 # Checks for programs.
 AC_ARG_VAR([SED], [The sed command @<:@autodetected@:>@])
 AC_PROG_SED
