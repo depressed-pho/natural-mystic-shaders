@@ -112,7 +112,7 @@ vec4 inColor = color;
 		/* The existence of fog should increase the intensity of
 		 * ambient light (#32)
 		 */
-		ambient.a *= 1.4;
+		ambient.a *= 1.6;
 	}
 #else
 	vec4 ambient = ambientLight(vec4(0.0));
