@@ -50,15 +50,16 @@ vec3 applyTorchLight(vec3 frag, vec3 pigment, float torchLevel, float sunLevel, 
     const float baseIntensity = 160.0;
     const float decay         = 5.0;
 
-    /* Reduce the effect of the torch light on areas lit by the
-     * sunlight. Theoretically we shouldn't need to do this and
-     * instead can use much more intense light for the sun, but we
-     * haven't found a good tone mapping curve for doing that.
-     */
-    torchLevel = torchLevel - (sunLevel * daylight * 0.3);
-
     if (torchLevel > 0.0) {
         float intensity = baseIntensity * pow(torchLevel, decay);
+
+        /* Reduce the effect of the torch light on areas lit by the
+         * sunlight. Theoretically we shouldn't need to do this and
+         * instead can use much more intense light for the sun, but we
+         * haven't found a good tone mapping curve for that.
+         */
+        intensity *= mix(1.0, 0.1, smoothstep(0.65, 0.875, sunLevel * daylight));
+
 #if defined(ENABLE_TORCH_FLICKER)
         intensity *= torchLightFlicker(time) + 1.3;
 #endif
