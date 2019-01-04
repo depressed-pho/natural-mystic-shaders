@@ -37,4 +37,14 @@ bool isWaterPlane(highp vec4 wPos) {
     return y >= 0.7 && y <= 0.9;
 }
 
+/* Detect the nether fog. */
+bool isNetherFog(vec4 fogColor) {
+    return fogColor.r > fogColor.b && fogColor.r < 0.5;
+}
+
+/* Detect the render distance fog. */
+bool isRenderDistanceFog(vec2 fogControl) {
+    return fogControl.x > 0.5;
+}
+
 #endif /* NATURAL_MYSTIC_HACKS_H_INCLUDED */

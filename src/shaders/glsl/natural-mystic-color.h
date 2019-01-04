@@ -83,23 +83,21 @@ vec4 computeFogColor(vec3 baseFog, float dist) {
  * See: http://filmicworlds.com/blog/filmic-tonemapping-operators/
  */
 vec3 uncharted2ToneMap_(vec3 x) {
-    const float A = 0.15;
-    const float B = 0.50;
-    const float C = 0.10;
-    const float D = 0.20;
-    const float E = 0.02;
-    const float F = 0.30;
+    const float A = 0.015; // Shoulder strength
+    const float B = 0.50; // Linear strength
+    const float C = 0.10; // Linear angle
+    const float D = 0.010; // Toe strength
+    const float E = 0.02; // Toe numerator
+    const float F = 0.30; // Toe denominator
 
     return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
 }
-vec3 uncharted2ToneMap(vec3 frag, float exposureBias) {
-    const float W = 11.2;
-
+vec3 uncharted2ToneMap(vec3 frag, float whiteLevel, float exposureBias) {
     vec3 curr = uncharted2ToneMap_(exposureBias * frag);
-    vec3 whiteScale = 1.0 / uncharted2ToneMap_(vec3(W, W, W));
+    vec3 whiteScale = 1.0 / uncharted2ToneMap_(vec3(whiteLevel));
     vec3 color = curr * whiteScale;
 
-    return color;
+    return clamp(color, 0.0, 1.0);
 }
 
 /* Apply ACES filmic tone mapping to the original fragment "x".
@@ -116,16 +114,23 @@ vec3 acesFilmicToneMap(vec3 x) {
     return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
 }
 
-/* Apply a contrast filter to the original fragment "frag". The
- * contrast must be a non-negative number.
+/* Apply a contrast filter on some LDR color.
  */
-vec3 contrastFilter(vec3 frag, float contrast) {
-    return (frag - 0.5) * max(contrast, 0.0) + 0.5;
+vec3 contrastFilter(vec3 color, float contrast) {
+    return clamp((color - 0.5) * contrast + 0.5, 0.0, 1.0);
+}
+
+/* Apply a contrast filter on some LDR luminance.
+ */
+float contrastFilter(float lum, float contrast) {
+    float t = 0.5 - contrast * 0.5;
+    return clamp(lum * contrast + t, 0.0, 1.0);
+    return clamp((lum - 0.5) * contrast + 0.5, 0.0, 1.0);
 }
 
 /* Apply an HDR exposure filter to the original LDR fragment
  * "frag". The resulting image will be HDR, and need to be tone-mapped
- * back to LDR at the last stage. */
+ * back to LDR at the last stage. [Currently unused] */
 vec3 hdrExposure(vec3 frag, float overExposure, float underExposure) {
     vec3 overExposed   = frag / overExposure;
     vec3 normalExposed = frag;

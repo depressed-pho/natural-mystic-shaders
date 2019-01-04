@@ -32,6 +32,7 @@ varying vec4 fogColor;
 #include "natural-mystic-color.h"
 #include "natural-mystic-config.h"
 #include "natural-mystic-light.h"
+#include "natural-mystic-hacks.h"
 
 LAYOUT_BINDING(0) uniform sampler2D TEXTURE_0;
 LAYOUT_BINDING(1) uniform sampler2D TEXTURE_1;
@@ -45,11 +46,10 @@ void main()
 #else 
 
 #if USE_TEXEL_AA
-	vec4 pigment = texture2D_AA(TEXTURE_0, uv0);
+	vec4 diffuse = texture2D_AA(TEXTURE_0, uv0);
 #else
-	vec4 pigment = texture2D(TEXTURE_0, uv0);
+	vec4 diffuse = texture2D(TEXTURE_0, uv0);
 #endif
-	vec4 diffuse = pigment;
 	
 #ifdef SEASONS_FAR
 	diffuse.a = 1.0;
@@ -72,7 +72,7 @@ vec4 inColor = color;
 #endif
 
 #if !defined(ALWAYS_LIT)
-	diffuse *= texture2D( TEXTURE_1, uv1 );
+//	diffuse *= texture2D( TEXTURE_1, uv1 );
 #endif
 
 #ifndef SEASONS
@@ -88,43 +88,66 @@ vec4 inColor = color;
 	diffuse.a = 1.0;
 #endif
 
+	/* Reset the diffused color here to the complete darkness. We are
+	 * going to redo all the lightings with our own HDR method. */
+	vec3 pigment = diffuse.rgb;
+	diffuse.rgb  = vec3(0.0);
+
 	/* Fetch the level of daylight (i.e. the one which darkens at
 	 * night) from the light map passed by the upstream. */
-	float daylight = min(1.0, (texture2D(TEXTURE_1, vec2(0.0, 1.0)).r - 0.5) / 0.5);
+	float daylight = texture2D(TEXTURE_1, vec2(0.0, 1.0)).r;
+	daylight = smoothstep(0.4, 1.0, daylight);
 
 	/* Calculate the color of the ambient light based on the fog
 	 * color. We'll use it at several places. Note that the .a
 	 * component denotes the intensity. */
 #if defined(FOG)
 	vec4 ambient = ambientLight(fogColor);
+	if (isNetherFog(fogColor)) {
+		/* Increase the ambient light level when in the Nether, or
+		 * otherwise it'll be unplayably dark there. */
+		ambient.a += 18.0;
+	}
+	else if (!isRenderDistanceFog(FOG_CONTROL)) {
+		/* The existence of fog should increase the intensity of
+		 * ambient light (#32)
+		 */
+		ambient.a *= 1.4;
+	}
 #else
 	vec4 ambient = ambientLight(vec4(0.0));
 #endif
 
-	diffuse.rgb = applyAmbientLight(diffuse.rgb, pigment.rgb, ambient);
+	diffuse.rgb = applyAmbientLight(diffuse.rgb, pigment, ambient);
 #if defined(FOG)
-	/* We must reduce the amount of shadow in this case, as the
-	 * seafloor will get unacceptably dark otherwise. This is because
-	 * the terrain underwater is rendered with a fog. BUT THIS HAS A
-	 * SIDE EFFECT. When it rains shadows will suddenly
-	 * disappear. (#33) */
-	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y, daylight, 0.1);
+	/* When it's raining the sunlight shouldn't affect the scene
+	 * (#24), but this has a side effect. Shadows appear and disappear
+	 * all of sudden (#33).
+	 */
+	if (isRenderDistanceFog(FOG_CONTROL)) {
+		diffuse.rgb = applySunlight(diffuse.rgb, pigment, uv1.y, daylight);
+	}
 #else
-	diffuse.rgb = applyShadow(diffuse.rgb, uv1.x, uv1.y, daylight, 1.0);
+	diffuse.rgb = applySunlight(diffuse.rgb, pigment, uv1.y, daylight);
+#endif /* FOG */
+	diffuse.rgb = applySkylight(diffuse.rgb, pigment, uv1.y, daylight);
+	diffuse.rgb = applyMoonlight(diffuse.rgb, pigment, uv1.y, daylight);
+	diffuse.rgb = applyTorchLight(diffuse.rgb, pigment, uv1.x, uv1.y, daylight, TIME);
+
+	/* Light sources should be significantly brighter than normal
+	 * objects. */
+#if defined(ALWAYS_LIT)
+	diffuse.rgb += pigment * vec3(1.0) * 60.0;
 #endif
-	diffuse.rgb = applyTorchColor(diffuse.rgb, uv1.x, uv1.y, daylight, TIME);
-	diffuse.rgb = applySunlight(diffuse.rgb, uv1.y, daylight);
-	diffuse.rgb = applySkylight(diffuse.rgb, uv1.y, daylight);
-	diffuse.rgb = applyMoonlight(diffuse.rgb, uv1.x, uv1.y, daylight);
-	diffuse.rgb = contrastFilter(diffuse.rgb, 1.05);
+
 #if defined(TONE_MAPPING_METHOD)
-	diffuse.rgb = hdrExposure(diffuse.rgb, 4.0, 3.0);
-#  if TONE_MAPPING_METHOD == 1
-	diffuse.rgb = uncharted2ToneMap(diffuse.rgb, 4.0);
-#  elif TONE_MAPPING_METHOD == 2
+#  if TONE_MAPPING_METHOD == TONE_MAPPING_U2
+	diffuse.rgb = uncharted2ToneMap(diffuse.rgb, 112.0, 1.0);
+#  elif TONE_MAPPING_METHOD == TONE_MAPPING_ACES
 	diffuse.rgb = acesFilmicToneMap(diffuse.rgb);
 #  endif
 #endif /* TONE_MAPPING_METHOD */
+	diffuse.rgb = contrastFilter(diffuse.rgb, 1.25);
 
 	/* We can't apply fogs before doing tone mapping, because that
 	 * changes the fog color and breaks "render distance fog". */
