@@ -14,7 +14,7 @@
   when it rains.
 * Shadows are now much less dense at night.
 
-## 1.2.0
+## 1.2.0 - 2018-12-31
 
 Enhancements:
 
@@ -35,7 +35,7 @@ Bugfixes:
   is moving. Water still has the same issue but we don't know how to
   fix it. (#36)
 
-## 1.1.0
+## 1.1.0 - 2018-12-26
 
 Enhancements:
 
@@ -44,6 +44,6 @@ Enhancements:
   in the current rendering system. (#10, #11)
 * Replaced clouds with non-blocky, shader-generated one.
 
-## 1.0.0
+## 1.0.0 - 2018-12-22
 
 The first release.
