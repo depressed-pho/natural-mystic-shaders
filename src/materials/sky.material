@@ -52,7 +52,7 @@
     "blendSrc": "OneMinusDestColor",
     "blendDst": "One",
 
-		"vertexShader" : "shaders/color.vertex",
+		"vertexShader" : "shaders/stars.vertex",
 		"vrGeometryShader" :  "shaders/color.geometry",
 		"fragmentShader" : "shaders/stars.fragment",
     "vertexFields": [

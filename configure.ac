@@ -52,6 +52,15 @@ AS_IF([test x"$enable_fbm_clouds" != x"no"],
       [AC_DEFINE([ENABLE_FBM_CLOUDS], [1],
                  [Define to enable shader-generated clouds.])])
 
+AC_ARG_ENABLE(
+    [perlin-stars],
+    [AS_HELP_STRING(
+         [--disable-perlin-stars],
+         [disable randomness in the brightness of stars])])
+AS_IF([test x"$enable_perlin_stars" != x"no"],
+      [AC_DEFINE([ENABLE_PERLIN_STARS], [1],
+                 [Define to introduce randomness in the brighness of stars.])])
+
 # Checks for programs.
 AC_ARG_VAR([SED], [The sed command @<:@autodetected@:>@])
 AC_PROG_SED

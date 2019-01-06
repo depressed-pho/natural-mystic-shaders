@@ -2,18 +2,20 @@
 
 ## 1.3.0
 
+* Clouds are now slightly brighter at night.
+* Introduced a randomness in the brightness of stars.
+* Torches now flicker more randomly and slightly more intensely.
 * Overhauled the entire lighting passes in the terrain shader. Now it
   computes light levels and colors completely differently. This was
-  inevitable to improve lights and fix bugs listed below.
-* Torches now flicker more randomly and slightly more intensely.
-* The intensity of the ambient light now slightly increases when it's
-  foggy (#32).
-* The scene no longer becomes reddish as if it were in the sunset,
-  when it rains during the daytime (#24).
-* Dark areas, especially caves, no longer become strangely brighter
-  when it rains.
-* Shadows are now much less dense at night.
-* Clouds are now slightly brighter at night.
+  inevitable to improve lights and fix bugs listed below:
+
+    * The intensity of the ambient light now slightly increases when
+      it's foggy (#32).
+    * The scene no longer becomes reddish as if it were in the sunset,
+      when it rains during the daytime (#24).
+    * Dark areas, especially caves, no longer become strangely
+      brighter when it rains.
+    * Shadows are now much less dense at night.
 
 ## 1.2.0 - 2018-12-31
 

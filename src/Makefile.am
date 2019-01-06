@@ -15,6 +15,7 @@ MCPACK_FILES = \
 	shaders/glsl/renderchunk.vertex \
 	shaders/glsl/sky.fragment \
 	shaders/glsl/sky.vertex \
+	shaders/glsl/stars.vertex \
 	shaders/glsl/uniformPerFrameConstants.h \
 	splashes.json
 
