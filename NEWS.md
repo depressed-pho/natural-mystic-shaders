@@ -1,6 +1,6 @@
 # Release notes
 
-## 1.3.0
+## 1.3.0 -- 2019-01-06
 
 * Clouds are now slightly brighter at night.
 * Introduced a randomness in the brightness of stars.
