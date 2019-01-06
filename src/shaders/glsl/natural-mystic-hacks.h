@@ -42,7 +42,10 @@ bool isNetherFog(vec4 fogColor) {
     return fogColor.r > fogColor.b && fogColor.r < 0.5;
 }
 
-/* Detect the render distance fog. */
+/* Detect the render distance fog. THINKME: We could possibly use the
+ * material variant "fading" instead of this hack. See
+ * terrain.material
+ */
 bool isRenderDistanceFog(vec2 fogControl) {
     return fogControl.x > 0.5;
 }
