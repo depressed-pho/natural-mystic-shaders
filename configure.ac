@@ -62,6 +62,11 @@ AS_IF([test x"$enable_perlin_stars" != x"no"],
                  [Define to introduce randomness in the brighness of stars.])])
 
 # Checks for programs.
+AC_ARG_VAR([DIFF], [The diff command @<:@autodetected@:>@])
+AC_CHECK_PROGS([DIFF], [diff])
+AS_IF([test "x$DIFF" = x],
+      [AC_MSG_ERROR([You need to install a diff command.])])
+
 AC_ARG_VAR([SED], [The sed command @<:@autodetected@:>@])
 AC_PROG_SED
 AS_IF([test "x$SED" = x],
