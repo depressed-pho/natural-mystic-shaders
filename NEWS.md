@@ -13,6 +13,7 @@
 * Dark areas, especially caves, no longer become strangely brighter
   when it rains.
 * Shadows are now much less dense at night.
+* Clouds are now slightly brighter at night.
 
 ## 1.2.0 - 2018-12-31
 

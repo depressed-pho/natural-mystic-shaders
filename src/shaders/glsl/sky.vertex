@@ -30,8 +30,8 @@ void main()
      * close to that of the fog. This way we will have something like
      * a sunlight-reflected-by-clouds effect (but more
      * lightgray-ish). */
-    float brightness = clamp(desaturate(FOG_COLOR.rgb, 1.0).r + 0.05, 0.0, 1.0);
-    cloudColor     = mix(skyColor, FOG_COLOR, 0.8);
+    float brightness = clamp(desaturate(FOG_COLOR.rgb, 1.0).r + 0.05, 0.105, 1.0);
+    cloudColor     = mix(skyColor, FOG_COLOR, 0.9);
     cloudColor     = mix(cloudColor, vec4(1.0), brightness);
     cloudColor.rgb = desaturate(cloudColor.rgb, 0.4);
 }
