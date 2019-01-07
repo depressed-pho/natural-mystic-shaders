@@ -84,7 +84,7 @@ vec4 waterColor(vec4 baseColor, vec4 ambient, highp vec3 relPos, highp float wav
 	surfColor.rgb = max(surfColor.rgb, min(vec3(1.0), surfColor.rgb + lightDelta * 0.20));
 	nearColor.rgb = max(nearColor.rgb, min(vec3(1.0), nearColor.rgb + lightDelta * 0.03));
 	/* NOTE: We currently don't use the intensity of the ambient
-	 * color. We probably should use it.
+	 * light. We probably should use it.
 	 */
 
 	return mix(surfColor, nearColor, cosTheta);
