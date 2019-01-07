@@ -24,7 +24,7 @@ void main()
 	POS4 worldPos = WORLD * POSITION;
  	gl_Position = pos;
 
-#if defined(ENABLE_FBM_CLOUDS) && defined(FANCY)
+#if defined(ENABLE_FBM_CLOUDS)
 	/* We completely disable the vanilla clouds. It's impossible to
 	 * improve it. Instead we render clouds with sky shaders. */
 	color = vec4(0.0);

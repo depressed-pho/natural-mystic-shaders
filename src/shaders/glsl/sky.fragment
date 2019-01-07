@@ -12,12 +12,11 @@ varying vec3 worldPos;
 varying float camDist;
 
 /* Generate a pattern of clouds based on a world position. */
-highp float clouds(highp float time, highp vec3 pos) {
+highp float cloudMap(int octaves, highp float time, highp vec3 pos) {
     /* Use of highp is essential here, as the uniform TIME in mediump
      * starts to lose precision within 10 minutes.
      */
     const highp vec2 resolution = vec2(0.8, 0.8);
-    const int octaves = 6;
 
     highp vec2 st = pos.xz / resolution;
     st.x *= resolution.x / resolution.y;
@@ -43,10 +42,16 @@ highp float clouds(highp float time, highp vec3 pos) {
 void main() {
 #if defined(ENABLE_FBM_CLOUDS)
 
+    /* NOTE: It seems modifying materials/fancy.json takes no effect
+     * on 1.8. We want to reduce the number of octaves when
+     * !defined(FANCY) but we can't do it for now, because FANCY gets
+     * never defined in this shader. */
+    const int octaves = 6;
+
     /* Clouds near the horizon should be blended back to the sky
      * color, or otherwise the planar nature of the sky plane will be
      * even more apparent. */
-    highp float density = clouds(TIME, worldPos);
+    highp float density = cloudMap(octaves, TIME, worldPos);
     density = mix(density, 0.0, smoothstep(0.9, 1.0, camDist));
 
     gl_FragColor = mix(skyColor, cloudColor, density);

@@ -3,9 +3,15 @@ MANIFEST_SRC = manifest.json.in
 MCPACK_INSTALLATION_DIRECTORY = $(MCPACK_INSTALLATION_DIRECTORY_resource)
 MCPACK_FILES = \
 	manifest.json \
+	materials/common.json \
+	materials/fancy.json \
+	materials/fancy.material \
+	materials/sad.json \
+	materials/sad.material \
 	materials/sky.material \
 	materials/terrain.material \
 	pack_icon.png \
+	shaders/glsl/cloud.fragment \
 	shaders/glsl/cloud.vertex \
 	shaders/glsl/natural-mystic-color.h \
 	shaders/glsl/natural-mystic-config.h \

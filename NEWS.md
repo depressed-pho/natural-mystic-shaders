@@ -1,5 +1,9 @@
 # Release notes
 
+## 1.3.1 -- FIXME
+
+* Fixed vanilla clouds being shown when "Fancy Graphics" is disabled.
+
 ## 1.3.0 -- 2019-01-06
 
 * Clouds are now slightly brighter at night.
