@@ -20,6 +20,11 @@
 	#endif
 #endif
 
+/* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
+#if defined(MCPE40059)
+varying POS4 worldPos;
+#endif
+
 varying vec4 color;
 
 #ifdef FOG

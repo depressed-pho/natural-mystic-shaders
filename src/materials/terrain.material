@@ -7,7 +7,7 @@
       "vrGeometryShader": "shaders/renderchunk.geometry",
       "fragmentShader": "shaders/renderchunk.fragment",
 
-      "+defines": [ "LOW_PRECISION", "TEXEL_AA", "ATLAS_TEXTURE" ],
+      "+defines": [ "LOW_PRECISION", "TEXEL_AA", "ATLAS_TEXTURE", "MCPE40059" ],
       "+states": [ "DisableAlphaWrite" ],
 
       "+samplerStates": [

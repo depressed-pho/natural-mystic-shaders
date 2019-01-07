@@ -14,6 +14,11 @@
 	#endif
 #endif
 
+/* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
+#if defined(MCPE40059)
+varying POS4 worldPos;
+#endif
+
 #ifndef BYPASS_PIXEL_SHADER
 	varying vec4 color;
 #endif
@@ -90,7 +95,9 @@ vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp float wav
 
 void main()
 {
+#if !defined(MCPE40059)
     POS4 worldPos;
+#endif
 #ifdef AS_ENTITY_RENDERER
 		POS4 pos = WORLDVIEWPROJ * POSITION;
 		worldPos = pos;
