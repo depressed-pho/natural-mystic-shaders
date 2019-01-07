@@ -142,16 +142,19 @@ vec4 inColor = color;
 	/* We can't apply fogs before doing tone mapping, because that
 	 * changes the fog color and breaks "render distance fog". */
 #ifdef FOG
-	/* During a bad weather everything should look dull. We do a
-	 * desaturation for that (#6). The reason for the mix() is so fogs
-	 * not only reduce saturation but also contrast. Note that we must
-	 * not desaturate it too much, as the horizon in the ocean starts
-	 * to look bad.
-	 */
-	diffuse.rgb = mix(
-		desaturate(diffuse.rgb, fogColor.a) * ambient.rgb,
-		fogColor.rgb,
-		fogColor.a);
+	if (isRenderDistanceFog(FOG_CONTROL)) {
+		diffuse.rgb = mix( diffuse.rgb, fogColor.rgb, fogColor.a );
+	}
+	else {
+		/* During a bad weather everything should look dull. We do a
+		 * desaturation for that (#6). The reason for the mix() is so
+		 * fogs not only reduce saturation but also contrast.
+		 */
+		diffuse.rgb = mix(
+			desaturate(diffuse.rgb, fogColor.a) * ambient.rgb,
+			fogColor.rgb,
+			fogColor.a);
+	}
 #endif
 
 //#define SHOW_MATERIAL_COLOR 1
