@@ -4,6 +4,7 @@ MCPACK_INSTALLATION_DIRECTORY = $(MCPACK_INSTALLATION_DIRECTORY_resource)
 MCPACK_FILES = \
 	manifest.json \
 	materials/sky.material \
+	materials/terrain.material \
 	pack_icon.png \
 	shaders/glsl/cloud.vertex \
 	shaders/glsl/natural-mystic-color.h \
