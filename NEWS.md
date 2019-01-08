@@ -3,6 +3,7 @@
 ## 1.3.1 -- FIXME
 
 * Fixed vanilla clouds being shown when "Fancy Graphics" is disabled.
+* The scene no longer becomes unplayably dark when underwater.
 
 ## 1.3.0 -- 2019-01-06
 

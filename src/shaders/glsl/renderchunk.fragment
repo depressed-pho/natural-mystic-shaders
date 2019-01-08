@@ -97,22 +97,32 @@ vec4 inColor = color;
 	/* Calculate the color of the ambient light based on the fog
 	 * color. We'll use it at several places. Note that the .a
 	 * component denotes the intensity. */
+#if defined(UNDERWATER)
+	const bool isUnderwater = true;
+#else
+	const bool isUnderwater = false;
+#endif /* defined(UNDERWATER) */
 #if defined(FOG)
 	vec4 ambient = ambientLight(fogColor);
-	if (isNetherFog(fogColor)) {
+	if (isUnderwater) {
+		/* Increase the ambient light level underwater, or otherwise
+		 * it'll be unplayably dark there. */
+		ambient.a += 20.0;
+	}
+	else if (isNetherFog(fogColor)) {
 		/* Increase the ambient light level when in the Nether, or
 		 * otherwise it'll be unplayably dark there. */
-		ambient.a += 18.0;
+		ambient.a += 20.0;
 	}
 	else if (!isRenderDistanceFog(FOG_CONTROL)) {
-		/* The existence of fog should increase the intensity of
-		 * ambient light (#32)
+		/* The existence of bad weather fog should also increase the
+		 * intensity of ambient light (#32).
 		 */
-		ambient.a *= 1.6;
+		ambient.a *= 1.4;
 	}
 #else
 	vec4 ambient = ambientLight(vec4(0.0));
-#endif
+#endif /* defined(FOG) */
 
 	diffuse.rgb = applyAmbientLight(diffuse.rgb, pigment, ambient);
 #if defined(FOG)
@@ -120,7 +130,7 @@ vec4 inColor = color;
 	 * (#24), but this has a side effect. Shadows appear and disappear
 	 * all of sudden (#33).
 	 */
-	if (isRenderDistanceFog(FOG_CONTROL)) {
+	if (isUnderwater || isRenderDistanceFog(FOG_CONTROL)) {
 		diffuse.rgb = applySunlight(diffuse.rgb, pigment, uv1.y, daylight);
 	}
 #else
@@ -142,7 +152,7 @@ vec4 inColor = color;
 	/* We can't apply fogs before doing tone mapping, because that
 	 * changes the fog color and breaks "render distance fog". */
 #ifdef FOG
-	if (isRenderDistanceFog(FOG_CONTROL)) {
+	if (isUnderwater || isRenderDistanceFog(FOG_CONTROL)) {
 		diffuse.rgb = mix( diffuse.rgb, fogColor.rgb, fogColor.a );
 	}
 	else {

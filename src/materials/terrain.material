@@ -41,7 +41,7 @@
         { "fog": { "+defines": [ "FOG" ] } },
         { "lit": { "+defines": [ "ALWAYS_LIT" ] } },
         { "underwater": { "+defines": [ "FOG" ] } },
-        { "fog.underwater": {} },
+        { "fog.underwater": { "+defines": [ "UNDERWATER" ] } },
         { "fading": { "+defines": [ "FOG", "ALLOW_FADE" ] } }
       ]
     },
