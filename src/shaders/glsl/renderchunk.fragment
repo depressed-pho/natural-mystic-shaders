@@ -96,6 +96,12 @@ vec4 inColor = color;
 	float daylight = texture2D(TEXTURE_1, vec2(0.0, 1.0)).r;
 	daylight = smoothstep(0.4, 1.0, daylight);
 
+	/* Fetch the level of ambient light from the light map passed by
+	 * the upstream. The constant multiplifier is determined so the
+	 * intensity will be 6 on the Overworld and 26 in the
+	 * Nether/End. */
+	float ambientBrightness = texture2D(TEXTURE_1, vec2(0.0, 0.0)).r * 44.797;
+
 	/* Calculate the color of the ambient light based on the fog
 	 * color. We'll use it at several places. Note that the .a
 	 * component denotes the intensity. */
@@ -104,34 +110,28 @@ vec4 inColor = color;
 #else
 	const bool isUnderwater = false;
 #endif /* defined(UNDERWATER) */
+
+	vec3 ambientColor;
 #if defined(FOG)
-	vec4 ambient;
 	if (isRenderDistanceFog(FOG_CONTROL)) {
 		/* Don't use the fog color in this case, as it would be
 		 * slightly different from the color of near terrain. */
-		ambient = ambientLight(uv1.y, daylight);
+		ambientColor = ambientLightColor(uv1.y, daylight);
 	}
 	else {
-		ambient = ambientLight(fogColor);
+		ambientColor = ambientLightColor(fogColor);
 
-		if (isUnderwater || isNetherFog(fogColor) || isTheEndFog(fogColor)) {
-			/* Increase the ambient light level underwater, in the Nether,
-			 * or in The End. Otherwise it'll be unplayably dark there. */
-			ambient.a += 20.0;
-		}
-		else {
-			/* The existence of bad weather fog should also increase
-			 * the intensity of ambient light (#32). But at night it
-			 * should work the other way.
-			 */
-			ambient.a *= mix(0.9, 1.4, daylight);
-		}
+		/* The existence of bad weather fog should also increase the
+		 * intensity of ambient light (#32). But at night it should
+		 * work the other way.
+		 */
+		ambientBrightness *= mix(0.9, 1.4, daylight);
 	}
 #else
-	vec4 ambient = ambientLight(uv1.y, daylight);
+	ambientColor = ambientLightColor(uv1.y, daylight);
 #endif /* defined(FOG) */
 
-	diffuse.rgb = applyAmbientLight(diffuse.rgb, pigment, ambient);
+	diffuse.rgb = applyAmbientLight(diffuse.rgb, pigment, ambientColor, ambientBrightness);
 #if defined(FOG)
 	/* When it's raining the sunlight shouldn't affect the scene
 	 * (#24), but this has a side effect. Shadows appear and disappear
@@ -169,7 +169,7 @@ vec4 inColor = color;
 		 * fogs not only reduce saturation but also contrast.
 		 */
 		diffuse.rgb = mix(
-			desaturate(diffuse.rgb, fogColor.a) * ambient.rgb,
+			desaturate(diffuse.rgb, fogColor.a) * ambientColor,
 			fogColor.rgb,
 			fogColor.a);
 	}

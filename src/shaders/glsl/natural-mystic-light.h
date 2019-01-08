@@ -23,24 +23,19 @@ vec3 sunlightColor(float daylight) {
     return mix(setColor, dayColor, smoothstep(0.45, 1.0, daylight));
 }
 
-/* Calculate the color and the intensity of the ambient light based
- * solely on the fog color.
+/* Calculate the color of the ambient light based solely on the fog
+ * color.
  */
-vec4 ambientLight(vec4 fogColor) {
-    const float intensity = 6.0;
-
-    vec3 color = brighten(fogColor.rgb);
-    return vec4(color, intensity);
+vec3 ambientLightColor(vec4 fogColor) {
+    return brighten(fogColor.rgb);
 }
 
-/* Calculate the color and the intensity of the ambient light based on
- * the terrain-dependent sunlight level, and the time-dependent
- * daylight level. The level of ambient light is not dependent on the
- * terrain but the color is.
+/* Calculate the color of the ambient light based on the
+ * terrain-dependent sunlight level, and the time-dependent daylight
+ * level. The level of ambient light is not dependent on the terrain
+ * but the color is.
  */
-vec4 ambientLight(float sunLevel, float daylight) {
-    const float intensity = 6.0;
-
+vec3 ambientLightColor(float sunLevel, float daylight) {
     /* The daylight color is a mixture of sunlight and skylight. */
     vec3 daylightColor = mix(skylightColor, sunlightColor(daylight), 0.625);
 
@@ -50,9 +45,7 @@ vec4 ambientLight(float sunLevel, float daylight) {
 
     /* In caves the torch light is the only possible light source but
      * on the ground the sun or the moon is the most influential. */
-    vec3 color = mix(torchlightColor, outsideColor, sunLevel);
-
-    return vec4(color, intensity);
+    return mix(torchlightColor, outsideColor, sunLevel);
 }
 
 /* Apply the ambient light on the original fragment "frag". The .a
@@ -60,8 +53,8 @@ vec4 ambientLight(float sunLevel, float daylight) {
  * getting no light will be rendered in complete darkness, which isn't
  * how the reality works.
  */
-vec3 applyAmbientLight(vec3 frag, vec3 pigment, vec4 ambient) {
-    return frag + ambient.a * pigment * ambient.rgb;
+vec3 applyAmbientLight(vec3 frag, vec3 pigment, vec3 lightColor, float intensity) {
+    return frag + intensity * pigment * lightColor;
 }
 
 /* Calculate the torch light flickering factor [-1, 1] based on the

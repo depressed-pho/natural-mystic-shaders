@@ -57,7 +57,7 @@ highp float waterWave(highp vec3 wPos, highp float time) {
 	return mix(wave3, wave4, interp) + interp * 0.5;
 }
 
-vec4 waterColor(vec4 baseColor, vec4 ambient, highp vec3 relPos, highp float wave) {
+vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp float wave) {
 	/* We want to know the angle between the normal of the water plane
 	 * (or anything rendered similarly to water) and the camera. Note
 	 * that we assume the surface normal is always (0, 1, 0) and the
@@ -80,12 +80,9 @@ vec4 waterColor(vec4 baseColor, vec4 ambient, highp vec3 relPos, highp float wav
 	/* Simulate the specular light. THINKME: Do a proper normal
 	 * mapping, possibly by calculating the derivation of the wave
 	 * function. Dunno if it's worth it tho. */
-	vec3 lightDelta = ambient.rgb * wave;
+	vec3 lightDelta = ambient * wave;
 	surfColor.rgb = max(surfColor.rgb, min(vec3(1.0), surfColor.rgb + lightDelta * 0.20));
 	nearColor.rgb = max(nearColor.rgb, min(vec3(1.0), nearColor.rgb + lightDelta * 0.03));
-	/* NOTE: We currently don't use the intensity of the ambient
-	 * light. We probably should use it.
-	 */
 
 	return mix(surfColor, nearColor, cosTheta);
 }
@@ -168,9 +165,9 @@ void main()
 			/* THINKME: The color of the ambient light can only be
 			 * calculated accurately in the fragment shader. */
 #if defined(FOG)
-			vec4 ambient = ambientLight(fogColor);
+			vec3 ambient = ambientLightColor(fogColor);
 #else
-			vec4 ambient = ambientLight(1.0, 1.0);
+			vec3 ambient = ambientLightColor(1.0, 1.0);
 #endif
 			/* Reduce the base opacity here. We are going to increase it
 			 * depending on the angle between the water plane and the

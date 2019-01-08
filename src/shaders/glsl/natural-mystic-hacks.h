@@ -37,12 +37,12 @@ bool isWaterPlane(highp vec4 wPos) {
     return y >= 0.7 && y <= 0.9;
 }
 
-/* Detect the Nether fog. */
+/* Detect the Nether fog. [Currently unused] */
 bool isNetherFog(vec4 fogColor) {
     return fogColor.r > fogColor.b && fogColor.r < 0.5 && fogColor.b < 0.05;
 }
 
-/* Detect the End fog. */
+/* Detect the End fog. [Currently unused] */
 bool isTheEndFog(vec4 fogColor) {
     return fogColor.r > fogColor.g && fogColor.b > fogColor.g &&
         lessThan(fogColor.rgb, vec3(0.05)) == bvec3(true);
