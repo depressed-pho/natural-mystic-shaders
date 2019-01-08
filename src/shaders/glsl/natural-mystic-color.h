@@ -114,18 +114,24 @@ vec3 acesFilmicToneMap(vec3 x) {
     return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
 }
 
-/* Apply a contrast filter on some LDR color.
+/* Apply a contrast filter on some LDR linear RGB color. The contrast
+ * must be in [0, 2]. Note that this function modifies both the
+ * saturation and the luminance, which means if you are to decrease
+ * the contrast you should multiply the result with the color of the
+ * ambient light, or otherwise you'll get gray when it's
+ * inappropriate.
  */
 vec3 contrastFilter(vec3 color, float contrast) {
-    return clamp((color - 0.5) * contrast + 0.5, 0.0, 1.0);
+    float t = 0.5 - contrast * 0.5;
+    return clamp(color * contrast + t, 0.0, 1.0);
 }
 
-/* Apply a contrast filter on some LDR luminance.
+/* Apply a contrast filter on some LDR luminance. The contrast must be
+ * in [0, 2].
  */
 float contrastFilter(float lum, float contrast) {
     float t = 0.5 - contrast * 0.5;
     return clamp(lum * contrast + t, 0.0, 1.0);
-    return clamp((lum - 0.5) * contrast + 0.5, 0.0, 1.0);
 }
 
 /* Apply an HDR exposure filter to the original LDR fragment
