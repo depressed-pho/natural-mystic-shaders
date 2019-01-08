@@ -4,6 +4,7 @@
 
 * Fixed vanilla clouds being shown when "Fancy Graphics" is disabled.
 * The scene no longer becomes unplayably dark when underwater.
+* Moonlight no longer affects the scene on a rainy night.
 
 ## 1.3.0 -- 2019-01-06
 

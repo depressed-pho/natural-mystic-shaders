@@ -116,9 +116,10 @@ vec4 inColor = color;
 	}
 	else if (!isRenderDistanceFog(FOG_CONTROL)) {
 		/* The existence of bad weather fog should also increase the
-		 * intensity of ambient light (#32).
+		 * intensity of ambient light (#32). But at night it should
+		 * work the other way.
 		 */
-		ambient.a *= 1.4;
+		ambient.a *= mix(0.9, 1.4, daylight);
 	}
 #else
 	vec4 ambient = ambientLight(vec4(0.0));
@@ -132,12 +133,13 @@ vec4 inColor = color;
 	 */
 	if (isUnderwater || isRenderDistanceFog(FOG_CONTROL)) {
 		diffuse.rgb = applySunlight(diffuse.rgb, pigment, uv1.y, daylight);
+		diffuse.rgb = applyMoonlight(diffuse.rgb, pigment, uv1.y, daylight);
 	}
 #else
 	diffuse.rgb = applySunlight(diffuse.rgb, pigment, uv1.y, daylight);
+	diffuse.rgb = applyMoonlight(diffuse.rgb, pigment, uv1.y, daylight);
 #endif /* FOG */
 	diffuse.rgb = applySkylight(diffuse.rgb, pigment, uv1.y, daylight);
-	diffuse.rgb = applyMoonlight(diffuse.rgb, pigment, uv1.y, daylight);
 	diffuse.rgb = applyTorchLight(diffuse.rgb, pigment, uv1.x, uv1.y, daylight, TIME);
 
 	/* Light sources should be significantly brighter than normal
