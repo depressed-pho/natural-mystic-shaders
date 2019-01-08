@@ -165,10 +165,12 @@ void main()
 #  if defined(FANCY)
 		/* When we know the surface norm we can do something advanced. */
 		if (isWaterPlane(POSITION)) {
+			/* THINKME: The color of the ambient light can only be
+			 * calculated accurately in the fragment shader. */
 #if defined(FOG)
 			vec4 ambient = ambientLight(fogColor);
 #else
-			vec4 ambient = ambientLight(vec4(0.0));
+			vec4 ambient = ambientLight(1.0, 1.0);
 #endif
 			/* Reduce the base opacity here. We are going to increase it
 			 * depending on the angle between the water plane and the

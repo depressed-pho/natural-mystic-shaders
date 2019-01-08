@@ -90,7 +90,9 @@ vec4 inColor = color;
 	diffuse.rgb  = vec3(0.0);
 
 	/* Fetch the level of daylight (i.e. the one which darkens at
-	 * night) from the light map passed by the upstream. */
+	 * night) from the light map passed by the upstream. Note that we
+	 * intentionally reduce the dynamic range because the upstream
+	 * daylight level doesn't drop to zero at night. */
 	float daylight = texture2D(TEXTURE_1, vec2(0.0, 1.0)).r;
 	daylight = smoothstep(0.4, 1.0, daylight);
 
@@ -103,21 +105,30 @@ vec4 inColor = color;
 	const bool isUnderwater = false;
 #endif /* defined(UNDERWATER) */
 #if defined(FOG)
-	vec4 ambient = ambientLight(fogColor);
-	if (isUnderwater || isNetherFog(fogColor)) {
-		/* Increase the ambient light level underwater or in the
-		 * Nether. Otherwise it'll be unplayably dark there. */
-		ambient.a += 20.0;
+	vec4 ambient;
+	if (isRenderDistanceFog(FOG_CONTROL)) {
+		/* Don't use the fog color in this case, as it would be
+		 * slightly different from the color of near terrain. */
+		ambient = ambientLight(uv1.y, daylight);
 	}
-	else if (!isRenderDistanceFog(FOG_CONTROL)) {
-		/* The existence of bad weather fog should also increase the
-		 * intensity of ambient light (#32). But at night it should
-		 * work the other way.
-		 */
-		ambient.a *= mix(0.9, 1.4, daylight);
+	else {
+		ambient = ambientLight(fogColor);
+
+		if (isUnderwater || isNetherFog(fogColor) || isTheEndFog(fogColor)) {
+			/* Increase the ambient light level underwater, in the Nether,
+			 * or in The End. Otherwise it'll be unplayably dark there. */
+			ambient.a += 20.0;
+		}
+		else {
+			/* The existence of bad weather fog should also increase
+			 * the intensity of ambient light (#32). But at night it
+			 * should work the other way.
+			 */
+			ambient.a *= mix(0.9, 1.4, daylight);
+		}
 	}
 #else
-	vec4 ambient = ambientLight(vec4(0.0));
+	vec4 ambient = ambientLight(uv1.y, daylight);
 #endif /* defined(FOG) */
 
 	diffuse.rgb = applyAmbientLight(diffuse.rgb, pigment, ambient);

@@ -37,9 +37,15 @@ bool isWaterPlane(highp vec4 wPos) {
     return y >= 0.7 && y <= 0.9;
 }
 
-/* Detect the nether fog. */
+/* Detect the Nether fog. */
 bool isNetherFog(vec4 fogColor) {
-    return fogColor.r > fogColor.b && fogColor.r < 0.5;
+    return fogColor.r > fogColor.b && fogColor.r < 0.5 && fogColor.b < 0.05;
+}
+
+/* Detect the End fog. */
+bool isTheEndFog(vec4 fogColor) {
+    return fogColor.r > fogColor.g && fogColor.b > fogColor.g &&
+        lessThan(fogColor.rgb, vec3(0.05)) == bvec3(true);
 }
 
 /* Detect the render distance fog. THINKME: We could possibly use the

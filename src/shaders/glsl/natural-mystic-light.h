@@ -6,13 +6,49 @@
 #include "natural-mystic-config.h"
 #include "natural-mystic-noise.h"
 
-/* Calculate the color and the intensity of the ambient light, based
- * on the fog color. */
+/* Light color constants. Should be private to this file.
+ */
+const vec3 torchlightColor = vec3(1.0, 0.66, 0.28);
+const vec3 moonlightColor  = vec3(112.0, 135.5, 255.0)/255.0;
+
+/* Calculate the color of sunlight based on the time-dependent
+ * daylight level "daylight" [0, 1]. The color of sunlight changes
+ * depending on the daylight level to express dusk and dawn.
+ */
+vec3 sunlightColor(float daylight) {
+    const vec3 setColor = vec3(1.0, 0.3569, 0.0196);
+    const vec3 dayColor = vec3(1.0, 0.8706, 0.8039);
+
+    return mix(setColor, dayColor, smoothstep(0.45, 1.0, daylight));
+}
+
+/* Calculate the color and the intensity of the ambient light based
+ * solely on the fog color.
+ */
 vec4 ambientLight(vec4 fogColor) {
     const vec3  baseColor = vec3(1.0);
     const float intensity = 6.0;
 
     vec3 color = mix(baseColor, brighten(fogColor.rgb), fogColor.a);
+    return vec4(color, intensity);
+}
+
+/* Calculate the color and the intensity of the ambient light based on
+ * the terrain-dependent sunlight level, and the time-dependent
+ * daylight level. The level of ambient light is not dependent on the
+ * terrain but the color is.
+ */
+vec4 ambientLight(float sunLevel, float daylight) {
+    const float intensity = 6.0;
+
+    /* The influence of the sun and the moon depend on the daylight
+     * level. */
+    vec3 outsideColor = mix(moonlightColor, sunlightColor(daylight), daylight);
+
+    /* In caves the torch light is the only possible light source but
+     * on the ground the sun or the moon is the most influential. */
+    vec3 color = mix(torchlightColor, outsideColor, sunLevel);
+
     return vec4(color, intensity);
 }
 
@@ -46,7 +82,6 @@ float torchLightFlicker(highp float time) {
  * effect.
  */
 vec3 applyTorchLight(vec3 frag, vec3 pigment, float torchLevel, float sunLevel, float daylight, highp float time) {
-    const vec3  torchColor    = vec3(1.0, 0.66, 0.28);
     const float baseIntensity = 160.0;
     const float decay         = 5.0;
 
@@ -63,7 +98,7 @@ vec3 applyTorchLight(vec3 frag, vec3 pigment, float torchLevel, float sunLevel, 
 #if defined(ENABLE_TORCH_FLICKER)
         intensity *= torchLightFlicker(time) + 1.3;
 #endif
-        return frag + pigment * torchColor * intensity;
+        return frag + pigment * torchlightColor * intensity;
     }
     else {
         return frag;
@@ -77,8 +112,6 @@ vec3 applyTorchLight(vec3 frag, vec3 pigment, float torchLevel, float sunLevel, 
  * directional light.
  */
 vec3 applySunlight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
-    const vec3  setColor      = vec3(1.0, 0.3569, 0.0196);
-    const vec3  dayColor      = vec3(1.0, 0.8706, 0.8039);
     const float baseIntensity = 50.0;
     const float shadowFactor  = 0.10;  // [0, 1]
     const float shadowBorder  = 0.87;  // [0, 1]
@@ -86,16 +119,12 @@ vec3 applySunlight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
 
     float intensity = baseIntensity * sunLevel * daylight;
     if (intensity > 0.0) {
-        /* The color of sunlight changes depending on the daylight
-         * level to express dusk and dawn. */
-        vec3 sunColor = mix(setColor, dayColor, smoothstep(0.4, 1.0, daylight));
-
         /* Shadows reduce the amount of sunlight. */
         intensity *= mix(
             shadowFactor, 1.0,
             smoothstep(shadowBorder - shadowBlur, shadowBorder + shadowBlur, sunLevel));
 
-        return frag + pigment * sunColor * intensity;
+        return frag + pigment * sunlightColor(daylight) * intensity;
     }
     else {
         return frag;
@@ -122,12 +151,11 @@ vec3 applySkylight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
 }
 
 /* Apply the moonlight on a fragment "frag" based on the
- * time-dependent daylight level [0,1] and the terrain-dependent
- * sunlight level [0,1]. The moonlight behaves like sunlight but is
+ * time-dependent daylight level [0, 1] and the terrain-dependent
+ * sunlight level [0, 1]. The moonlight behaves like sunlight but is
  * blue-ish white.
  */
 vec3 applyMoonlight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
-    const vec3 moonColor = vec3(0.1, 0.2431, 1.0);
     const float baseIntensity = 10.0;
     const float shadowFactor  = 0.20;  // [0, 1]
     const float shadowBorder  = 0.87;  // [0, 1]
@@ -140,7 +168,7 @@ vec3 applyMoonlight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
             shadowFactor, 1.0,
             smoothstep(shadowBorder - shadowBlur, shadowBorder + shadowBlur, sunLevel));
 
-        return frag + pigment * moonColor * intensity;
+        return frag + pigment * moonlightColor * intensity;
     }
     else {
         return frag;
