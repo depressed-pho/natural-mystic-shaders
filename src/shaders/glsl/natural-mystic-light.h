@@ -9,6 +9,7 @@
 /* Light color constants. Should be private to this file.
  */
 const vec3 torchlightColor = vec3(1.0, 0.66, 0.28);
+const vec3 skylightColor   = vec3(0.8392, 0.9098, 0.9961);
 const vec3 moonlightColor  = vec3(112.0, 135.5, 255.0)/255.0;
 
 /* Calculate the color of sunlight based on the time-dependent
@@ -41,9 +42,12 @@ vec4 ambientLight(vec4 fogColor) {
 vec4 ambientLight(float sunLevel, float daylight) {
     const float intensity = 6.0;
 
+    /* The daylight color is a mixture of sunlight and skylight. */
+    vec3 daylightColor = mix(skylightColor, sunlightColor(daylight), 0.625);
+
     /* The influence of the sun and the moon depends on the daylight
      * level. */
-    vec3 outsideColor = mix(moonlightColor, sunlightColor(daylight), daylight);
+    vec3 outsideColor = mix(moonlightColor, daylightColor, daylight);
 
     /* In caves the torch light is the only possible light source but
      * on the ground the sun or the moon is the most influential. */
@@ -138,12 +142,11 @@ vec3 applySunlight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
  * ambient light but is affected by occlusion.
  */
 vec3 applySkylight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
-    const vec3 skyColor = vec3(0.8392, 0.9098, 0.9961);
     const float baseIntensity = 30.0;
 
     float intensity = baseIntensity * sunLevel * daylight;
     if (intensity > 0.0) {
-        return frag + pigment * skyColor * intensity;
+        return frag + pigment * skylightColor * intensity;
     }
     else {
         return frag;

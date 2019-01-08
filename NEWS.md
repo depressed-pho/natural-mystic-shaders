@@ -3,7 +3,8 @@
 ## 1.3.1 -- FIXME
 
 * Fixed vanilla clouds being shown when "Fancy Graphics" is disabled.
-* The scene no longer becomes unplayably dark when underwater.
+* The scene no longer becomes unplayably dark when underwater or in
+  The End.
 * Moonlight no longer affects the scene on a rainy night.
 * The color of the ambient light is no longer a constant white. It now
   changes depending on the terrain-dependent sunlight level and the
