@@ -41,7 +41,7 @@ vec4 ambientLight(vec4 fogColor) {
 vec4 ambientLight(float sunLevel, float daylight) {
     const float intensity = 6.0;
 
-    /* The influence of the sun and the moon depend on the daylight
+    /* The influence of the sun and the moon depends on the daylight
      * level. */
     vec3 outsideColor = mix(moonlightColor, sunlightColor(daylight), daylight);
 

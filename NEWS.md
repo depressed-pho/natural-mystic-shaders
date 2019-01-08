@@ -5,6 +5,13 @@
 * Fixed vanilla clouds being shown when "Fancy Graphics" is disabled.
 * The scene no longer becomes unplayably dark when underwater.
 * Moonlight no longer affects the scene on a rainy night.
+* The color of the ambient light is no longer a constant white. It now
+  changes depending on the terrain-dependent sunlight level and the
+  time-dependent daylight level. That is, when in an occluded area
+  like a cave, the only possible light sources are torches so the
+  color of ambient light resembles that of torch light. Likewise, when
+  on the ground of the Overworld, either the color of the sun or the
+  moon will affect the ambient depending on the in-game time.
 
 ## 1.3.0 -- 2019-01-06
 
