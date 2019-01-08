@@ -104,14 +104,9 @@ vec4 inColor = color;
 #endif /* defined(UNDERWATER) */
 #if defined(FOG)
 	vec4 ambient = ambientLight(fogColor);
-	if (isUnderwater) {
-		/* Increase the ambient light level underwater, or otherwise
-		 * it'll be unplayably dark there. */
-		ambient.a += 20.0;
-	}
-	else if (isNetherFog(fogColor)) {
-		/* Increase the ambient light level when in the Nether, or
-		 * otherwise it'll be unplayably dark there. */
+	if (isUnderwater || isNetherFog(fogColor)) {
+		/* Increase the ambient light level underwater or in the
+		 * Nether. Otherwise it'll be unplayably dark there. */
 		ambient.a += 20.0;
 	}
 	else if (!isRenderDistanceFog(FOG_CONTROL)) {
