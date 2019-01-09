@@ -135,6 +135,8 @@ void main()
 #  if defined(FOG_TYPE)
 #    if FOG_TYPE == FOG_TYPE_LINEAR
 	fogColor.a = linearFog(FOG_CONTROL, len);
+#    elif FOG_TYPE == FOG_TYPE_EXP
+	fogColor.a = exponentialFog(FOG_CONTROL, len);
 #    elif FOG_TYPE == FOG_TYPE_EXP2
 	fogColor.a = exponentialSquaredFog(FOG_CONTROL, len);
 #    endif

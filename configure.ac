@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([Natural Mystic Shaders],
-        [1.3.1],
+        [1.4.0],
         [https://github.com/depressed-pho/natural-mystic-shaders/issues],
         [],
         [https://github.com/depressed-pho/natural-mystic-shaders])
@@ -67,7 +67,8 @@ AC_ARG_WITH(
          [--with-fog-type=@<:@linear|exp2@:>@],
          [fog type to use. linear: linear fog, exp2: exponential squared fog @<:default: exp2@>:@])])
 AH_TOP([#define FOG_TYPE_LINEAR 1
-#define FOG_TYPE_EXP2 2])
+#define FOG_TYPE_EXP 2
+#define FOG_TYPE_EXP2 3])
 AH_TEMPLATE(
     [FOG_TYPE],
     [Define to one of FOG_TYPE_LINEAR and FOG_TYPE_EXP2 to choose a fog type to use.])
@@ -75,6 +76,7 @@ AS_CASE(
     [$with_fog_type],
     ["no"],            [],
     ["linear"],        [AC_DEFINE([FOG_TYPE], [FOG_TYPE_LINEAR])],
+    ["exp"],           [AC_DEFINE([FOG_TYPE], [FOG_TYPE_EXP])],
     ["yes"|""|"exp2"], [AC_DEFINE([FOG_TYPE], [FOG_TYPE_EXP2])],
     [AC_MSG_ERROR(
          [Unknown fog type `$with_fog_type'. See `configure --help'.])])

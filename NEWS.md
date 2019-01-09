@@ -1,6 +1,6 @@
 # Release notes
 
-## 1.3.1 -- FIXME
+## 1.4.0 -- FIXME
 
 * Fixed vanilla clouds being shown when "Fancy Graphics" is disabled.
 * The scene no longer becomes unplayably dark when underwater or in
@@ -13,6 +13,8 @@
   color of ambient light resembles that of torch light. Likewise, when
   on the ground of the Overworld, either the color of the sun or the
   moon will affect the ambient depending on the in-game time.
+* Changed the fog type from linear fog (vanilla) to exponential
+  squared fog. It is slightly more expensive but produces better fog.
 
 ## 1.3.0 -- 2019-01-06
 

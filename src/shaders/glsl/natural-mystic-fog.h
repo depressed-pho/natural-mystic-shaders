@@ -10,12 +10,32 @@ float linearFog(vec2 control, float dist) {
     return clamp(density, 0.0, 1.0);
 }
 
+float exponentialFog(vec2 control, float dist) {
+    /* Determine the base density so the final result will be maxed
+     * out to 1 at the fog far, i.e. the y component of the fog
+     * control.
+     *
+     *   1 / e^(far * base) <= r (for some very small positive r),
+     *   r * e^(far * base) >= 1,
+     *   e^(far * base) >= 1/r,
+     *   far * base >= log 1/r, therefore
+     *   base >= (log 1/r) / far
+     */
+    float base = log(1.0/0.03) / (control.y - control.x);
+    dist = max(0.0, dist - control.x);
+
+    float fogFactor = 1.0 / exp(dist * base);
+    fogFactor = clamp(fogFactor, 0.0, 1.0);
+
+    return 1.0 - fogFactor;
+}
+
 /* Compute the density [0, 1] of exponential squared fog based on a
  * near/far control and a camera distance. This function produces
  * better fogs than those of vanilla (#12). See:
  * http://in2gpu.com/2014/07/22/create-fog-shader/
  */
-highp float exponentialSquaredFog(highp vec2 control, highp float dist) {
+float exponentialSquaredFog(vec2 control, float dist) {
     /* Determine the base density so the final result will be maxed
      * out to 1 at the fog far, i.e. the y component of the fog
      * control.
@@ -27,10 +47,10 @@ highp float exponentialSquaredFog(highp vec2 control, highp float dist) {
      *   far * base >= sqrt (log 1/r), therefore
      *   base >= (sqrt (log 1/r)) / far
      */
-    highp float base = sqrt(log(1.0/0.015)) / (control.y - control.x);
+    float base = sqrt(log(1.0/0.015)) / (control.y - control.x);
     dist = max(0.0, dist - control.x);
 
-    highp float fogFactor = 1.0 / exp(pow(dist * base, 2.0));
+    float fogFactor = 1.0 / exp(pow(dist * base, 2.0));
     fogFactor = clamp(fogFactor, 0.0, 1.0);
 
     return 1.0 - fogFactor;
