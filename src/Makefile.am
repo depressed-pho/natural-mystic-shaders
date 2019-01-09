@@ -15,6 +15,7 @@ MCPACK_FILES = \
 	shaders/glsl/cloud.vertex \
 	shaders/glsl/natural-mystic-color.h \
 	shaders/glsl/natural-mystic-config.h \
+	shaders/glsl/natural-mystic-fog.h \
 	shaders/glsl/natural-mystic-hacks.h \
 	shaders/glsl/natural-mystic-light.h \
 	shaders/glsl/natural-mystic-noise.h \

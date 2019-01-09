@@ -61,6 +61,24 @@ AS_IF([test x"$enable_perlin_stars" != x"no"],
       [AC_DEFINE([ENABLE_PERLIN_STARS], [1],
                  [Define to introduce randomness in the brighness of stars.])])
 
+AC_ARG_WITH(
+    [fog-type],
+    [AS_HELP_STRING(
+         [--with-fog-type=@<:@linear|exp2@:>@],
+         [fog type to use. linear: linear fog, exp2: exponential squared fog @<:default: exp2@>:@])])
+AH_TOP([#define FOG_TYPE_LINEAR 1
+#define FOG_TYPE_EXP2 2])
+AH_TEMPLATE(
+    [FOG_TYPE],
+    [Define to one of FOG_TYPE_LINEAR and FOG_TYPE_EXP2 to choose a fog type to use.])
+AS_CASE(
+    [$with_fog_type],
+    ["no"],            [],
+    ["linear"],        [AC_DEFINE([FOG_TYPE], [FOG_TYPE_LINEAR])],
+    ["yes"|""|"exp2"], [AC_DEFINE([FOG_TYPE], [FOG_TYPE_EXP2])],
+    [AC_MSG_ERROR(
+         [Unknown fog type `$with_fog_type'. See `configure --help'.])])
+
 # Checks for programs.
 AC_ARG_VAR([DIFF], [The diff command @<:@autodetected@:>@])
 AC_CHECK_PROGS([DIFF], [diff])

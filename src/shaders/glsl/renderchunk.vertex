@@ -27,6 +27,7 @@
 #include "uniformShaderConstants.h"
 #include "uniformRenderChunkConstants.h"
 #include "natural-mystic-config.h"
+#include "natural-mystic-fog.h"
 #include "natural-mystic-hacks.h"
 #include "natural-mystic-light.h"
 #include "natural-mystic-noise.h"
@@ -131,8 +132,16 @@ void main()
 	#endif
 
     fogColor.rgb = FOG_COLOR.rgb;
-	fogColor.a = clamp((len - FOG_CONTROL.x) / (FOG_CONTROL.y - FOG_CONTROL.x), 0.0, 1.0);
-#endif
+#  if defined(FOG_TYPE)
+#    if FOG_TYPE == FOG_TYPE_LINEAR
+	fogColor.a = linearFog(FOG_CONTROL, len);
+#    elif FOG_TYPE == FOG_TYPE_EXP2
+	fogColor.a = exponentialSquaredFog(FOG_CONTROL, len);
+#    endif
+#  else
+	fogColor.a = 0.0; /* Fog disabled? Really?? */
+#  endif /* defined(FOG_TYPE) */
+#endif /* FOG */
 
 	/* Waves */
 #if !defined(BYPASS_PIXEL_SHADER) && defined(ENABLE_WAVES)

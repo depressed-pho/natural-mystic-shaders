@@ -48,9 +48,11 @@ bool isTheEndFog(vec4 fogColor) {
         lessThan(fogColor.rgb, vec3(0.05)) == bvec3(true);
 }
 
-/* Detect the render distance fog. THINKME: We could possibly use the
- * material variant "fading" instead of this hack. See
- * terrain.material
+/* Detect the render distance fog. NOTE: It is tempting to use
+ * material variants "*_far" instead of this hack (see
+ * terrain.material) but no, that's actually not possible because the
+ * fog they can have is not always the render distance fog. It can
+ * also be the bad weather fog.
  */
 bool isRenderDistanceFog(vec2 fogControl) {
     return fogControl.x > 0.5;
