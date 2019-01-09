@@ -14,7 +14,8 @@
   on the ground of the Overworld, either the color of the sun or the
   moon will affect the ambient depending on the in-game time.
 * Changed the fog type from linear fog (vanilla) to exponential
-  squared fog. It is slightly more expensive but produces better fog.
+  squared fog (#12). It is slightly more expensive but produces better
+  results.
 
 ## 1.3.0 -- 2019-01-06
 
