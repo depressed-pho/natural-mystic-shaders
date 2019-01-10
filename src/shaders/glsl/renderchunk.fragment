@@ -24,6 +24,7 @@
 #if defined(MCPE40059)
 varying POS4 worldPos;
 varying float cameraDist;
+varying float flickerFactor;
 varying float desatFactor;
 #endif
 
@@ -153,7 +154,9 @@ vec4 inColor = color;
 	diffuse.rgb = applyMoonlight(diffuse.rgb, pigment, uv1.y, daylight);
 #endif /* FOG */
 	diffuse.rgb = applySkylight(diffuse.rgb, pigment, uv1.y, daylight);
-	diffuse.rgb = applyTorchLight(diffuse.rgb, pigment, uv1.x, uv1.y, daylight, TIME);
+#if defined(MCPE40059)
+	diffuse.rgb = applyTorchLight(diffuse.rgb, pigment, uv1.x, uv1.y, daylight, flickerFactor);
+#endif
 
 	/* Light sources should be significantly brighter than normal
 	 * objects. */

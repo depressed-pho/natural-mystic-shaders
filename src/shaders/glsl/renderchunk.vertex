@@ -20,6 +20,7 @@ varying POS4 worldPos;
 varying float cameraDist; /* Normalized camera distance being 1.0 at
 						   * the point where the far terrain fog
 						   * ends. */
+varying float flickerFactor;
 varying float desatFactor;
 #endif
 
@@ -123,6 +124,14 @@ void main()
     uv1 = TEXCOORD_1;
 	color = COLOR;
 #endif
+
+#if defined(MCPE40059)
+#  if defined(ENABLE_TORCH_FLICKER)
+	flickerFactor = torchLightFlicker(TIME);
+#  else
+	flickerFactor = 1.0;
+#  endif
+#endif /* defined(MCPE40059) */
 
 ///// find distance from the camera
 	vec3 relPos = -worldPos.xyz;

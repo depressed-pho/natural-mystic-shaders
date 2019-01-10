@@ -3,7 +3,6 @@
 #define NATURAL_MYSTIC_LIGHT_H_INCLUDED 1
 
 #include "natural-mystic-color.h"
-#include "natural-mystic-config.h"
 #include "natural-mystic-noise.h"
 
 /* Light color constants. Should be private to this file.
@@ -57,7 +56,7 @@ vec3 applyAmbientLight(vec3 frag, vec3 pigment, vec3 lightColor, float intensity
     return frag + intensity * pigment * lightColor;
 }
 
-/* Calculate the torch light flickering factor [-1, 1] based on the
+/* Calculate the torch light flickering factor [0, 2] based on the
  * in-game time.
  */
 float torchLightFlicker(highp float time) {
@@ -68,8 +67,8 @@ float torchLightFlicker(highp float time) {
      */
     highp float amplitude = 0.15;
     highp float st        = time * 3.0;
-    highp float flicker   = clamp(perlinNoise(st), 0.0, 1.0);
-    return (flicker * 2.0 - 1.0) * amplitude;
+    highp float flicker   = perlinNoise(st);
+    return (flicker * 2.0 - 1.0) * amplitude + 1.3;
 }
 
 /* Calculate and apply the torch light on the original fragment
@@ -77,12 +76,12 @@ float torchLightFlicker(highp float time) {
  * [0, 1], and the "time" is the in-game time, used for the flickering
  * effect.
  */
-vec3 applyTorchLight(vec3 frag, vec3 pigment, float torchLevel, float sunLevel, float daylight, highp float time) {
+vec3 applyTorchLight(vec3 frag, vec3 pigment, float torchLevel, float sunLevel, float daylight, highp float flickerFactor) {
     const float baseIntensity = 160.0;
     const float decay         = 5.0;
 
     if (torchLevel > 0.0) {
-        float intensity = baseIntensity * pow(torchLevel, decay);
+        float intensity = baseIntensity * pow(torchLevel, decay) * flickerFactor;
 
         /* Reduce the effect of the torch light on areas lit by the
          * sunlight. Theoretically we shouldn't need to do this and
@@ -91,9 +90,6 @@ vec3 applyTorchLight(vec3 frag, vec3 pigment, float torchLevel, float sunLevel, 
          */
         intensity *= mix(1.0, 0.1, smoothstep(0.65, 0.875, sunLevel * daylight));
 
-#if defined(ENABLE_TORCH_FLICKER)
-        intensity *= torchLightFlicker(time) + 1.3;
-#endif
         return frag + pigment * torchlightColor * intensity;
     }
     else {
