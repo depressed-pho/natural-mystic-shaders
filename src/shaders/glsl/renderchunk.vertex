@@ -20,6 +20,7 @@ varying POS4 worldPos;
 varying float cameraDist; /* Normalized camera distance being 1.0 at
 						   * the point where the far terrain fog
 						   * ends. */
+varying float desatFactor;
 #endif
 
 #ifndef BYPASS_PIXEL_SHADER
@@ -127,6 +128,12 @@ void main()
 	vec3 relPos = -worldPos.xyz;
 	float cameraDepth = length(relPos);
 	cameraDist = cameraDepth / RENDER_DISTANCE;
+
+	/* Reduce the contrast of far objects (#5). The overall color
+	 * should lean towards the ambient. */
+#if defined(FANCY) && defined(MCPE40059)
+	desatFactor = exponentialFog(vec2(0.0, 4.0), cameraDist);
+#endif
 
 ///// apply fog
 

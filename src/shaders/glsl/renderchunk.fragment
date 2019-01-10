@@ -24,6 +24,7 @@
 #if defined(MCPE40059)
 varying POS4 worldPos;
 varying float cameraDist;
+varying float desatFactor;
 #endif
 
 varying vec4 color;
@@ -37,7 +38,6 @@ varying vec4 fogColor;
 #include "util.h"
 #include "natural-mystic-color.h"
 #include "natural-mystic-config.h"
-#include "natural-mystic-fog.h"
 #include "natural-mystic-light.h"
 #include "natural-mystic-hacks.h"
 
@@ -167,9 +167,8 @@ vec4 inColor = color;
 	/* Reduce the contrast of far objects (#5). The overall color
 	 * should lean towards the ambient. */
 #if defined(FANCY) && defined(MCPE40059)
-	diffuse.rgb =
-		mix(diffuse.rgb, contrastFilter(diffuse.rgb, 0.45) * ambientColor,
-			exponentialFog(vec2(0.0, 4.0), cameraDist));
+	diffuse.rgb = mix(
+		diffuse.rgb, contrastFilter(diffuse.rgb, 0.45) * ambientColor, desatFactor);
 #endif
 
 	/* We can't apply fogs before doing tone mapping, because that
