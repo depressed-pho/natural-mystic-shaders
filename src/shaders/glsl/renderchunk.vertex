@@ -17,6 +17,9 @@
 /* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
 #if defined(MCPE40059)
 varying POS4 worldPos;
+varying float cameraDist; /* Normalized camera distance being 1.0 at
+						   * the point where the far terrain fog
+						   * ends. */
 #endif
 
 #ifndef BYPASS_PIXEL_SHADER
@@ -97,6 +100,7 @@ void main()
 {
 #if !defined(MCPE40059)
     POS4 worldPos;
+	float cameraDist;
 #endif
 #ifdef AS_ENTITY_RENDERER
 		POS4 pos = WORLDVIEWPROJ * POSITION;
@@ -120,20 +124,14 @@ void main()
 #endif
 
 ///// find distance from the camera
-
-#if defined(FOG) || defined(BLEND) || defined(FANCY)
-	#ifdef FANCY
-		vec3 relPos = -worldPos.xyz;
-		float cameraDepth = length(relPos);
-	#else
-		float cameraDepth = pos.z;
-	#endif
-#endif
+	vec3 relPos = -worldPos.xyz;
+	float cameraDepth = length(relPos);
+	cameraDist = cameraDepth / RENDER_DISTANCE;
 
 ///// apply fog
 
 #ifdef FOG
-	float len = cameraDepth / RENDER_DISTANCE;
+	float len = cameraDist;
 	#ifdef ALLOW_FADE
 		len += RENDER_CHUNK_FOG_ALPHA;
 	#endif
@@ -208,17 +206,13 @@ void main()
 	bool shouldBecomeOpaqueInTheDistance = color.a < 0.95;
 	if(shouldBecomeOpaqueInTheDistance) {
 		#ifdef FANCY  /////enhance water
-			float cameraDist = cameraDepth / FAR_CHUNKS_DISTANCE;
 		#else
 			// Completely insane, but if I don't have these two lines in here, the water doesn't render on a Nexus 6
 			vec4 surfColor = vec4(color.rgb, 1.0);
 			color = surfColor;
-				
-			vec3 relPos = -worldPos.xyz;
-			float camDist = length(relPos);
-			float cameraDist = camDist / FAR_CHUNKS_DISTANCE;
 		#endif //FANCY
-		
+
+		float cameraDist = cameraDepth / FAR_CHUNKS_DISTANCE;
 		float alphaFadeOut = clamp(cameraDist, 0.0, 1.0);
 		color.a = mix(color.a, 1.0, alphaFadeOut);
 	}

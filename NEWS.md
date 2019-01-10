@@ -16,6 +16,9 @@
 * Changed the fog type from linear fog (vanilla) to exponential
   squared fog (#12). It is slightly more expensive but produces better
   results.
+* Distant terrain is now rendered with gradually reduced contrast to
+  express a light scattering effect caused by particles flowing in the
+  air (#5).
 
 ## 1.3.0 -- 2019-01-06
 

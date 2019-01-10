@@ -45,7 +45,7 @@ vec3 ambientLightColor(float sunLevel, float daylight) {
 
     /* In caves the torch light is the only possible light source but
      * on the ground the sun or the moon is the most influential. */
-    return mix(torchlightColor, outsideColor, sunLevel);
+    return brighten(mix(torchlightColor, outsideColor, sunLevel));
 }
 
 /* Apply the ambient light on the original fragment "frag". The .a
