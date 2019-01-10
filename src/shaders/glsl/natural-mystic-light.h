@@ -109,13 +109,17 @@ vec3 applyTorchLight(vec3 frag, vec3 pigment, float torchLevel, float sunLevel, 
  */
 vec3 applySunlight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
     const float baseIntensity = 50.0;
-    const float shadowFactor  = 0.10;  // [0, 1]
+    const float shadowFactor  = 0.01;  // [0, 1]
     const float shadowBorder  = 0.87;  // [0, 1]
     const float shadowBlur    = 0.003; // The higher the more blur.
 
     float intensity = baseIntensity * sunLevel * daylight;
     if (intensity > 0.0) {
-        /* Shadows reduce the amount of sunlight. */
+        /* Shadows reduce the amount of sunlight. The reason why we
+         * don't remove it entirely is that a shadowed area near a lit
+         * area will receive higher amount of scattered light. If it
+         * were completely occluded the sunlight level won't be
+         * non-zero. */
         intensity *= mix(
             shadowFactor, 1.0,
             smoothstep(shadowBorder - shadowBlur, shadowBorder + shadowBlur, sunLevel));
