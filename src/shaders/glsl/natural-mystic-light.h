@@ -57,18 +57,21 @@ vec3 applyAmbientLight(vec3 frag, vec3 pigment, vec3 lightColor, float intensity
 }
 
 /* Calculate the torch light flickering factor [0, 2] based on the
- * in-game time.
+ * world coordinates and the in-game time.
  */
-float torchLightFlicker(highp float time) {
-    /* The flicker factor is solely determined by the time. Ideally it
-     * should be separately computed for each light source in the
-     * scene, but we can't do it because shaders don't have access to
-     * such information.
+float torchLightFlicker(highp vec3 wPos, highp float time) {
+    /* The flicker factor is solely determined by the coords and the
+     * time. Ideally it should be separately computed for each light
+     * source in the scene, but we can't do it because shaders don't
+     * have access to such information. We instead generate a
+     * 4-dimensional simplex noise and slice it by time.
      */
-    highp float amplitude = 0.15;
-    highp float st        = time * 3.0;
-    highp float flicker   = perlinNoise(st);
-    return (flicker * 2.0 - 1.0) * amplitude + 1.3;
+    const highp float amplitude  = 0.20;
+    const highp vec4  resolution = vec4(vec3(12.0), 0.8);
+
+    highp vec4  st      = vec4(wPos, time) / resolution;
+    highp float flicker = simplexNoise(st);
+    return flicker * amplitude + 1.0;
 }
 
 /* Calculate and apply the torch light on the original fragment
@@ -77,7 +80,7 @@ float torchLightFlicker(highp float time) {
  * effect.
  */
 vec3 applyTorchLight(vec3 frag, vec3 pigment, float torchLevel, float sunLevel, float daylight, highp float flickerFactor) {
-    const float baseIntensity = 160.0;
+    const float baseIntensity = 180.0;
     const float decay         = 5.0;
 
     if (torchLevel > 0.0) {

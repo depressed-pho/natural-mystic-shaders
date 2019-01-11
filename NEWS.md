@@ -19,6 +19,7 @@
 * Distant terrain is now rendered with gradually reduced contrast to
   express a light scattering effect caused by particles flowing in the
   air (#5).
+* Cluster of torches no longer flicker in a synchronized manner (#48).
 
 ## 1.3.0 -- 2019-01-06
 

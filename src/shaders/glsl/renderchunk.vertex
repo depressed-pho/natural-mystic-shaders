@@ -127,7 +127,7 @@ void main()
 
 #if defined(MCPE40059)
 #  if defined(ENABLE_TORCH_FLICKER)
-	flickerFactor = torchLightFlicker(TIME);
+	flickerFactor = torchLightFlicker(worldPos.xyz, TIME);
 #  else
 	flickerFactor = 1.0;
 #  endif
