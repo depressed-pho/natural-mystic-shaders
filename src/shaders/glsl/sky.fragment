@@ -16,10 +16,9 @@ highp float cloudMap(int octaves, highp float time, highp vec3 pos) {
     /* Use of highp is essential here, as the uniform TIME in mediump
      * starts to lose precision within 10 minutes.
      */
-    const highp vec2 resolution = vec2(0.8, 0.8);
+    const highp vec2 resolution = vec2(1.4, 1.4);
 
     highp vec2 st = pos.xz / resolution;
-    st.x *= resolution.x / resolution.y;
     /* The inverse of the speed (512) should be a power of two in
      * order to avoid a precision loss.
      */
@@ -29,7 +28,7 @@ highp float cloudMap(int octaves, highp float time, highp vec3 pos) {
      * of the precision so we get somewhat sparse noise.
      */
     highp float result = fBM(octaves, st * 3.0);
-    result = smoothstep(0.5, 1.0, result) * 4.0;
+    result = smoothstep(0.5, 1.0, result) * 1.5;
     result = clamp(result, 0.0, 1.0);
 
     /* Workaround for MCPE-39749: the uniform TIME might not be a
