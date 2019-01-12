@@ -15,12 +15,10 @@ varying vec4 color;
 /* Generate a pattern of brightness of stars based on a world
  * position. */
 highp float stars(highp vec3 pos) {
-    const highp vec2 resolution = vec2(0.3, 0.3);
+    const highp vec2 resolution = vec2(0.3);
 
     highp vec2 st = pos.xz / resolution;
-    st.x *= resolution.x / resolution.y;
-
-    return perlinNoise(st);
+    return (simplexNoise(st) + 1.0) * 0.5;
 }
 
 void main()
@@ -29,7 +27,7 @@ void main()
 
     color = COLOR;
 
-#if defined(ENABLE_PERLIN_STARS)
+#if defined(ENABLE_RANDOM_STARS)
     color.rgb *= vec3(stars(POSITION.xyz));
 #endif
 }

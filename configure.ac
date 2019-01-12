@@ -53,12 +53,12 @@ AS_IF([test x"$enable_fbm_clouds" != x"no"],
                  [Define to enable shader-generated clouds.])])
 
 AC_ARG_ENABLE(
-    [perlin-stars],
+    [random-stars],
     [AS_HELP_STRING(
-         [--disable-perlin-stars],
+         [--disable-random-stars],
          [disable randomness in the brightness of stars])])
-AS_IF([test x"$enable_perlin_stars" != x"no"],
-      [AC_DEFINE([ENABLE_PERLIN_STARS], [1],
+AS_IF([test x"$enable_random_stars" != x"no"],
+      [AC_DEFINE([ENABLE_RANDOM_STARS], [1],
                  [Define to introduce randomness in the brighness of stars.])])
 
 AC_ARG_WITH(

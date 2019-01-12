@@ -6,41 +6,6 @@
 // Also https://briansharpe.wordpress.com/2011/10/01/gpu-texture-free-noise/
 // Also https://github.com/stegu/webgl-noise/
 
-/* Generate a random scalar [0, 1) based on some 2D vector. See
- * https://thebookofshaders.com/13/
- */
-highp float random(highp vec2 st) {
-    st += 128.0; // The function has a bad characteristic near (0, 0).
-    return fract(
-        sin(dot(st, vec2(12.9898, 4.1414))) * 43758.5453123);
-}
-
-/* Generate a 2D perlin noise. Based on Morgan McGuire @morgan3d
- * https://www.shadertoy.com/view/4dS3Wd
- */
-highp float perlinNoise(highp vec2 st) {
-    highp vec2 i = floor(st);
-    highp vec2 f = fract(st);
-
-    // Four corners in 2D of a tile.
-    highp float a = random(i);
-    highp float b = random(i + vec2(1.0, 0.0));
-    highp float c = random(i + vec2(0.0, 1.0));
-    highp float d = random(i + vec2(1.0, 1.0));
-
-    // Simple 2D lerp using smoothstep envelope between the values.
-    // return mix(mix(a, b, smoothstep(0.0, 1.0, f.x)),
-    //            mix(c, d, smoothstep(0.0, 1.0, f.x)),
-    //            smoothstep(0.0, 1.0, f.y));
-
-    // Same code, with the clamps in smoothstep and common subexpressions
-    // optimized away.
-    highp vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(a, b, u.x) +
-        (c - a) * u.y * (1.0 - u.x) +
-        (d - b) * u.x * u.y;
-}
-
 /* Permutation in mod 289. */
 highp float permute289(highp float x) {
     return mod((x * 34.0 + 1.0) * x, 289.0);
