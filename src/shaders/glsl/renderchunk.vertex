@@ -53,14 +53,14 @@ const vec3 UNIT_Y = vec3(0,1,0);
 const float DIST_DESATURATION = 56.0 / 255.0; //WARNING this value is also hardcoded in the water color, don'tchange
 
 highp float waterWave(highp vec3 wPos, highp float time) {
-	highp vec2 resolution = vec2(7.0, 1.6);
+	highp vec2 resolution = vec2(17.25, 2.8);
 	highp vec2  st    = wPos.xz / resolution;
 	highp float tSlow = time / 1.5;
 	highp vec2  st1   = st + tSlow * vec2( 0.5,  1.0);
 	highp vec2  st2   = st + tSlow * vec2(-0.4, -1.0);
 
-	highp float wave1  = perlinNoise(st1) * 2.0 - 1.0;
-	highp float wave2  = perlinNoise(st2) * 2.0 - 1.0;
+	highp float wave1  = simplexNoise(st1) * 0.5;
+	highp float wave2  = simplexNoise(st2) * 0.5;
 	highp float wave3  = wave1 + wave2 * 0.9;
 	highp float wave4  = wave3 * 0.5;
 	highp float interp = sin(TIME * 5.0 - 2.1 * wPos.x - 1.4 * wPos.z + wPos.y);
@@ -93,7 +93,7 @@ vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp float wav
 	 * function. Dunno if it's worth it tho. */
 	vec3 lightDelta = ambient * wave;
 	surfColor.rgb = max(surfColor.rgb, min(vec3(1.0), surfColor.rgb + lightDelta * 0.20));
-	nearColor.rgb = max(nearColor.rgb, min(vec3(1.0), nearColor.rgb + lightDelta * 0.03));
+	nearColor.rgb = max(nearColor.rgb, min(vec3(1.0), nearColor.rgb + lightDelta * 0.07));
 
 	return mix(surfColor, nearColor, cosTheta);
 }
