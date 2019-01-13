@@ -66,7 +66,7 @@ float torchLightFlicker(highp vec3 wPos, highp float time) {
      * have access to such information. We instead generate a
      * 4-dimensional simplex noise and slice it by time.
      */
-    const highp float amplitude  = 0.30;
+    const highp float amplitude  = 0.40;
     const highp vec4  resolution = vec4(vec3(12.0), 0.8);
 
     highp vec4  st      = vec4(wPos, time) / resolution;
