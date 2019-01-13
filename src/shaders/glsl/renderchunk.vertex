@@ -40,7 +40,7 @@ varying float desatFactor;
 #include "natural-mystic-fog.h"
 #include "natural-mystic-hacks.h"
 #include "natural-mystic-light.h"
-#include "natural-mystic-noise.h"
+#include "natural-mystic-water.h"
 
 attribute POS4 POSITION;
 attribute vec4 COLOR;
@@ -52,6 +52,7 @@ const float rB = 1.0;
 const vec3 UNIT_Y = vec3(0,1,0);
 const float DIST_DESATURATION = 56.0 / 255.0; //WARNING this value is also hardcoded in the water color, don'tchange
 
+#if 0
 highp float waterWave(highp vec3 wPos, highp float time) {
 	highp vec2 resolution = vec2(17.25, 2.8);
 	highp vec2  st    = wPos.xz / resolution;
@@ -67,6 +68,7 @@ highp float waterWave(highp vec3 wPos, highp float time) {
 
 	return mix(wave3, wave4, interp) + interp * 0.5;
 }
+#endif
 
 vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp float wave) {
 	/* We want to know the angle between the normal of the water plane
@@ -104,6 +106,7 @@ void main()
     POS4 worldPos;
 	float cameraDist;
 #endif
+
 #ifdef AS_ENTITY_RENDERER
 		POS4 pos = WORLDVIEWPROJ * POSITION;
 		worldPos = pos;
@@ -168,7 +171,7 @@ void main()
 #endif /* FOG */
 
 	/* Waves */
-#if !defined(BYPASS_PIXEL_SHADER) && defined(ENABLE_WAVES)
+#if !defined(BYPASS_PIXEL_SHADER) && !defined(AS_ENTITY_RENDERER) && defined(ENABLE_WAVES)
 	if (isLeaf(color)) {
 		POS3 posw = POSITION.xyz;
 		highp float wave = sin(TIME * 3.5 + 2.0 * posw.x + 2.0 * posw.z + posw.y);
@@ -179,42 +182,47 @@ void main()
 		 * vertex in the world coordinates without getting affected by
 		 * the view position, but actually it's not working as
 		 * expected. I don't know why. (#36) */
-		POS3 posw = worldPos.xyz + VIEW_POS;
+		highp vec3 wPos = worldPos.xyz + VIEW_POS;
 
 		/* We want water to swell in proportion to its volume. The more
 		 * the vertex is close to the ground (i.e. integral points in the
 		 * world position), the less the vertex should swell. Without this
 		 * tweak the water will leave the ground a bit. */
-		highp float wave   = 0.0;
 		highp float volume = fract(POSITION.y);
+		highp float waveHeight = 0.0;
 		if (volume > 0.0) {
-			wave = waterWave(posw, TIME);
-			gl_Position.y += wave * 0.08 * volume;
+			highp vec3 normal;
+			highp vec3 wPos1     = geometricWaterWave(wPos, TIME, normal);
+			highp vec3 wPosDelta = (wPos1 - wPos) * volume;
+			worldPos.xyz    += wPosDelta;
+			gl_Position.xyz += wPosDelta;
+			waveHeight       = wPosDelta.y;
 		}
 
 #  if defined(FANCY)
-		/* When we know the surface norm we can do something advanced. */
+		/* When we know the surface normal we can do something
+		 * advanced. */
 		if (isWaterPlane(POSITION)) {
 			/* THINKME: The color of the ambient light can only be
 			 * calculated accurately in the fragment shader. */
-#if defined(FOG)
+#    if defined(FOG)
 			vec3 ambient = ambientLightColor(fogColor);
-#else
+#    else
 			vec3 ambient = ambientLightColor(1.0, 1.0);
-#endif
+#    endif /* defined(FOG) */
 			/* Reduce the base opacity here. We are going to increase it
 			 * depending on the angle between the water plane and the
 			 * camera.
 			 */
 			color.a *= 0.25;
-			color = waterColor(color, ambient, relPos, wave);
+			color = waterColor(color, ambient, relPos, waveHeight);
 		}
 		else {
 			color.a *= 0.5;
 		}
-#  endif
+#  endif /* defined(FANCY) */
 	}
-#endif
+#endif /* !defined(BYPASS_PIXEL_SHADER) && defined(ENABLE_WAVES) */
 
 ///// blended layer (mostly water) magic
 #ifdef BLEND
