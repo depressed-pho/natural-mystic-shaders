@@ -52,24 +52,6 @@ const float rB = 1.0;
 const vec3 UNIT_Y = vec3(0,1,0);
 const float DIST_DESATURATION = 56.0 / 255.0; //WARNING this value is also hardcoded in the water color, don'tchange
 
-#if 0
-highp float waterWave(highp vec3 wPos, highp float time) {
-	highp vec2 resolution = vec2(17.25, 2.8);
-	highp vec2  st    = wPos.xz / resolution;
-	highp float tSlow = time / 1.5;
-	highp vec2  st1   = st + tSlow * vec2( 0.5,  1.0);
-	highp vec2  st2   = st + tSlow * vec2(-0.4, -1.0);
-
-	highp float wave1  = simplexNoise(st1) * 0.5;
-	highp float wave2  = simplexNoise(st2) * 0.5;
-	highp float wave3  = wave1 + wave2 * 0.9;
-	highp float wave4  = wave3 * 0.5;
-	highp float interp = sin(TIME * 5.0 - 2.1 * wPos.x - 1.4 * wPos.z + wPos.y);
-
-	return mix(wave3, wave4, interp) + interp * 0.5;
-}
-#endif
-
 vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp float wave) {
 	/* We want to know the angle between the normal of the water plane
 	 * (or anything rendered similarly to water) and the camera. Note
@@ -93,7 +75,7 @@ vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp float wav
 	/* Simulate the specular light. THINKME: Do a proper normal
 	 * mapping, possibly by calculating the derivation of the wave
 	 * function. Dunno if it's worth it tho. */
-	vec3 lightDelta = ambient * wave;
+	vec3 lightDelta = ambient * wave * 12.5;
 	surfColor.rgb = max(surfColor.rgb, min(vec3(1.0), surfColor.rgb + lightDelta * 0.20));
 	nearColor.rgb = max(nearColor.rgb, min(vec3(1.0), nearColor.rgb + lightDelta * 0.07));
 
@@ -194,9 +176,9 @@ void main()
 			highp vec3 normal;
 			highp vec3 wPos1     = geometricWaterWave(wPos, TIME, normal);
 			highp vec3 wPosDelta = (wPos1 - wPos) * volume;
-			worldPos.xyz    += wPosDelta;
-			gl_Position.xyz += wPosDelta;
-			waveHeight       = wPosDelta.y;
+			worldPos.xyz += wPosDelta;
+			waveHeight    = wPosDelta.y;
+			gl_Position   = PROJ * (WORLDVIEW * worldPos);
 		}
 
 #  if defined(FANCY)
