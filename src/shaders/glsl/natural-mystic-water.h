@@ -103,19 +103,18 @@ highp vec3 waterWaveGeometric(highp vec3 wPos, highp float time, out highp vec3 
     wPos   = gerstnerWave(wPos, time, normal, Q, numWaves, 0.05, deg2dir( 70.0),  8.0, 13.0);
     wPos   = gerstnerWave(wPos, time, normal, Q, numWaves, 0.02, deg2dir(200.0),  7.0, 14.0);
 
-    normal = normalize(normal);
     return wPos;
 }
 
 highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal) {
-    const float Q        = 0.2;
+    const float Q        = 0.45;
     const float numWaves = float(3);
 
-    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0008, deg2dir( 85.0), 1.50, 1.0);
-    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0008, deg2dir(255.0), 1.45, 2.0);
-    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0005, deg2dir( 65.0), 1.40, 2.0);
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0058, deg2dir( 85.0), 1.50, 1.0);
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0058, deg2dir(255.0), 1.45, 2.0);
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0045, deg2dir( 65.0), 1.40, 2.0);
 
-    return normal;
+    return normalize(normal);
 }
 
 vec4 waterColor(
@@ -133,12 +132,15 @@ vec4 waterColor(
     normal = waterWaveNormal(worldPos + VIEW_POS, time, normal);
 
     /* The intensity of the specular light is determined with the
-     * angle between the reflected sun light and the view vector.
+     * angle between the reflected sun light and the view vector. See
+     * https://en.wikibooks.org/wiki/GLSL_Programming/GLUT/Specular_Highlights
      */
-    highp vec3  viewPoint      = normalize(-relPos);
-    highp vec3  reflectedLight = normalize(reflect(-sunMoonPos, normal));
-    highp float lightAngle     = abs(dot(reflectedLight, viewPoint)); // [0, 1]
-    highp vec3  specular       = smoothstep(0.7, 1.0, lightAngle) * ambient * 60.0;
+    highp vec3  viewPoint    = normalize(-relPos);
+    highp vec3  reflectedSun = normalize(reflect(-sunMoonPos, normal));
+    const float intensity    = 60.0; // FIXME: Caves and night. Also torches?
+    const float shininess    = 2.0;
+    highp float sunAngle     = max(0.0, dot(reflectedSun, viewPoint));
+    highp vec3  specular     = ambient * intensity * pow(sunAngle, shininess);
 
     /* We want to know the angle between the normal of the water plane
      * (or anything rendered similarly to water) and the camera. The
