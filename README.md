@@ -34,6 +34,31 @@ See [NEWS](NEWS.md).
 
 * Minecraft Bedrock 1.8, iPad Pro (MLMY2J/A), iOS 12.1 (16B92)
 
+## Changing configuration
+
+Ideally there should be an in-game GUI to dynamically control the
+settings of shaders, but that isn't possible at the moment (#44). To
+compensate this shader pack contains a configuration file so users can
+edit it directly to modify its behavior.
+
+* Unpack the `.mcpack` file to some directory. It's just a zip archive.
+* Open `src/shaders/glsl/natural-mystic-config.h` with your favorite editor.
+* Edit the file to change configuration.
+* Archive it again, and install it.
+
+For example, you can disable the shader-generated clouds and turn it
+into the default by changing the following line:
+
+```glsl
+#define ENABLE_FBM_CLOUDS 1
+```
+
+To this:
+
+```glsl
+//#define ENABLE_FBM_CLOUDS 1
+```
+
 ## Author
 
 PHO
