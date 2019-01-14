@@ -111,9 +111,9 @@ highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal)
     const float Q        = 0.2;
     const float numWaves = float(3);
 
-    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0008, deg2dir( 85.0), 0.50, 1.0);
-    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0008, deg2dir(255.0), 0.45, 2.0);
-    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0005, deg2dir( 65.0), 0.40, 2.0);
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0008, deg2dir( 85.0), 1.50, 1.0);
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0008, deg2dir(255.0), 1.45, 2.0);
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0005, deg2dir( 65.0), 1.40, 2.0);
 
     return normal;
 }
@@ -125,7 +125,7 @@ vec4 waterColor(
     /* The game doesn't tell us where the sun or the moon is, which is
      * so unfortunate. We have to assume they are always near the
      * origin. */
-    const highp vec3 sunMoonPos = vec3(0.0, 1.0e10, -2.5);
+    const highp vec3 sunMoonPos = vec3(-2.5, 1.0e10, 0);
 
     /* Oscillate the normal even more, but this time with much higher
      * frequencies. This is a kind of bump mapping.
