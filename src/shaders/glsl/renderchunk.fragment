@@ -23,9 +23,12 @@
 /* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
 #if defined(MCPE40059)
 varying POS4 worldPos;
+varying highp vec3 relPos;
+varying highp vec3 normal;
 varying float cameraDist;
 varying float flickerFactor;
 varying float desatFactor;
+varying float waterPlane;
 #endif
 
 varying vec4 color;
@@ -41,6 +44,7 @@ varying vec4 fogColor;
 #include "natural-mystic-config.h"
 #include "natural-mystic-light.h"
 #include "natural-mystic-hacks.h"
+#include "natural-mystic-water.h"
 
 LAYOUT_BINDING(0) uniform sampler2D TEXTURE_0;
 LAYOUT_BINDING(1) uniform sampler2D TEXTURE_1;
@@ -92,11 +96,6 @@ vec4 inColor = color;
 	diffuse.a = 1.0;
 #endif
 
-	/* Reset the diffused color here to the complete darkness. We are
-	 * going to redo all the lightings with our own HDR method. */
-	vec3 pigment = diffuse.rgb;
-	diffuse.rgb  = vec3(0.0);
-
 	/* Fetch the level of daylight (i.e. the one which darkens at
 	 * night) from the light map passed by the upstream. Note that we
 	 * intentionally reduce the dynamic range because the upstream
@@ -138,6 +137,17 @@ vec4 inColor = color;
 #else
 	ambientColor = ambientLightColor(uv1.y, daylight);
 #endif /* defined(FOG) */
+
+	/* Reset the diffused color here to the complete darkness. We are
+	 * going to redo all the lightings with our own HDR method. */
+	vec3 pigment = diffuse.rgb;
+	diffuse.rgb  = vec3(0.0);
+
+#if defined(MCPE40059)
+	if (waterPlane > 0.0) {
+		diffuse = waterColor(vec4(pigment, diffuse.a), ambientColor, relPos, normal);
+	}
+#endif
 
 	diffuse.rgb = applyAmbientLight(diffuse.rgb, pigment, ambientColor, ambientBrightness);
 #if defined(FOG)

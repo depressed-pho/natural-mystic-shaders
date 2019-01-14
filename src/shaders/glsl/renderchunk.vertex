@@ -17,11 +17,14 @@
 /* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
 #if defined(MCPE40059)
 varying POS4 worldPos;
+varying highp vec3 relPos;
+varying highp vec3 normal; // Only defined when waterPlane > 0.0
 varying float cameraDist; /* Normalized camera distance being 1.0 at
 						   * the point where the far terrain fog
 						   * ends. */
 varying float flickerFactor;
 varying float desatFactor;
+varying float waterPlane; // [0, 1]
 #endif
 
 #ifndef BYPASS_PIXEL_SHADER
@@ -52,6 +55,7 @@ const float rB = 1.0;
 const vec3 UNIT_Y = vec3(0,1,0);
 const float DIST_DESATURATION = 56.0 / 255.0; //WARNING this value is also hardcoded in the water color, don'tchange
 
+#if 0
 vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp float wave) {
 	/* We want to know the angle between the normal of the water plane
 	 * (or anything rendered similarly to water) and the camera. Note
@@ -81,11 +85,13 @@ vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp float wav
 
 	return mix(surfColor, nearColor, cosTheta);
 }
+#endif
 
 void main()
 {
 #if !defined(MCPE40059)
     POS4 worldPos;
+	vec3 relPos;
 	float cameraDist;
 #endif
 
@@ -120,7 +126,7 @@ void main()
 #endif /* defined(MCPE40059) */
 
 ///// find distance from the camera
-	vec3 relPos = -worldPos.xyz;
+	relPos = -worldPos.xyz;
 	float cameraDepth = length(relPos);
 	cameraDist = cameraDepth / RENDER_DISTANCE;
 
@@ -153,7 +159,10 @@ void main()
 #endif /* FOG */
 
 	/* Waves */
-#if !defined(BYPASS_PIXEL_SHADER) && !defined(AS_ENTITY_RENDERER) && defined(ENABLE_WAVES)
+#if defined(MCPE40059)
+	waterPlane = 0.0;
+#endif
+#if !defined(BYPASS_PIXEL_SHADER) && !defined(AS_ENTITY_RENDERER) && defined(ENABLE_WAVES) && defined(MCPE40059)
 	if (isLeaf(color)) {
 		POS3 posw = POSITION.xyz;
 		highp float wave = sin(TIME * 3.5 + 2.0 * posw.x + 2.0 * posw.z + posw.y);
@@ -171,13 +180,10 @@ void main()
 		 * world position), the less the vertex should swell. Without this
 		 * tweak the water will leave the ground a bit. */
 		highp float volume = fract(POSITION.y);
-		highp float waveHeight = 0.0;
 		if (volume > 0.0) {
-			highp vec3 normal;
 			highp vec3 wPos1     = geometricWaterWave(wPos, TIME, normal);
 			highp vec3 wPosDelta = (wPos1 - wPos) * volume;
 			worldPos.xyz += wPosDelta;
-			waveHeight    = wPosDelta.y;
 			gl_Position   = PROJ * (WORLDVIEW * worldPos);
 		}
 
@@ -185,26 +191,20 @@ void main()
 		/* When we know the surface normal we can do something
 		 * advanced. */
 		if (isWaterPlane(POSITION)) {
-			/* THINKME: The color of the ambient light can only be
-			 * calculated accurately in the fragment shader. */
-#    if defined(FOG)
-			vec3 ambient = ambientLightColor(fogColor);
-#    else
-			vec3 ambient = ambientLightColor(1.0, 1.0);
-#    endif /* defined(FOG) */
+			waterPlane = 1.0;
+
 			/* Reduce the base opacity here. We are going to increase it
 			 * depending on the angle between the water plane and the
 			 * camera.
 			 */
 			color.a *= 0.25;
-			color = waterColor(color, ambient, relPos, waveHeight);
 		}
 		else {
 			color.a *= 0.5;
 		}
 #  endif /* defined(FANCY) */
 	}
-#endif /* !defined(BYPASS_PIXEL_SHADER) && defined(ENABLE_WAVES) */
+#endif /* !defined(BYPASS_PIXEL_SHADER) && !defined(AS_ENTITY_RENDERER) && defined(ENABLE_WAVES) */
 
 ///// blended layer (mostly water) magic
 #ifdef BLEND
