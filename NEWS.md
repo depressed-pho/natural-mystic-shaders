@@ -1,6 +1,6 @@
 # Release notes
 
-## 1.4.0 -- FIXME
+## 1.4.0 -- 2019-01-14
 
 * Fixed vanilla clouds being shown when "Fancy Graphics" is disabled.
 * The scene no longer becomes unplayably dark when underwater or in
