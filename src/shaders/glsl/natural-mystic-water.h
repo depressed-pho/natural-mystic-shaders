@@ -38,12 +38,30 @@ highp vec3 gerstnerWave(
     return wPos;
 }
 
+highp vec3 gerstnerWaveN(
+    highp vec3 wPos, highp float time, highp vec3 normal,
+    float Q, float numWaves, float Ai, vec2 Di, float Li, float Si) {
+
+    const float wFactor = 9.80665 * 2.0 * 3.14159;
+
+    float wi    = sqrt(wFactor / Li);
+    float Qi    = Q / (wi * Ai * numWaves);
+    float phi_i = Si * 2.0 / Li;
+
+    highp float phase = wi * dot(Di, wPos.xz) + phi_i * time;
+    highp float wiAi  = wi * Ai;
+    normal.xz -= wiAi * Di * cos(phase);
+    normal.y  -= wiAi * Qi * sin(phase);
+
+    return normal;
+}
+
 vec2 deg2dir(float deg) {
     float rad = radians(deg);
     return vec2(cos(rad), sin(rad));
 }
 
-highp vec3 geometricWaterWave(highp vec3 wPos, highp float time, out highp vec3 normal) {
+highp vec3 waterWaveGeometric(highp vec3 wPos, highp float time, out highp vec3 normal) {
     /* The Gerstner wave function is:
      *
      *              [ x + Σ(Q_i A_i * D_i.x * cos(w_i D_i · (x, y) + φ_i t)), ]
@@ -89,20 +107,38 @@ highp vec3 geometricWaterWave(highp vec3 wPos, highp float time, out highp vec3 
     return wPos;
 }
 
-vec4 waterColor(vec4 pigment, vec3 ambient, highp vec3 relPos, highp vec3 normal) {
+highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal) {
+    const float Q        = 0.2;
+    const float numWaves = float(3);
+
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0008, deg2dir( 85.0), 0.50, 1.0);
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0008, deg2dir(255.0), 0.45, 2.0);
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0005, deg2dir( 65.0), 0.40, 2.0);
+
+    return normal;
+}
+
+vec4 waterColor(
+    vec4 pigment, vec3 ambient,
+    highp vec3 worldPos, highp vec3 relPos, highp float time, highp vec3 normal) {
+
     /* The game doesn't tell us where the sun or the moon is, which is
      * so unfortunate. We have to assume they are always near the
      * origin. */
-    const highp vec3 sunMoonPos = vec3(0.0, 1.0, -1.5);
+    const highp vec3 sunMoonPos = vec3(0.0, 1.0e10, -2.5);
 
-    highp vec3 viewPoint      = normalize(-relPos);
-    highp vec3 reflectedLight = normalize(reflect(-sunMoonPos, normal));
-    highp float lightAngle    = abs(dot(reflectedLight, viewPoint)); // [0, 1]
+    /* Oscillate the normal even more, but this time with much higher
+     * frequencies. This is a kind of bump mapping.
+     */
+    normal = waterWaveNormal(worldPos + VIEW_POS, time, normal);
 
     /* The intensity of the specular light is determined with the
      * angle between the reflected sun light and the view vector.
      */
-    vec3 specular = smoothstep(0.7, 1.0, lightAngle) * ambient * 10.0;
+    highp vec3  viewPoint      = normalize(-relPos);
+    highp vec3  reflectedLight = normalize(reflect(-sunMoonPos, normal));
+    highp float lightAngle     = abs(dot(reflectedLight, viewPoint)); // [0, 1]
+    highp vec3  specular       = smoothstep(0.7, 1.0, lightAngle) * ambient * 60.0;
 
     /* We want to know the angle between the normal of the water plane
      * (or anything rendered similarly to water) and the camera. The
@@ -119,7 +155,7 @@ vec4 waterColor(vec4 pigment, vec3 ambient, highp vec3 relPos, highp vec3 normal
     vec4 surfColor = vec4(specular, min(1.0, pigment.a * 8.0));
     vec4 nearColor = vec4(vec3(0), opacity);
 
-    return mix(surfColor, nearColor, viewAngle);
+    return mix(surfColor, nearColor, smoothstep(0.0, 0.8, viewAngle));
 }
 
 #endif /* !defined(NATURAL_MYSTIC_WATER_H_INCLUDED) */

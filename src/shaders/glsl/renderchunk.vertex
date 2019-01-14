@@ -55,38 +55,6 @@ const float rB = 1.0;
 const vec3 UNIT_Y = vec3(0,1,0);
 const float DIST_DESATURATION = 56.0 / 255.0; //WARNING this value is also hardcoded in the water color, don'tchange
 
-#if 0
-vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp float wave) {
-	/* We want to know the angle between the normal of the water plane
-	 * (or anything rendered similarly to water) and the camera. Note
-	 * that we assume the surface normal is always (0, 1, 0) and the
-	 * assumption can be wrong! When in doubt never use this
-	 * function. */
-	const highp vec3 surfNorm = vec3(0.0, 1.0, 0.0);
-	highp float cosTheta = abs(dot(surfNorm, normalize(-relPos))); // [0, 1]
-
-	/* Use the angle to calculate the color of surface. The more steep
-	 * the angle is, the less intensity of the supecular light will
-	 * be. And we also use the angle to determine the opacity, that
-	 * is, when the angle is wide the water plane behaves more like a
-	 * mirror than air.
-	 */
-	float opacity   = baseColor.a;
-	float lightness = 1.0 - baseColor.a;
-	vec4 surfColor  = vec4(baseColor.rgb, min(1.0, baseColor.a * 8.0));
-	vec4 nearColor  = vec4(baseColor.rgb * lightness, opacity);
-
-	/* Simulate the specular light. THINKME: Do a proper normal
-	 * mapping, possibly by calculating the derivation of the wave
-	 * function. Dunno if it's worth it tho. */
-	vec3 lightDelta = ambient * wave * 12.5;
-	surfColor.rgb = max(surfColor.rgb, min(vec3(1.0), surfColor.rgb + lightDelta * 0.20));
-	nearColor.rgb = max(nearColor.rgb, min(vec3(1.0), nearColor.rgb + lightDelta * 0.07));
-
-	return mix(surfColor, nearColor, cosTheta);
-}
-#endif
-
 void main()
 {
 #if !defined(MCPE40059)
@@ -181,7 +149,7 @@ void main()
 		 * tweak the water will leave the ground a bit. */
 		highp float volume = fract(POSITION.y);
 		if (volume > 0.0) {
-			highp vec3 wPos1     = geometricWaterWave(wPos, TIME, normal);
+			highp vec3 wPos1     = waterWaveGeometric(wPos, TIME, normal);
 			highp vec3 wPosDelta = (wPos1 - wPos) * volume;
 			worldPos.xyz += wPosDelta;
 			gl_Position   = PROJ * (WORLDVIEW * worldPos);

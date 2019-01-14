@@ -145,7 +145,7 @@ vec4 inColor = color;
 
 #if defined(MCPE40059) && defined(FANCY)
 	if (waterPlane > 0.0) {
-		diffuse = waterColor(vec4(pigment, diffuse.a), ambientColor, relPos, normal);
+		diffuse = waterColor(vec4(pigment, diffuse.a), ambientColor, worldPos.xyz, relPos, TIME, normal);
 	}
 #endif
 
