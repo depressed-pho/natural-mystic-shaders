@@ -89,10 +89,25 @@ highp vec3 geometricWaterWave(highp vec3 wPos, highp float time, out highp vec3 
     return wPos;
 }
 
-vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp vec3 normal) {
+vec4 waterColor(vec4 pigment, vec3 ambient, highp vec3 relPos, highp vec3 normal) {
+    /* The game doesn't tell us where the sun or the moon is, which is
+     * so unfortunate. We have to assume they are always near the
+     * origin. */
+    const highp vec3 sunMoonPos = vec3(0.0, 1.0, -1.5);
+
+    highp vec3 viewPoint      = normalize(-relPos);
+    highp vec3 reflectedLight = normalize(reflect(-sunMoonPos, normal));
+    highp float lightAngle    = abs(dot(reflectedLight, viewPoint)); // [0, 1]
+
+    /* The intensity of the specular light is determined with the
+     * angle between the reflected sun light and the view vector.
+     */
+    vec3 specular = smoothstep(0.7, 1.0, lightAngle) * ambient * 10.0;
+
     /* We want to know the angle between the normal of the water plane
-     * (or anything rendered similarly to water) and the camera. */
-    highp float cosTheta = abs(dot(normal, normalize(-relPos))); // [0, 1]
+     * (or anything rendered similarly to water) and the camera. The
+     * value of viewAngle is actually cos θ, not in radian. */
+    highp float viewAngle = abs(dot(normal, viewPoint)); // [0, 1]
 
     /* Use the angle to calculate the color of surface. The more steep
      * the angle is, the less intensity of the supecular light will
@@ -100,11 +115,11 @@ vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp vec3 norm
      * is, when the angle is wide the water plane behaves more like a
      * mirror than air.
      */
-    float opacity  = baseColor.a;
-    vec4 surfColor = vec4(baseColor.rgb, min(1.0, baseColor.a * 8.0));
-    vec4 nearColor = vec4(baseColor.rgb, opacity);
+    float opacity  = pigment.a;
+    vec4 surfColor = vec4(specular, min(1.0, pigment.a * 8.0));
+    vec4 nearColor = vec4(vec3(0), opacity);
 
-    return mix(surfColor, nearColor, cosTheta);
+    return mix(surfColor, nearColor, viewAngle);
 }
 
 #endif /* !defined(NATURAL_MYSTIC_WATER_H_INCLUDED) */
