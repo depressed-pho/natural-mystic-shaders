@@ -37,7 +37,8 @@ See [NEWS](NEWS.md).
 ## Changing configuration
 
 Ideally there should be an in-game GUI to dynamically control the
-settings of shaders, but that isn't possible at the moment (#44). To
+settings of shaders, but that isn't possible at the moment
+([#44](https://github.com/depressed-pho/natural-mystic-shaders/issues/44)). To
 compensate this shader pack contains a configuration file so users can
 edit it directly to modify its behavior.
 
