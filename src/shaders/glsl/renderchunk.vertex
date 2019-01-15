@@ -160,16 +160,9 @@ void main()
 		 * advanced. */
 		if (isWaterPlane(POSITION)) {
 			waterPlane = 1.0;
-
-			/* Reduce the base opacity here. We are going to increase it
-			 * depending on the angle between the water plane and the
-			 * camera.
-			 */
-			color.a *= 0.25;
 		}
-		else {
-			color.a *= 0.5;
-		}
+		// The default opacity of water is way too high. Reduce it.
+		color.a *= 0.5;
 #  endif /* defined(FANCY) */
 	}
 #endif /* !defined(BYPASS_PIXEL_SHADER) && !defined(AS_ENTITY_RENDERER) && defined(ENABLE_WAVES) */

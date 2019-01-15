@@ -178,8 +178,8 @@ vec4 inColor = color;
 #if defined(MCPE40059) && defined(FANCY)
 	if (waterPlane > 0.0) {
 		vec4 specular = waterSpecularLight(diffuse.a, light, worldPos.xyz, relPos, TIME, normal);
-		diffuse.rgb += specular.rgb;
-		diffuse.a    = specular.a;
+		diffuse.rgb += specular.rgb * waterPlane;
+		diffuse.a    = mix(diffuse.a, specular.a, waterPlane);
 	}
 #endif
 
