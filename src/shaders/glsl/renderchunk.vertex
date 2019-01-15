@@ -17,11 +17,14 @@
 /* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
 #if defined(MCPE40059)
 varying POS4 worldPos;
+varying highp vec3 relPos;
+varying highp vec3 normal; // Only defined when waterPlane > 0.0
 varying float cameraDist; /* Normalized camera distance being 1.0 at
 						   * the point where the far terrain fog
 						   * ends. */
 varying float flickerFactor;
 varying float desatFactor;
+varying float waterPlane; // [0, 1]
 #endif
 
 #ifndef BYPASS_PIXEL_SHADER
@@ -40,7 +43,7 @@ varying float desatFactor;
 #include "natural-mystic-fog.h"
 #include "natural-mystic-hacks.h"
 #include "natural-mystic-light.h"
-#include "natural-mystic-noise.h"
+#include "natural-mystic-water.h"
 
 attribute POS4 POSITION;
 attribute vec4 COLOR;
@@ -52,58 +55,14 @@ const float rB = 1.0;
 const vec3 UNIT_Y = vec3(0,1,0);
 const float DIST_DESATURATION = 56.0 / 255.0; //WARNING this value is also hardcoded in the water color, don'tchange
 
-highp float waterWave(highp vec3 wPos, highp float time) {
-	highp vec2 resolution = vec2(17.25, 2.8);
-	highp vec2  st    = wPos.xz / resolution;
-	highp float tSlow = time / 1.5;
-	highp vec2  st1   = st + tSlow * vec2( 0.5,  1.0);
-	highp vec2  st2   = st + tSlow * vec2(-0.4, -1.0);
-
-	highp float wave1  = simplexNoise(st1) * 0.5;
-	highp float wave2  = simplexNoise(st2) * 0.5;
-	highp float wave3  = wave1 + wave2 * 0.9;
-	highp float wave4  = wave3 * 0.5;
-	highp float interp = sin(TIME * 5.0 - 2.1 * wPos.x - 1.4 * wPos.z + wPos.y);
-
-	return mix(wave3, wave4, interp) + interp * 0.5;
-}
-
-vec4 waterColor(vec4 baseColor, vec3 ambient, highp vec3 relPos, highp float wave) {
-	/* We want to know the angle between the normal of the water plane
-	 * (or anything rendered similarly to water) and the camera. Note
-	 * that we assume the surface normal is always (0, 1, 0) and the
-	 * assumption can be wrong! When in doubt never use this
-	 * function. */
-	const highp vec3 surfNorm = vec3(0.0, 1.0, 0.0);
-	highp float cosTheta = abs(dot(surfNorm, normalize(-relPos))); // [0, 1]
-
-	/* Use the angle to calculate the color of surface. The more steep
-	 * the angle is, the less intensity of the supecular light will
-	 * be. And we also use the angle to determine the opacity, that
-	 * is, when the angle is wide the water plane behaves more like a
-	 * mirror than air.
-	 */
-	float opacity   = baseColor.a;
-	float lightness = 1.0 - baseColor.a;
-	vec4 surfColor  = vec4(baseColor.rgb, min(1.0, baseColor.a * 8.0));
-	vec4 nearColor  = vec4(baseColor.rgb * lightness, opacity);
-
-	/* Simulate the specular light. THINKME: Do a proper normal
-	 * mapping, possibly by calculating the derivation of the wave
-	 * function. Dunno if it's worth it tho. */
-	vec3 lightDelta = ambient * wave;
-	surfColor.rgb = max(surfColor.rgb, min(vec3(1.0), surfColor.rgb + lightDelta * 0.20));
-	nearColor.rgb = max(nearColor.rgb, min(vec3(1.0), nearColor.rgb + lightDelta * 0.07));
-
-	return mix(surfColor, nearColor, cosTheta);
-}
-
 void main()
 {
 #if !defined(MCPE40059)
     POS4 worldPos;
+	vec3 relPos;
 	float cameraDist;
 #endif
+
 #ifdef AS_ENTITY_RENDERER
 		POS4 pos = WORLDVIEWPROJ * POSITION;
 		worldPos = pos;
@@ -135,7 +94,7 @@ void main()
 #endif /* defined(MCPE40059) */
 
 ///// find distance from the camera
-	vec3 relPos = -worldPos.xyz;
+	relPos = -worldPos.xyz;
 	float cameraDepth = length(relPos);
 	cameraDist = cameraDepth / RENDER_DISTANCE;
 
@@ -168,7 +127,10 @@ void main()
 #endif /* FOG */
 
 	/* Waves */
-#if !defined(BYPASS_PIXEL_SHADER) && defined(ENABLE_WAVES)
+#if defined(MCPE40059)
+	waterPlane = 0.0;
+#endif
+#if !defined(BYPASS_PIXEL_SHADER) && !defined(AS_ENTITY_RENDERER) && defined(ENABLE_WAVES) && defined(MCPE40059)
 	if (isLeaf(color)) {
 		POS3 posw = POSITION.xyz;
 		highp float wave = sin(TIME * 3.5 + 2.0 * posw.x + 2.0 * posw.z + posw.y);
@@ -179,42 +141,31 @@ void main()
 		 * vertex in the world coordinates without getting affected by
 		 * the view position, but actually it's not working as
 		 * expected. I don't know why. (#36) */
-		POS3 posw = worldPos.xyz + VIEW_POS;
+		highp vec3 wPos = worldPos.xyz + VIEW_POS;
 
 		/* We want water to swell in proportion to its volume. The more
 		 * the vertex is close to the ground (i.e. integral points in the
 		 * world position), the less the vertex should swell. Without this
 		 * tweak the water will leave the ground a bit. */
-		highp float wave   = 0.0;
 		highp float volume = fract(POSITION.y);
 		if (volume > 0.0) {
-			wave = waterWave(posw, TIME);
-			gl_Position.y += wave * 0.08 * volume;
+			highp vec3 wPos1     = waterWaveGeometric(wPos, TIME, normal);
+			highp vec3 wPosDelta = (wPos1 - wPos) * volume;
+			worldPos.xyz += wPosDelta;
+			gl_Position   = PROJ * (WORLDVIEW * worldPos);
 		}
 
 #  if defined(FANCY)
-		/* When we know the surface norm we can do something advanced. */
+		/* When we know the surface normal we can do something
+		 * advanced. */
 		if (isWaterPlane(POSITION)) {
-			/* THINKME: The color of the ambient light can only be
-			 * calculated accurately in the fragment shader. */
-#if defined(FOG)
-			vec3 ambient = ambientLightColor(fogColor);
-#else
-			vec3 ambient = ambientLightColor(1.0, 1.0);
-#endif
-			/* Reduce the base opacity here. We are going to increase it
-			 * depending on the angle between the water plane and the
-			 * camera.
-			 */
-			color.a *= 0.25;
-			color = waterColor(color, ambient, relPos, wave);
+			waterPlane = 1.0;
 		}
-		else {
-			color.a *= 0.5;
-		}
-#  endif
+		// The default opacity of water is way too high. Reduce it.
+		color.a *= 0.5;
+#  endif /* defined(FANCY) */
 	}
-#endif
+#endif /* !defined(BYPASS_PIXEL_SHADER) && !defined(AS_ENTITY_RENDERER) && defined(ENABLE_WAVES) */
 
 ///// blended layer (mostly water) magic
 #ifdef BLEND

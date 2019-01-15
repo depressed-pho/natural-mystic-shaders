@@ -47,13 +47,12 @@ vec3 ambientLightColor(float sunLevel, float daylight) {
     return brighten(mix(torchlightColor, outsideColor, sunLevel));
 }
 
-/* Apply the ambient light on the original fragment "frag". The .a
- * component denotes the intensity. Without this filter, objects
- * getting no light will be rendered in complete darkness, which isn't
- * how the reality works.
+/* Compute the ambient light to be accumulated to a fragment. Without
+ * this filter, objects getting no light will be rendered in complete
+ * darkness, which isn't how the reality works.
  */
-vec3 applyAmbientLight(vec3 frag, vec3 pigment, vec3 lightColor, float intensity) {
-    return frag + intensity * pigment * lightColor;
+vec3 ambientLight(vec3 lightColor, float intensity) {
+    return lightColor * intensity;
 }
 
 /* Calculate the torch light flickering factor [0, 2] based on the
@@ -74,12 +73,10 @@ float torchLightFlicker(highp vec3 wPos, highp float time) {
     return flicker * amplitude + 1.0;
 }
 
-/* Calculate and apply the torch light on the original fragment
- * "frag". The argument "torchLevel" should be the torch light level
- * [0, 1], and the "time" is the in-game time, used for the flickering
- * effect.
+/* Compute the torch light. The argument "torchLevel" should be the
+ * torch light level [0, 1].
  */
-vec3 applyTorchLight(vec3 frag, vec3 pigment, float torchLevel, float sunLevel, float daylight, highp float flickerFactor) {
+vec3 torchLight(float torchLevel, float sunLevel, float daylight, highp float flickerFactor) {
     const float baseIntensity = 180.0;
     const float decay         = 5.0;
 
@@ -93,20 +90,30 @@ vec3 applyTorchLight(vec3 frag, vec3 pigment, float torchLevel, float sunLevel, 
          */
         intensity *= mix(1.0, 0.1, smoothstep(0.65, 0.875, sunLevel * daylight));
 
-        return frag + pigment * torchlightColor * intensity;
+        return torchlightColor * intensity;
     }
     else {
-        return frag;
+        return vec3(0);
     }
 }
 
-/* Apply the sunlight on a fragment "frag" based on the
- * terrain-dependent sunlight level [0,1] and the time-dependent
- * daylight level "daylight" [0,1]. The sunlight is yellow-ish
- * red. The sunlight comes from the sun which behaves like a
- * directional light.
+/* Compute the emissive light for light source objects.
  */
-vec3 applySunlight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
+vec3 emissiveLight(highp float flickerFactor) {
+    /* The game doesn't tell us what kind of light source it is, so we
+     * assume it's a torch. */
+    const vec3  lightColor = torchlightColor;
+    const float intensity  = 60.0;
+
+    return lightColor * intensity * flickerFactor;
+}
+
+/* Compute the sunlight based on the terrain-dependent sunlight level
+ * [0,1] and the time-dependent daylight level "daylight" [0,1]. The
+ * sunlight is yellow-ish red. The sunlight comes from the sun which
+ * behaves like a directional light.
+ */
+vec3 sunlight(float sunLevel, float daylight) {
     const float baseIntensity = 50.0;
     const float shadowFactor  = 0.01;  // [0, 1]
     const float shadowBorder  = 0.87;  // [0, 1]
@@ -123,37 +130,35 @@ vec3 applySunlight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
             shadowFactor, 1.0,
             smoothstep(shadowBorder - shadowBlur, shadowBorder + shadowBlur, sunLevel));
 
-        return frag + pigment * sunlightColor(daylight) * intensity;
+        return sunlightColor(daylight) * intensity;
     }
     else {
-        return frag;
+        return vec3(0);
     }
 }
 
-/* Apply the skylight on a fragment "frag" based on the
- * terrain-dependent sunlight level [0,1] and the time-dependent
- * daylight level "daylight" [0,1]. The skylight is blue-ish
- * white. The skylight comes from the sky which behaves like an
- * ambient light but is affected by occlusion.
+/* Compute the skylight based on the terrain-dependent sunlight level
+ * [0,1] and the time-dependent daylight level "daylight" [0,1]. The
+ * skylight is blue-ish white. The skylight comes from the sky which
+ * behaves like an ambient light but is affected by occlusion.
  */
-vec3 applySkylight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
+vec3 skylight(float sunLevel, float daylight) {
     const float baseIntensity = 30.0;
 
     float intensity = baseIntensity * sunLevel * daylight;
     if (intensity > 0.0) {
-        return frag + pigment * skylightColor * intensity;
+        return skylightColor * intensity;
     }
     else {
-        return frag;
+        return vec3(0);
     }
 }
 
-/* Apply the moonlight on a fragment "frag" based on the
- * time-dependent daylight level [0, 1] and the terrain-dependent
- * sunlight level [0, 1]. The moonlight behaves like sunlight but is
- * blue-ish white.
+/* Compute the moonlight based on the time-dependent daylight level
+ * [0, 1] and the terrain-dependent sunlight level [0, 1]. The
+ * moonlight behaves like sunlight but is blue-ish white.
  */
-vec3 applyMoonlight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
+vec3 moonlight(float sunLevel, float daylight) {
     const float baseIntensity = 10.0;
     const float shadowFactor  = 0.20;  // [0, 1]
     const float shadowBorder  = 0.87;  // [0, 1]
@@ -166,10 +171,10 @@ vec3 applyMoonlight(vec3 frag, vec3 pigment, float sunLevel, float daylight) {
             shadowFactor, 1.0,
             smoothstep(shadowBorder - shadowBlur, shadowBorder + shadowBlur, sunLevel));
 
-        return frag + pigment * moonlightColor * intensity;
+        return moonlightColor * intensity;
     }
     else {
-        return frag;
+        return vec3(0);
     }
 }
 

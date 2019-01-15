@@ -19,6 +19,7 @@ MCPACK_FILES = \
 	shaders/glsl/natural-mystic-hacks.h \
 	shaders/glsl/natural-mystic-light.h \
 	shaders/glsl/natural-mystic-noise.h \
+	shaders/glsl/natural-mystic-water.h \
 	shaders/glsl/renderchunk.fragment \
 	shaders/glsl/renderchunk.vertex \
 	shaders/glsl/sky.fragment \
