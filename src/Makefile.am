@@ -13,6 +13,7 @@ MCPACK_FILES = \
 	pack_icon.png \
 	shaders/glsl/cloud.fragment \
 	shaders/glsl/cloud.vertex \
+	shaders/glsl/natural-mystic-cloud.h \
 	shaders/glsl/natural-mystic-color.h \
 	shaders/glsl/natural-mystic-config.h \
 	shaders/glsl/natural-mystic-fog.h \
