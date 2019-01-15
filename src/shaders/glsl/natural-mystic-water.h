@@ -122,7 +122,7 @@ highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal)
  * absolute, not relative opacity.
  */
 vec4 waterSpecularLight(
-    float baseOpacity, vec3 ambient,
+    float baseOpacity, vec3 incomingLight,
     highp vec3 worldPos, highp vec3 relPos, highp float time, highp vec3 normal) {
 
     /* The game doesn't tell us where the sun or the moon is, which is
@@ -141,10 +141,9 @@ vec4 waterSpecularLight(
      */
     highp vec3  viewPoint    = normalize(-relPos);
     highp vec3  reflectedSun = normalize(reflect(-sunMoonPos, normal));
-    const float intensity    = 60.0; // FIXME: Caves and night. Also torches?
     const float shininess    = 2.0;
     highp float sunAngle     = max(0.0, dot(reflectedSun, viewPoint));
-    highp vec3  specular     = ambient * intensity * pow(sunAngle, shininess);
+    highp vec3  specular     = incomingLight * pow(sunAngle, shininess);
 
     /* We want to know the angle between the normal of the water plane
      * (or anything rendered similarly to water) and the camera. The

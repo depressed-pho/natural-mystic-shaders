@@ -146,14 +146,6 @@ vec4 inColor = color;
 	 * to use it for diffuse lighting, and also specular lighting. */
 	vec3 light = vec3(0);
 
-#if defined(MCPE40059) && defined(FANCY)
-	if (waterPlane > 0.0) {
-		vec4 specular = waterSpecularLight(diffuse.a, ambientColor, worldPos.xyz, relPos, TIME, normal);
-		light     += specular.rgb;
-		diffuse.a  = specular.a;
-	}
-#endif
-
 	light += ambientLight(ambientColor, ambientBrightness);
 #if defined(FOG)
 	/* When it's raining the sunlight shouldn't affect the scene
@@ -183,6 +175,13 @@ vec4 inColor = color;
 	 * and the specular light here. We assume the color of specular
 	 * light is always the same as the color of accumulated light. */
 	diffuse.rgb = pigment * light;
+#if defined(MCPE40059) && defined(FANCY)
+	if (waterPlane > 0.0) {
+		vec4 specular = waterSpecularLight(diffuse.a, light, worldPos.xyz, relPos, TIME, normal);
+		diffuse.rgb += specular.rgb;
+		diffuse.a    = specular.a;
+	}
+#endif
 
 	diffuse.rgb = uncharted2ToneMap(diffuse.rgb, 112.0, 1.0);
 	diffuse.rgb = contrastFilter(diffuse.rgb, 1.25);
