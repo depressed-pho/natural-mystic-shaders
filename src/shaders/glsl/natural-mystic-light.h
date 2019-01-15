@@ -51,8 +51,8 @@ vec3 ambientLightColor(float sunLevel, float daylight) {
  * this filter, objects getting no light will be rendered in complete
  * darkness, which isn't how the reality works.
  */
-vec3 ambientLight(vec3 pigment, vec3 lightColor, float intensity) {
-    return intensity * pigment * lightColor;
+vec3 ambientLight(vec3 lightColor, float intensity) {
+    return lightColor * intensity;
 }
 
 /* Calculate the torch light flickering factor [0, 2] based on the
@@ -76,7 +76,7 @@ float torchLightFlicker(highp vec3 wPos, highp float time) {
 /* Compute the torch light. The argument "torchLevel" should be the
  * torch light level [0, 1].
  */
-vec3 torchLight(vec3 pigment, float torchLevel, float sunLevel, float daylight, highp float flickerFactor) {
+vec3 torchLight(float torchLevel, float sunLevel, float daylight, highp float flickerFactor) {
     const float baseIntensity = 180.0;
     const float decay         = 5.0;
 
@@ -90,7 +90,7 @@ vec3 torchLight(vec3 pigment, float torchLevel, float sunLevel, float daylight, 
          */
         intensity *= mix(1.0, 0.1, smoothstep(0.65, 0.875, sunLevel * daylight));
 
-        return pigment * torchlightColor * intensity;
+        return torchlightColor * intensity;
     }
     else {
         return vec3(0);
@@ -99,13 +99,13 @@ vec3 torchLight(vec3 pigment, float torchLevel, float sunLevel, float daylight, 
 
 /* Compute the emissive light for light source objects.
  */
-vec3 emissiveLight(vec3 pigment, highp float flickerFactor) {
+vec3 emissiveLight(highp float flickerFactor) {
     /* The game doesn't tell us what kind of light source it is, so we
      * assume it's a torch. */
     const vec3  lightColor = torchlightColor;
     const float intensity  = 60.0;
 
-    return pigment * lightColor * intensity * flickerFactor;
+    return lightColor * intensity * flickerFactor;
 }
 
 /* Compute the sunlight based on the terrain-dependent sunlight level
@@ -113,7 +113,7 @@ vec3 emissiveLight(vec3 pigment, highp float flickerFactor) {
  * sunlight is yellow-ish red. The sunlight comes from the sun which
  * behaves like a directional light.
  */
-vec3 sunlight(vec3 pigment, float sunLevel, float daylight) {
+vec3 sunlight(float sunLevel, float daylight) {
     const float baseIntensity = 50.0;
     const float shadowFactor  = 0.01;  // [0, 1]
     const float shadowBorder  = 0.87;  // [0, 1]
@@ -130,7 +130,7 @@ vec3 sunlight(vec3 pigment, float sunLevel, float daylight) {
             shadowFactor, 1.0,
             smoothstep(shadowBorder - shadowBlur, shadowBorder + shadowBlur, sunLevel));
 
-        return pigment * sunlightColor(daylight) * intensity;
+        return sunlightColor(daylight) * intensity;
     }
     else {
         return vec3(0);
@@ -142,12 +142,12 @@ vec3 sunlight(vec3 pigment, float sunLevel, float daylight) {
  * skylight is blue-ish white. The skylight comes from the sky which
  * behaves like an ambient light but is affected by occlusion.
  */
-vec3 skylight(vec3 pigment, float sunLevel, float daylight) {
+vec3 skylight(float sunLevel, float daylight) {
     const float baseIntensity = 30.0;
 
     float intensity = baseIntensity * sunLevel * daylight;
     if (intensity > 0.0) {
-        return pigment * skylightColor * intensity;
+        return skylightColor * intensity;
     }
     else {
         return vec3(0);
@@ -158,7 +158,7 @@ vec3 skylight(vec3 pigment, float sunLevel, float daylight) {
  * [0, 1] and the terrain-dependent sunlight level [0, 1]. The
  * moonlight behaves like sunlight but is blue-ish white.
  */
-vec3 moonlight(vec3 pigment, float sunLevel, float daylight) {
+vec3 moonlight(float sunLevel, float daylight) {
     const float baseIntensity = 10.0;
     const float shadowFactor  = 0.20;  // [0, 1]
     const float shadowBorder  = 0.87;  // [0, 1]
@@ -171,7 +171,7 @@ vec3 moonlight(vec3 pigment, float sunLevel, float daylight) {
             shadowFactor, 1.0,
             smoothstep(shadowBorder - shadowBlur, shadowBorder + shadowBlur, sunLevel));
 
-        return pigment * moonlightColor * intensity;
+        return moonlightColor * intensity;
     }
     else {
         return vec3(0);
