@@ -17,6 +17,9 @@
  * See also: https://developer.nvidia.com/gpugems/GPUGems/gpugems_ch01.html
  */
 
+/* Compute a Gerstner wave. See comments in waterWaveGeometric() for
+ * the meaning of parameters.
+ */
 highp vec3 gerstnerWave(
     highp vec3 wPos, highp float time, inout highp vec3 normal,
     float Q, float numWaves, float Ai, vec2 Di, float Li, float Si) {
@@ -38,6 +41,8 @@ highp vec3 gerstnerWave(
     return wPos;
 }
 
+/* Similar to gerstnerWave() but this only computes the normal vector.
+ */
 highp vec3 gerstnerWaveN(
     highp vec3 wPos, highp float time, highp vec3 normal,
     float Q, float numWaves, float Ai, vec2 Di, float Li, float Si) {
@@ -56,6 +61,9 @@ highp vec3 gerstnerWaveN(
     return normal;
 }
 
+/* Translate an angle in degrees into a normalized direction vector,
+ * hoping drivers will optimize it out.
+ */
 vec2 deg2dir(float deg) {
     float rad = radians(deg);
     return vec2(cos(rad), sin(rad));
