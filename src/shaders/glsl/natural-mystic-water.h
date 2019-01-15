@@ -117,8 +117,12 @@ highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal)
     return normalize(normal);
 }
 
-vec4 waterColor(
-    vec4 pigment, vec3 ambient,
+/* Compute the specular light on a water surface, and the opacity at
+ * the same time. The .a component of the result should be used as an
+ * absolute, not relative opacity.
+ */
+vec4 waterSpecularLight(
+    float baseOpacity, vec3 ambient,
     highp vec3 worldPos, highp vec3 relPos, highp float time, highp vec3 normal) {
 
     /* The game doesn't tell us where the sun or the moon is, which is
@@ -153,11 +157,11 @@ vec4 waterColor(
      * is, when the angle is wide the water plane behaves more like a
      * mirror than air.
      */
-    float opacity  = pigment.a;
-    vec4 surfColor = vec4(specular, min(1.0, pigment.a * 8.0));
-    vec4 nearColor = vec4(vec3(0), opacity);
+    float opacity  = baseOpacity;
+    vec4 surfLight = vec4(specular, min(1.0, baseOpacity * 8.0));
+    vec4 nearLight = vec4(vec3(0), opacity);
 
-    return mix(surfColor, nearColor, smoothstep(0.0, 0.8, viewAngle));
+    return mix(surfLight, nearLight, smoothstep(0.0, 0.8, viewAngle));
 }
 
 #endif /* !defined(NATURAL_MYSTIC_WATER_H_INCLUDED) */

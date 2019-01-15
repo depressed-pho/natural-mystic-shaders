@@ -145,33 +145,35 @@ vec4 inColor = color;
 
 #if defined(MCPE40059) && defined(FANCY)
 	if (waterPlane > 0.0) {
-		diffuse = waterColor(vec4(pigment, diffuse.a), ambientColor, worldPos.xyz, relPos, TIME, normal);
+		vec4 specular = waterSpecularLight(diffuse.a, ambientColor, worldPos.xyz, relPos, TIME, normal);
+		diffuse.rgb += specular.rgb;
+		diffuse.a    = specular.a;
 	}
 #endif
 
-	diffuse.rgb = applyAmbientLight(diffuse.rgb, pigment, ambientColor, ambientBrightness);
+	diffuse.rgb += ambientLight(pigment, ambientColor, ambientBrightness);
 #if defined(FOG)
 	/* When it's raining the sunlight shouldn't affect the scene
 	 * (#24), but this has a side effect. Shadows appear and disappear
 	 * all of sudden (#33).
 	 */
 	if (isUnderwater || isRenderDistanceFog(FOG_CONTROL)) {
-		diffuse.rgb = applySunlight(diffuse.rgb, pigment, uv1.y, daylight);
-		diffuse.rgb = applyMoonlight(diffuse.rgb, pigment, uv1.y, daylight);
+		diffuse.rgb += sunlight(pigment, uv1.y, daylight);
+		diffuse.rgb += moonlight(pigment, uv1.y, daylight);
 	}
 #else
-	diffuse.rgb = applySunlight(diffuse.rgb, pigment, uv1.y, daylight);
-	diffuse.rgb = applyMoonlight(diffuse.rgb, pigment, uv1.y, daylight);
+	diffuse.rgb += sunlight(pigment, uv1.y, daylight);
+	diffuse.rgb += moonlight(pigment, uv1.y, daylight);
 #endif /* FOG */
-	diffuse.rgb = applySkylight(diffuse.rgb, pigment, uv1.y, daylight);
+	diffuse.rgb += skylight(pigment, uv1.y, daylight);
 #if defined(MCPE40059)
-	diffuse.rgb = applyTorchLight(diffuse.rgb, pigment, uv1.x, uv1.y, daylight, flickerFactor);
+	diffuse.rgb += torchLight(pigment, uv1.x, uv1.y, daylight, flickerFactor);
 #endif
 
 	/* Light sources should be significantly brighter than normal
 	 * objects. */
 #if defined(ALWAYS_LIT)
-	diffuse.rgb += pigment * vec3(1.0) * 60.0;
+	diffuse.rgb += emissiveLight(pigment, flickerFactor);
 #endif
 
 	diffuse.rgb = uncharted2ToneMap(diffuse.rgb, 112.0, 1.0);
