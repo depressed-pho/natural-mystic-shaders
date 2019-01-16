@@ -172,7 +172,7 @@ highp float simplexNoise(highp vec4 v) {
 /* Generate a 2D fBM noise [0, 1]. See
  * https://thebookofshaders.com/13/
  */
-highp float fBM(const int octaves, const float cutOff, highp vec2 st) {
+highp float fBM(const int octaves, const float lowerBound, const float upperBound, highp vec2 st) {
     // Initial values
     highp float value = 0.0;
     highp float amplitude = 0.5;
@@ -181,10 +181,17 @@ highp float fBM(const int octaves, const float cutOff, highp vec2 st) {
     for (int i = 0; i < octaves; i++) {
         value += amplitude * (simplexNoise(st) * 0.5 + 0.5);
 
-        if (value + amplitude <= cutOff) {
+        if (value >= upperBound) {
+            /* Optimization (#29): We have already reached the upper
+             * bound so no further accumulations can affect the final
+             * result.
+             */
+            break;
+        }
+        else if (value + amplitude <= lowerBound) {
             /* Optimization (#29): The maximum of accumulated noise
-             * converges to value + amplitude at this point (when
-             * octaves → ∞), which isn't going to reach the cutoff
+             * converges to value + amplitude at this point (at i →
+             * ∞), which isn't going to reach the cutoff
              * threshold. */
             break;
         }
@@ -193,7 +200,7 @@ highp float fBM(const int octaves, const float cutOff, highp vec2 st) {
         amplitude *= 0.5;
     }
 
-    return smoothstep(cutOff, 1.0, value);
+    return smoothstep(lowerBound, upperBound, value);
 }
 
 #endif /* NATURAL_MYSTIC_NOISE_H_INCLUDED */

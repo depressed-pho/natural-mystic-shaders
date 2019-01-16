@@ -20,11 +20,9 @@ highp float cloudMap(int octaves, highp float time, highp vec3 pos) {
     /* We intentionally throw away some
      * of the precision so we get somewhat sparse noise.
      */
-    const float cutOff    = 0.5;
-    const float amplifier = 1.5;
-    highp float density   = fBM(octaves, cutOff, st * 3.0);
-
-    return clamp(0.0, 1.0, density * amplifier);
+    const float lowerBound = 0.5;
+    const float upperBound = 0.85;
+    return fBM(octaves, lowerBound, upperBound, st * 3.0);
 }
 
 #endif /* !defined(NATURAL_MYSTIC_CLOUD_H_INCLUDED) */
