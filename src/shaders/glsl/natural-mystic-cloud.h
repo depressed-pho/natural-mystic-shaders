@@ -20,15 +20,11 @@ highp float cloudMap(int octaves, highp float time, highp vec3 pos) {
     /* We intentionally throw away some
      * of the precision so we get somewhat sparse noise.
      */
-    highp float result = fBM(octaves, st * 3.0);
-    result = smoothstep(0.5, 1.0, result) * 1.5;
-    result = clamp(result, 0.0, 1.0);
+    const float cutOff    = 0.5;
+    const float amplifier = 1.5;
+    highp float density   = fBM(octaves, cutOff, st * 3.0);
 
-    /* Workaround for MCPE-39749: the uniform TIME might not be a
-     * number. See https://bugs.mojang.com/browse/MCPE-39749
-     */
-    result = isnan(result) || isinf(result) ? 0.0 : result;
-    return result;
+    return clamp(0.0, 1.0, density * amplifier);
 }
 
 #endif /* !defined(NATURAL_MYSTIC_CLOUD_H_INCLUDED) */
