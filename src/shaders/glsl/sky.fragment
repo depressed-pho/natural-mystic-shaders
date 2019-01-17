@@ -20,13 +20,36 @@ void main() {
      * never defined in this shader. */
     const int octaves = 6;
 
+    /* We are going to perform a volumetric ray marching to compute
+     * self-casting shadows of clouds, but with only a few steps. This
+     * is because ray marching is terribly expensive as we cannot
+     * precompute noises in a texture and instead we have to generate
+     * them on the fly. */
+    highp float density = cloudMap(octaves, TIME, worldPos);
+    vec4 color = mix(skyColor, cloudColor, density);
+
+    /* The game doesn't tell us where the sun or the moon is, which is
+     * so unfortunate. We have to assume they are always near the
+     * origin. */
+    const highp vec3 sunMoonPos = vec3(-0.1, 1.0e2, 0);
+
+    const int   numSteps = 4;
+    const float stepSize = 0.4;
+    vec3        rayStep  = normalize(sunMoonPos - worldPos) * stepSize;
+    highp vec3  rayPos   = worldPos;
+    float       inside   = 0.0;
+    for (int i = 0; i < numSteps; i++) {
+        rayPos += rayStep;
+        highp float height = cloudMap(octaves, TIME, rayPos);
+        inside += (rayPos.y - worldPos.y) > height ? 0.0 : 1.0;
+    }
+    inside /= float(numSteps);
+    color.rgb = max(vec3(0.0), color.rgb - 0.1 * inside);
+
     /* Clouds near the horizon should be blended back to the sky
      * color, or otherwise the planar nature of the sky plane will be
      * even more apparent. */
-    highp float density = cloudMap(octaves, TIME, worldPos);
-    density = mix(density, 0.0, smoothstep(0.9, 1.0, camDist));
-
-    gl_FragColor = mix(skyColor, cloudColor, density);
+    gl_FragColor = mix(color, skyColor, smoothstep(0.9, 1.0, camDist));
 
 #else
     gl_FragColor = skyColor;
