@@ -30,13 +30,15 @@ highp vec3 gerstnerWave(
     float Qi    = Q / (wi * Ai * numWaves);
     float phi_i = Si * 2.0 / Li;
 
-    highp float phase = wi * dot(Di, wPos.xz) + phi_i * time;
-    wPos.xz += Qi * Ai * Di * cos(phase);
-    wPos.y  +=      Ai      * sin(phase);
+    highp float theta    = wi * dot(Di, wPos.xz) + phi_i * time;
+    highp float cosTheta = cos(theta);
+    highp float sinTheta = sin(theta);
+    wPos.xz += Qi * Ai * Di * cosTheta;
+    wPos.y  +=      Ai      * sinTheta;
 
     highp float wiAi = wi * Ai;
-    normal.xz -= wiAi * Di * cos(phase);
-    normal.y  -= wiAi * Qi * sin(phase);
+    normal.xz -= wiAi * Di * cosTheta;
+    normal.y  -= wiAi * Qi * sinTheta;
 
     return wPos;
 }
@@ -53,10 +55,10 @@ highp vec3 gerstnerWaveN(
     float Qi    = Q / (wi * Ai * numWaves);
     float phi_i = Si * 2.0 / Li;
 
-    highp float phase = wi * dot(Di, wPos.xz) + phi_i * time;
+    highp float theta = wi * dot(Di, wPos.xz) + phi_i * time;
     highp float wiAi  = wi * Ai;
-    normal.xz -= wiAi * Di * cos(phase);
-    normal.y  -= wiAi * Qi * sin(phase);
+    normal.xz -= wiAi * Di * cos(theta);
+    normal.y  -= wiAi * Qi * sin(theta);
 
     return normal;
 }
