@@ -53,6 +53,15 @@ AS_IF([test x"$enable_fbm_clouds" != x"no"],
                  [Define to enable shader-generated clouds.])])
 
 AC_ARG_ENABLE(
+    [cloud-shade],
+    [AS_HELP_STRING(
+         [--disable-cloud-shade],
+         [disable highlight and shade on fbm-clouds])])
+AS_IF([test x"$enable_cloud_shade" != x"no"],
+      [AC_DEFINE([ENABLE_CLOUD_SHADE], [1],
+                 [Define to enable highlight and shade on shader-generated clouds.])])
+
+AC_ARG_ENABLE(
     [random-stars],
     [AS_HELP_STRING(
          [--disable-random-stars],
