@@ -29,7 +29,6 @@ void main() {
     highp float density = cloudMap(octaves, TIME, worldPos);
     vec4 shadedCloud = mix(vec4(cloudColor.rgb, 0.0), cloudColor, density);
 
-#  define ENABLE_CLOUD_SHADE 1
 #  if defined(ENABLE_CLOUD_SHADE)
     /* Optimization: Don't bother to do it when there are no clouds at
      * the current position. */
@@ -49,6 +48,10 @@ void main() {
             highp float height = cloudMap(octaves / 2, TIME, rayPos);
             inside += max(0.0, height - (rayPos.y - worldPos.y));
         }
+        /* Average of height differences. This isn't a distance of ray
+         * traveled inside clouds in a normal sense, but if we do it
+         * strictly we get severe banding artifacts (because of the
+         * number of steps being too few). */
         inside /= float(numSteps);
 
         float brightness = cloudColor.r;
