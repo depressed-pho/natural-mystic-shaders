@@ -38,7 +38,8 @@ void main() {
          * at a fixed point. */
         const highp vec3 sunMoonPos = vec3(-0.3, 4.0, 0);
 
-        const int   numSteps = 1;
+        const int   numSteps = 1; /* Yes, it has to be this few, or
+                                   * we'll get a lag. */
         const float stepSize = 0.2;
         vec3        rayStep  = normalize(sunMoonPos - worldPos) * stepSize;
         highp vec3  rayPos   = worldPos;

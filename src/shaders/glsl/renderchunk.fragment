@@ -176,6 +176,8 @@ vec4 inColor = color;
 	 * light is always the same as the color of accumulated light. */
 	diffuse.rgb = pigment * light;
 #if defined(MCPE40059) && defined(FANCY)
+	/* It is tempting to do this only when defined(BLEND), but if we
+	 * do that water in far terrain will have different colors. */
 	if (waterPlane > 0.0) {
 		vec4 specular = waterSpecularLight(diffuse.a, light, worldPos.xyz, relPos, TIME, normal);
 		diffuse.rgb += specular.rgb * waterPlane;

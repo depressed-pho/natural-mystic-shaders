@@ -4,6 +4,7 @@
 
 * Reworked the water completely. Now it has much more convincing waves
   and specular highlights.
+* Clouds now have highlights and shade.
 
 ## 1.4.0 -- 2019-01-14
 
