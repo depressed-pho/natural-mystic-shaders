@@ -22,10 +22,9 @@
 
 /* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
 #if defined(MCPE40059)
-varying POS4 worldPos;
+varying highp vec3 wPos;
 varying highp vec3 relPos;
 varying highp vec3 normal;
-varying float cameraDist;
 varying float flickerFactor;
 varying float desatFactor;
 varying float waterPlane;
@@ -128,9 +127,9 @@ vec4 inColor = color;
 	else {
 		ambientColor = ambientLightColor(fogColor);
 
-		/* The existence of bad weather fog should also increase the
-		 * intensity of ambient light (#32). But at night it should
-		 * work the other way.
+		/* The existence of bad weather fog (and also underwater fog)
+		 * should increase the intensity of ambient light (#32). But
+		 * at night it should work the other way.
 		 */
 		ambientBrightness *= mix(0.9, 1.4, daylight);
 	}
@@ -179,7 +178,7 @@ vec4 inColor = color;
 	/* It is tempting to do this only when defined(BLEND), but if we
 	 * do that water in far terrain will have different colors. */
 	if (waterPlane > 0.0) {
-		vec4 specular = waterSpecularLight(diffuse.a, light, worldPos.xyz, relPos, TIME, normal);
+		vec4 specular = waterSpecularLight(diffuse.a, light, wPos, relPos, TIME, normal);
 		diffuse.rgb += specular.rgb * waterPlane;
 		diffuse.a    = mix(diffuse.a, specular.a, waterPlane);
 	}

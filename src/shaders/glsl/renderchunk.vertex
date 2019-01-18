@@ -16,12 +16,9 @@
 
 /* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
 #if defined(MCPE40059)
-varying POS4 worldPos;
+varying highp vec3 wPos;
 varying highp vec3 relPos;
 varying highp vec3 normal; // Only defined when waterPlane > 0.0
-varying float cameraDist; /* Normalized camera distance being 1.0 at
-						   * the point where the far terrain fog
-						   * ends. */
 varying float flickerFactor;
 varying float desatFactor;
 varying float waterPlane; // [0, 1]
@@ -57,10 +54,9 @@ const float DIST_DESATURATION = 56.0 / 255.0; //WARNING this value is also hardc
 
 void main()
 {
-#if !defined(MCPE40059)
     POS4 worldPos;
+#if !defined(MCPE40059)
 	vec3 relPos;
-	float cameraDist;
 #endif
 
 #ifdef AS_ENTITY_RENDERER
@@ -85,6 +81,12 @@ void main()
 #endif
 
 #if defined(MCPE40059)
+	/* THINKME: In theory this should be the position of the
+	 * vertex in the world coordinates without getting affected by
+	 * the view position, but actually it's not working as
+	 * expected. I don't know why. (#36) */
+	wPos = worldPos.xyz + VIEW_POS;
+
 	flickerFactor = 1.0;
 #  if defined(ENABLE_TORCH_FLICKER)
 	if (uv1.x > 0.0) {
@@ -96,10 +98,12 @@ void main()
 ///// find distance from the camera
 	relPos = -worldPos.xyz;
 	float cameraDepth = length(relPos);
-	cameraDist = cameraDepth / RENDER_DISTANCE;
+	float cameraDist = cameraDepth / RENDER_DISTANCE;
 
 	/* Reduce the contrast of far objects (#5). The overall color
-	 * should lean towards the ambient. */
+	 * should lean towards the ambient. Note that cameraDist is a
+	 * normalized camera distance being 1.0 at the point where the far
+	 * terrain fog ends. */
 #if defined(FANCY) && defined(MCPE40059)
 	desatFactor = exponentialFog(vec2(0.0, 4.0), cameraDist);
 #endif
@@ -137,12 +141,6 @@ void main()
 		gl_Position.x += wave * 0.015;
 	}
 	else if (isWater(color)) {
-		/* THINKME: In theory this should be the position of the
-		 * vertex in the world coordinates without getting affected by
-		 * the view position, but actually it's not working as
-		 * expected. I don't know why. (#36) */
-		highp vec3 wPos = worldPos.xyz + VIEW_POS;
-
 		/* We want water to swell in proportion to its volume. The more
 		 * the vertex is close to the ground (i.e. integral points in the
 		 * world position), the less the vertex should swell. Without this
@@ -152,6 +150,8 @@ void main()
 			highp vec3 wPos1     = waterWaveGeometric(wPos, TIME, normal);
 			highp vec3 wPosDelta = (wPos1 - wPos) * volume;
 			worldPos.xyz += wPosDelta;
+			wPos          = worldPos.xyz + VIEW_POS;
+			relPos        = -worldPos.xyz;
 			gl_Position   = PROJ * (WORLDVIEW * worldPos);
 		}
 

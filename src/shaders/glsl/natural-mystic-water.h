@@ -143,7 +143,7 @@ vec4 waterSpecularLight(
     /* Oscillate the normal even more, but this time with much higher
      * frequencies. This is a kind of bump mapping.
      */
-    normal = waterWaveNormal(worldPos + VIEW_POS, time, normal);
+    normal = waterWaveNormal(worldPos, time, normal);
 
     /* The intensity of the specular light is determined with the
      * angle between the reflected sun light and the view vector. See
