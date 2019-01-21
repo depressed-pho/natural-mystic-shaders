@@ -12,7 +12,7 @@ Features include:
 * Non-blocky clouds
 * Waves for water and leaves (but not plants)
 * Camera-angle dependent transparency and specular light for water
-* Improved torch light with flickering effect (unstable in 1.8 due to vanilla bug)
+* Improved torch light with flickering effect
 * Sunlight and moonlight colors with night time desaturation
 * Desaturation under a bad weather condition
 * Exposure adjustment, contrast filter, and tone mapping
@@ -32,7 +32,7 @@ See [NEWS](NEWS.md).
 
 ## Tested on
 
-* Minecraft Bedrock 1.8, iPad Pro (MLMY2J/A), iOS 12.1 (16B92)
+* Minecraft Bedrock 1.8.1, iPad Pro (MLMY2J/A), iOS 12.1 (16B92)
 
 ## Changing configuration
 
