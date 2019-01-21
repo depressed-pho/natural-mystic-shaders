@@ -5,6 +5,8 @@
 * Reworked the water completely. Now it has much more convincing waves
   and specular highlights.
 * Clouds now have highlights and shade.
+* Shadows no longer disappear all of a sudden when it starts raining
+  (#40).
 
 ## 1.4.0 -- 2019-01-14
 

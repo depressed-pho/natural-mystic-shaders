@@ -55,7 +55,15 @@ bool isTheEndFog(vec4 fogColor) {
  * also be the bad weather fog.
  */
 bool isRenderDistanceFog(vec2 fogControl) {
-    return fogControl.x > 0.5;
+    return fogControl.x > 0.6;
+}
+
+/* When it's raining on the Overworld, the game gradually reduces the
+ * fog far to < 1.0. We exploit this fact to detect rain. This
+ * function returns 0.0 when it's raining, and 1.0 otherwise.
+ */
+float isClearWeather(vec2 fogControl) {
+    return smoothstep(0.8, 1.0, fogControl.y);
 }
 
 #endif /* NATURAL_MYSTIC_HACKS_H_INCLUDED */

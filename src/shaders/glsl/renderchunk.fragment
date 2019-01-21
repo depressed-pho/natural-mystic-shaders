@@ -116,6 +116,11 @@ vec4 inColor = color;
 #else
 	const bool isUnderwater = false;
 #endif /* defined(UNDERWATER) */
+#if defined(FOG)
+	float clearWeather = isClearWeather(FOG_CONTROL);
+#else
+	const float clearWeather = 1.0;
+#endif /* defined(FOG) */
 
 	vec3 ambientColor;
 #if defined(FOG)
@@ -125,13 +130,21 @@ vec4 inColor = color;
 		ambientColor = ambientLightColor(uv1.y, daylight);
 	}
 	else {
-		ambientColor = ambientLightColor(fogColor);
-
 		/* The existence of bad weather fog (and also underwater fog)
 		 * should increase the intensity of ambient light (#32). But
 		 * at night it should work the other way.
 		 */
-		ambientBrightness *= mix(0.9, 1.4, daylight);
+		if (isUnderwater) {
+			ambientColor = ambientLightColor(fogColor);
+			ambientBrightness *= mix(0.9, 1.4, daylight);
+		}
+		else {
+			ambientColor = mix(
+				ambientLightColor(fogColor),
+				ambientLightColor(uv1.y, daylight),
+				clearWeather);
+			ambientBrightness *= mix(mix(0.9, 1.4, daylight), 1.0, clearWeather);
+		}
 	}
 #else
 	ambientColor = ambientLightColor(uv1.y, daylight);
@@ -148,12 +161,16 @@ vec4 inColor = color;
 	light += ambientLight(ambientColor, ambientBrightness);
 #if defined(FOG)
 	/* When it's raining the sunlight shouldn't affect the scene
-	 * (#24), but this has a side effect. Shadows appear and disappear
-	 * all of sudden (#33).
+	 * (#24), but we cannot treat the rain as a boolean switch as that
+	 * would cause #40.
 	 */
-	if (isUnderwater || isRenderDistanceFog(FOG_CONTROL)) {
+	if (isUnderwater) {
 		light += sunlight(uv1.y, daylight);
 		light += moonlight(uv1.y, daylight);
+	}
+	else {
+		light += sunlight(uv1.y, daylight) * clearWeather;
+		light += moonlight(uv1.y, daylight) * clearWeather;
 	}
 #else
 	light += sunlight(uv1.y, daylight);
