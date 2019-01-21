@@ -1,6 +1,6 @@
 # Release notes
 
-## 1.5.0 -- UNRELEASED
+## 1.5.0 -- 2019-01-21
 
 * Reworked the water completely. Now it has much more convincing waves
   and specular highlights.

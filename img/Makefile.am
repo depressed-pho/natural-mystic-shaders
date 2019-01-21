@@ -1,3 +1,4 @@
 EXTRA_DIST = \
-	day.jpg \
-	night.jpg
+	hill.jpg \
+	river.jpg \
+	screenshots.xcf.xz
