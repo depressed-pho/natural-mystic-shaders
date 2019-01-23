@@ -18,7 +18,8 @@
 #if defined(MCPE40059)
 varying highp vec3 wPos;
 varying highp vec3 relPos;
-varying highp vec3 normal; // Only defined when waterPlane > 0.0
+varying highp vec3 vNormal; // Vertex normal in the world space. Only
+							// defined when waterPlane > 0.0.
 varying float flickerFactor;
 varying float desatFactor;
 varying float waterPlane; // [0, 1]
@@ -85,8 +86,9 @@ void main()
 	 * vertex in the world coordinates without getting affected by
 	 * the view position, but actually it's not working as
 	 * expected. I don't know why. (#36) */
-	wPos = worldPos.xyz + VIEW_POS;
+	wPos = worldPos.xyz;
 
+	vNormal = vec3(0);
 	flickerFactor = 1.0;
 #  if defined(ENABLE_TORCH_FLICKER)
 	if (uv1.x > 0.0) {
@@ -144,10 +146,10 @@ void main()
 		/* We want water to swell in proportion to its volume. The more
 		 * the vertex is close to the ground (i.e. integral points in the
 		 * world position), the less the vertex should swell. Without this
-		 * tweak the water will leave the ground a bit. */
+		 * tweak the water will leave the ground. */
 		highp float volume = fract(POSITION.y);
 		if (volume > 0.0) {
-			highp vec3 wPos1     = waterWaveGeometric(wPos, TIME, normal);
+			highp vec3 wPos1     = waterWaveGeometric(wPos, TIME, vNormal);
 			highp vec3 wPosDelta = (wPos1 - wPos) * volume;
 			worldPos.xyz += wPosDelta;
 			wPos          = worldPos.xyz + VIEW_POS;

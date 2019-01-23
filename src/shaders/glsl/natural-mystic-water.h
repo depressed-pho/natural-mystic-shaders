@@ -120,9 +120,9 @@ highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal)
     const float Q        = 0.45;
     const float numWaves = float(3);
 
-    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0058, deg2dir( 85.0), 1.50, 1.0);
-    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0058, deg2dir(255.0), 1.45, 2.0);
-    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0045, deg2dir( 65.0), 1.40, 2.0);
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0058, deg2dir( 85.0), 0.75, 1.0);
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0058, deg2dir(255.0), 0.725, 2.0);
+    normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0045, deg2dir( 65.0), 0.7, 2.0);
 
     return normalize(normal);
 }
@@ -138,27 +138,58 @@ vec4 waterSpecularLight(
     /* The game doesn't tell us where the sun or the moon is, which is
      * so unfortunate. We have to assume they are always near the
      * origin. */
-    const highp vec3 sunMoonPos = vec3(-2.5, 1.0e10, 0);
+    //const highp vec3 sunMoonPos = vec3(-2.5, 1.0e10, 0);
+    //const highp vec3 lightDir0 = normalize(vec3(-2.5, 1.2, 0));
+    //const highp vec3 lightDir  = normalize(vec3(-2.5, 1.0e10, 0));
+    highp vec3 lightDir = normalize(vec3(-2.5, 2.5, 1.0));
+    //highp vec3 lightDir = normalize(worldPos - vec3(-2.5, 1.0e2, 1.5));
+    highp vec3 lightDir0 = lightDir;
 
     /* Oscillate the normal even more, but this time with much higher
      * frequencies. This is a kind of bump mapping.
      */
     normal = waterWaveNormal(worldPos, time, normal);
 
+#if 1
+    highp vec3  viewDir      = -normalize(worldPos - VIEW_POS); ///
+    highp vec3  reflDir      = normalize(reflect(-lightDir, normal));
+    const float shininess    = 128.0;
+    const float iorIn        = 1.0;
+    const float iorOut       = 1.33;
+    const float fresnel      = pow((iorIn - iorIn / iorOut) / (iorIn + iorIn / iorOut), 2.0);
+    highp vec3  halfDir      = normalize(viewDir + lightDir0);
+    highp float incident     = max(0.0, dot(viewDir, halfDir));
+    //highp float reflAngle    = max(0.0, dot(reflDir, viewDir));
+    highp float reflAngle    = max(0.0, dot(halfDir, normal));
+    highp float reflCoeff    = fresnel + (1.0 - fresnel) * pow(1.0 - incident, 5.0);
+    highp vec3  specular     = incomingLight * 80.0 * pow(reflAngle, shininess) * reflCoeff;
+
+    highp float viewAngle    = max(0.0, dot(normal, viewDir));
+    highp float opacCoeff    = fresnel + (1.0 - fresnel) * pow(1.0 - viewAngle, 5.0);
+    highp float opacity      = mix(baseOpacity, min(1.0, baseOpacity * 8.0), opacCoeff);
+
+    highp float sharpOpac    = smoothstep(0.1, 0.2, opacCoeff);
+    return vec4(specular * sharpOpac + opacCoeff * incomingLight * 0.2, opacity);
+    //return vec4(reflCoeff * 600.0, 0.0, 0.0, 1.0);
+    //return vec4(reflAngle * 60.0, 0.0, 0.0, 1.0);
+#else
     /* The intensity of the specular light is determined with the
      * angle between the reflected sun light and the view vector. See
      * https://en.wikibooks.org/wiki/GLSL_Programming/GLUT/Specular_Highlights
      */
-    highp vec3  viewPoint    = normalize(-relPos);
+    //highp vec3  viewDir      = normalize(worldPos - VIEW_POS); ///
+    highp vec3  viewDir      = -normalize(worldPos - VIEW_POS); ///
     highp vec3  reflectedSun = normalize(reflect(-sunMoonPos, normal));
     const float shininess    = 2.0;
-    highp float sunAngle     = max(0.0, dot(reflectedSun, viewPoint));
-    highp vec3  specular     = incomingLight * pow(sunAngle, shininess);
+    highp float sunAngle     = max(0.0, dot(reflectedSun, viewDir));
+    highp float reflectivity = min(1.0, 1.0 - dot(normalize(sunMoonPos), normal));
+    //highp float reflectivity = 1.0;
+    highp vec3  specular     = incomingLight * pow(sunAngle, shininess) * reflectivity;
 
     /* We want to know the angle between the normal of the water plane
      * (or anything rendered similarly to water) and the camera. The
      * value of viewAngle is actually cos θ, not in radian. */
-    highp float viewAngle = abs(dot(normal, viewPoint)); // [0, 1]
+    highp float viewAngle = abs(dot(normal, viewDir)); // [0, 1]
 
     /* Use the angle to calculate the color of surface. The more steep
      * the angle is, the less intensity of the supecular light will
@@ -169,8 +200,11 @@ vec4 waterSpecularLight(
     float opacity  = baseOpacity;
     vec4 surfLight = vec4(specular, min(1.0, baseOpacity * 8.0));
     vec4 nearLight = vec4(vec3(0), opacity);
+    //vec4 nearLight = surfLight;
+    //vec4 nearLight = vec4(specular, mix(baseOpacity, 1.0, pow(sunAngle, shininess) * reflectivity));
 
     return mix(surfLight, nearLight, smoothstep(0.0, 0.8, viewAngle));
+#endif
 }
 
 #endif /* !defined(NATURAL_MYSTIC_WATER_H_INCLUDED) */
