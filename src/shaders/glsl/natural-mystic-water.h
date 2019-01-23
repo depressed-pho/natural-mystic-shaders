@@ -154,16 +154,26 @@ vec4 waterSpecularLight(
     highp vec3  viewDir      = -normalize(worldPos - VIEW_POS); ///
     highp vec3  reflDir      = normalize(reflect(-lightDir, normal));
     const float shininess    = 128.0;
+    // https://www.gamedev.net/forums/topic/625142-blinn-phong-with-fresnel-effect/
+    // http://filmicworlds.com/blog/everything-has-fresnel/
+    // https://hal.inria.fr/inria-00443630/file/article-1.pdf
     const float iorIn        = 1.0;
     const float iorOut       = 1.33;
     const float fresnel      = pow((iorIn - iorIn / iorOut) / (iorIn + iorIn / iorOut), 2.0);
     highp vec3  halfDir      = normalize(viewDir + lightDir0);
     highp float incident     = max(0.0, dot(viewDir, halfDir));
-    //highp float reflAngle    = max(0.0, dot(reflDir, viewDir));
     highp float reflAngle    = max(0.0, dot(halfDir, normal));
     highp float reflCoeff    = fresnel + (1.0 - fresnel) * pow(1.0 - incident, 5.0);
     highp vec3  specular     = incomingLight * 80.0 * pow(reflAngle, shininess) * reflCoeff;
 
+#if 1
+    highp float viewAngle    = max(0.0, dot(normal, viewDir));
+    highp float viewCoeff    = fresnel + (1.0 - fresnel) * pow(1.0 - viewAngle, 5.0);
+    highp float opacity      = mix(baseOpacity, min(1.0, baseOpacity * 8.0), pow(1.0 - viewAngle, 2.0));
+
+    highp float sharpCoeff   = smoothstep(0.15, 0.2, viewCoeff);
+    return vec4(specular * sharpCoeff + viewCoeff * incomingLight * 0.1, opacity);
+#else
     highp float viewAngle    = max(0.0, dot(normal, viewDir));
     highp float opacCoeff    = fresnel + (1.0 - fresnel) * pow(1.0 - viewAngle, 5.0);
     highp float opacity      = mix(baseOpacity, min(1.0, baseOpacity * 8.0), opacCoeff);
@@ -172,6 +182,7 @@ vec4 waterSpecularLight(
     return vec4(specular * sharpOpac + opacCoeff * incomingLight * 0.2, opacity);
     //return vec4(reflCoeff * 600.0, 0.0, 0.0, 1.0);
     //return vec4(reflAngle * 60.0, 0.0, 0.0, 1.0);
+#endif
 #else
     /* The intensity of the specular light is determined with the
      * angle between the reflected sun light and the view vector. See
