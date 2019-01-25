@@ -23,7 +23,6 @@
 /* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
 #if defined(MCPE40059)
 varying highp vec3 wPos;
-varying highp vec3 relPos;
 varying highp vec3 vNormal;
 varying float flickerFactor;
 varying float desatFactor;
@@ -156,41 +155,43 @@ vec4 inColor = color;
 
 	/* Accumulate all the light to one linear RGB vector. We are going
 	 * to use it for diffuse lighting, and also specular lighting. */
-	vec3 light = vec3(0);
+	vec3 dirLight   = vec3(0);
+	vec3 undirLight = vec3(0);
 
-	light += ambientLight(ambientColor, ambientBrightness);
+	undirLight += ambientLight(ambientColor, ambientBrightness);
 #if defined(FOG)
 	/* When it's raining the sunlight shouldn't affect the scene
 	 * (#24), but we cannot treat the rain as a boolean switch as that
-	 * would cause #40.
-	 */
+	 * would cause #40. */
 	if (isUnderwater) {
-		light += sunlight(uv1.y, daylight);
-		light += moonlight(uv1.y, daylight);
+		dirLight += sunlight(uv1.y, daylight);
+		dirLight += moonlight(uv1.y, daylight);
 	}
 	else {
-		light += sunlight(uv1.y, daylight) * clearWeather;
-		light += moonlight(uv1.y, daylight) * clearWeather;
+		dirLight += sunlight(uv1.y, daylight) * clearWeather;
+		dirLight += moonlight(uv1.y, daylight) * clearWeather;
 	}
 #else
-	light += sunlight(uv1.y, daylight);
-	light += moonlight(uv1.y, daylight);
+	dirLight += sunlight(uv1.y, daylight);
+	dirLight += moonlight(uv1.y, daylight);
 #endif /* FOG */
-	light += skylight(uv1.y, daylight);
+	undirLight += skylight(uv1.y, daylight);
 #if defined(MCPE40059)
-	light += torchLight(uv1.x, uv1.y, daylight, flickerFactor);
+	/* Torchlight is directional, but since we don't actually know
+	 * their directions we have to consider it as undirectional. */
+	undirLight += torchLight(uv1.x, uv1.y, daylight, flickerFactor);
 #endif
 
 	/* Light sources should be significantly brighter than regular
 	 * objects. */
 #if defined(ALWAYS_LIT)
-	light += emissiveLight(flickerFactor);
+	undirLight += emissiveLight(flickerFactor);
 #endif
 
 	/* Now we finished accumulating light. Compute the diffuse light
 	 * and the specular light here. We assume the color of specular
 	 * light is always the same as the color of accumulated light. */
-	diffuse.rgb = pigment * light;
+	diffuse.rgb = pigment * (dirLight + undirLight);
 #if defined(MCPE40059) && defined(FANCY)
 	/* It is tempting to do this only when defined(BLEND), but if we
 	 * do that water in far terrain will have different colors. */
@@ -201,21 +202,23 @@ vec4 inColor = color;
 		 * other than flat top surfaces because the game doesn't tell
 		 * us anything about normals. In the fragment shader we can
 		 * compute the surface normal with dFdx/dFdy but it's only a
-		 * normal of flat triangles. To disguise the problem we mix
-		 * the flat surface normal with the smooth, analytical but the
-		 * incorrect one. */
+		 * normal of flat triangles. Luckily for us as the water
+		 * volume decreases the perturbance also decreases and thus
+		 * the surface becomes more and more flat. So to disguise the
+		 * problem we mix the flat surface normal with the smooth,
+		 * analytical but the incorrect one, using the volume. */
 #if 0 ////
 		vec3 sNormal = normalize(cross(dFdx(wPos), dFdy(wPos)));
 		//vec3 fNormal = normalize(mix(sNormal, vNormal, waterPlane));
 		vec3 fNormal = sNormal;
 		//vec3 fNormal = normalize(mix(sNormal, vNormal, smoothstep(0.9, 1.0, waterPlane)));
-		vec4 specular = waterSpecularLight(diffuse.a, light, wPos, relPos, TIME, fNormal);
+		vec4 specular = waterSpecularLight(diffuse.a, dirLight, undirLight, wPos, VIEW_POS, TIME, fNormal);
 		diffuse.rgb  += specular.rgb;
 		diffuse.a     = specular.a;
 
 		//diffuse.rgb = max(vec3(0.0), sNormal.xyz) * 60.0;
 #else ////
-		vec4 specular = waterSpecularLight(diffuse.a, light, wPos, relPos, TIME, vNormal);
+		vec4 specular = waterSpecularLight(diffuse.a, dirLight, undirLight, wPos, VIEW_POS, TIME, vNormal);
 		diffuse.rgb *= 0.5;
 		diffuse.rgb += specular.rgb * waterPlane;
 		diffuse.a    = mix(diffuse.a, specular.a, waterPlane);

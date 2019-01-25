@@ -132,90 +132,65 @@ highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal)
  * absolute, not relative opacity.
  */
 vec4 waterSpecularLight(
-    float baseOpacity, vec3 incomingLight,
-    highp vec3 worldPos, highp vec3 relPos, highp float time, highp vec3 normal) {
+    float baseOpacity, vec3 incomingDirLight, vec3 incomingUndirLight,
+    highp vec3 worldPos, highp vec3 viewPos, highp float time, highp vec3 normal) {
+
+    /* Compute the contribution of directional light (i.e. the sun and
+     * the moon) to the entire incoming light. */
+    vec3 incomingLight = incomingDirLight + incomingUndirLight;
+    vec3 dirLightRatio = incomingDirLight / (incomingLight + vec3(0.001));
 
     /* The game doesn't tell us where the sun or the moon is, which is
-     * so unfortunate. We have to assume they are always near the
-     * origin. */
-    //const highp vec3 sunMoonPos = vec3(-2.5, 1.0e10, 0);
-    //const highp vec3 lightDir0 = normalize(vec3(-2.5, 1.2, 0));
-    //const highp vec3 lightDir  = normalize(vec3(-2.5, 1.0e10, 0));
+     * so unfortunate. We have to assume they are always at some fixed
+     * point. */
     highp vec3 lightDir = normalize(vec3(-2.5, 2.5, 1.0));
-    //highp vec3 lightDir = normalize(worldPos - vec3(-2.5, 1.0e2, 1.5));
-    highp vec3 lightDir0 = lightDir;
 
-    /* Oscillate the normal even more, but this time with much higher
-     * frequencies. This is a kind of bump mapping.
-     */
+    /* Perturb the normal even more, but this time with much higher
+     * frequencies. This is a kind of bump mapping. */
     normal = waterWaveNormal(worldPos, time, normal);
 
-#if 1
-    highp vec3  viewDir      = -normalize(worldPos - VIEW_POS); ///
-    highp vec3  reflDir      = normalize(reflect(-lightDir, normal));
+    /* The intensity of the specular light is determined with the
+     * angle between the Blinn-Phong half vector and the normal. See:
+     * https://en.wikibooks.org/wiki/GLSL_Programming/GLUT/Specular_Highlights
+     * https://www.gamedev.net/forums/topic/625142-blinn-phong-with-fresnel-effect/
+     * http://filmicworlds.com/blog/everything-has-fresnel/
+     * https://hal.inria.fr/inria-00443630/file/article-1.pdf
+     */
+    highp vec3  viewDir      = -normalize(worldPos - viewPos);
     const float shininess    = 128.0;
-    // https://www.gamedev.net/forums/topic/625142-blinn-phong-with-fresnel-effect/
-    // http://filmicworlds.com/blog/everything-has-fresnel/
-    // https://hal.inria.fr/inria-00443630/file/article-1.pdf
-    const float iorIn        = 1.0;
-    const float iorOut       = 1.33;
+
+    /* Compute the Fresnel term between the view vector and the half
+     * vector. When the angle is wide the water surface behaves more
+     * like a mirror than air. */
+    const float iorIn        = 1.0;  // The refraction index of air.
+    const float iorOut       = 1.33; // And water.
     const float fresnel      = pow((iorIn - iorIn / iorOut) / (iorIn + iorIn / iorOut), 2.0);
-    highp vec3  halfDir      = normalize(viewDir + lightDir0);
-    highp float incident     = max(0.0, dot(viewDir, halfDir));
+    highp vec3  halfDir      = normalize(viewDir + lightDir);
+    highp float incident     = max(0.0, dot(viewDir, halfDir)); // Cosine of the angle.
     highp float reflAngle    = max(0.0, dot(halfDir, normal));
     highp float reflCoeff    = fresnel + (1.0 - fresnel) * pow(1.0 - incident, 5.0);
-    highp vec3  specular     = incomingLight * 80.0 * pow(reflAngle, shininess) * reflCoeff;
+    highp vec3  specular     = incomingLight * 160.0 * pow(reflAngle, shininess) * reflCoeff;
 
-#if 1
-    highp float viewAngle    = max(0.0, dot(normal, viewDir));
-    highp float viewCoeff    = fresnel + (1.0 - fresnel) * pow(1.0 - viewAngle, 5.0);
-    highp float opacity      = mix(baseOpacity, min(1.0, baseOpacity * 8.0), pow(1.0 - viewAngle, 2.0));
-
-    highp float sharpCoeff   = smoothstep(0.15, 0.2, viewCoeff);
-    return vec4(specular * sharpCoeff + viewCoeff * incomingLight * 0.1, opacity);
-#else
+    /* Compute the opacity of water. In real life when a light ray
+     * hits a surface of water, some part of it will reflect away, and
+     * the other part will refract and bounces back from the bottom
+     * (Fresnel effect). This means the opacity is dependent on the
+     * depth of water body. But we can't actually do it with just a
+     * single render pass so we have to somehow approximate it. Here
+     * we compute the Fresnel term between the normal and the view
+     * vector, and consider that the surface reflects all the possible
+     * incoming light rays (including ambient light and skylight), and
+     * when that happens the water is opaque. This is of course a
+     * crude hack and isn't based on the real optics. */
     highp float viewAngle    = max(0.0, dot(normal, viewDir));
     highp float opacCoeff    = fresnel + (1.0 - fresnel) * pow(1.0 - viewAngle, 5.0);
     highp float opacity      = mix(baseOpacity, min(1.0, baseOpacity * 8.0), opacCoeff);
 
     highp float sharpOpac    = smoothstep(0.1, 0.2, opacCoeff);
-    return vec4(specular * sharpOpac + opacCoeff * incomingLight * 0.2, opacity);
-    //return vec4(reflCoeff * 600.0, 0.0, 0.0, 1.0);
-    //return vec4(reflAngle * 60.0, 0.0, 0.0, 1.0);
-#endif
-#else
-    /* The intensity of the specular light is determined with the
-     * angle between the reflected sun light and the view vector. See
-     * https://en.wikibooks.org/wiki/GLSL_Programming/GLUT/Specular_Highlights
-     */
-    //highp vec3  viewDir      = normalize(worldPos - VIEW_POS); ///
-    highp vec3  viewDir      = -normalize(worldPos - VIEW_POS); ///
-    highp vec3  reflectedSun = normalize(reflect(-sunMoonPos, normal));
-    const float shininess    = 2.0;
-    highp float sunAngle     = max(0.0, dot(reflectedSun, viewDir));
-    highp float reflectivity = min(1.0, 1.0 - dot(normalize(sunMoonPos), normal));
-    //highp float reflectivity = 1.0;
-    highp vec3  specular     = incomingLight * pow(sunAngle, shininess) * reflectivity;
-
-    /* We want to know the angle between the normal of the water plane
-     * (or anything rendered similarly to water) and the camera. The
-     * value of viewAngle is actually cos θ, not in radian. */
-    highp float viewAngle = abs(dot(normal, viewDir)); // [0, 1]
-
-    /* Use the angle to calculate the color of surface. The more steep
-     * the angle is, the less intensity of the supecular light will
-     * be. And we also use the angle to determine the opacity, that
-     * is, when the angle is wide the water plane behaves more like a
-     * mirror than air.
-     */
-    float opacity  = baseOpacity;
-    vec4 surfLight = vec4(specular, min(1.0, baseOpacity * 8.0));
-    vec4 nearLight = vec4(vec3(0), opacity);
-    //vec4 nearLight = surfLight;
-    //vec4 nearLight = vec4(specular, mix(baseOpacity, 1.0, pow(sunAngle, shininess) * reflectivity));
-
-    return mix(surfLight, nearLight, smoothstep(0.0, 0.8, viewAngle));
-#endif
+    return vec4(
+        specular * dirLightRatio * sharpOpac + // Reflected directional light
+        opacCoeff * incomingLight * 0.15,      // Reflected undirectional light
+        opacity);
 }
 
 #endif /* !defined(NATURAL_MYSTIC_WATER_H_INCLUDED) */
