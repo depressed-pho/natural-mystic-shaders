@@ -21,6 +21,7 @@ varying highp vec3 vNormal; // Vertex normal in the world space. Only
 							// defined when waterPlane > 0.0.
 varying float flickerFactor;
 varying float desatFactor;
+flat varying float waterFlag;
 varying float waterPlane; // [0, 1]
 #endif
 
@@ -129,6 +130,7 @@ void main()
 
 	/* Waves */
 #if defined(MCPE40059)
+	waterFlag  = isWater(color) ? 1.0 : 0.0;
 	waterPlane = 0.0;
 #endif
 #if !defined(BYPASS_PIXEL_SHADER) && !defined(AS_ENTITY_RENDERER) && defined(ENABLE_WAVES) && defined(MCPE40059)
@@ -137,7 +139,7 @@ void main()
 		highp float wave = sin(TIME * 3.5 + 2.0 * posw.x + 2.0 * posw.z + posw.y);
 		gl_Position.x += wave * 0.015;
 	}
-	else if (isWater(color)) {
+	else if (waterFlag > 0.5) {
 		/* We want water to swell in proportion to its volume. The more
 		 * the vertex is close to the ground (i.e. integral points in the
 		 * world position), the less the vertex should swell. Without this

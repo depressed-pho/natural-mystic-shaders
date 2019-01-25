@@ -1,5 +1,12 @@
 # Release notes
 
+## 1.6.0 -- UNRELEASED
+
+* Reworked the water again. Now it has a darker base color and shows
+  reflected sunlight and moonlight. Note that the direction of
+  sunlight doesn't always match to the actual position of the sun due
+  to a limitation in the current rendering engine.
+
 ## 1.5.0 -- 2019-01-21
 
 * Reworked the water completely. Now it has much more convincing waves
