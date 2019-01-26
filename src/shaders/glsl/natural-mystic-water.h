@@ -164,7 +164,7 @@ vec4 waterSpecularLight(
      * like a mirror than air. */
     const float iorIn        = 1.0;  // The refraction index of air.
     const float iorOut       = 1.33; // And water.
-    const float fresnel      = pow((iorIn - iorIn / iorOut) / (iorIn + iorIn / iorOut), 2.0);
+    const float fresnel      = pow((iorIn - iorOut) / (iorIn + iorOut), 2.0);
     highp vec3  halfDir      = normalize(viewDir + lightDir);
     highp float incident     = max(0.0, dot(viewDir, halfDir)); // Cosine of the angle.
     highp float reflAngle    = max(0.0, dot(halfDir, normal));
