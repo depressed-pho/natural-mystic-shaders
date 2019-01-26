@@ -80,6 +80,78 @@ highp float simplexNoise(highp vec2 v) {
     return 130.0 * dot(m, g);
 }
 
+/* 3D simplex noise [-1, 1], based on https://github.com/stegu/webgl-noise/
+ */
+highp float simplexNoise(highp vec3 v) {
+    const highp vec2 C = vec2(1.0/6.0, 1.0/3.0);
+    const highp vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+
+    // First corner
+    highp vec3 i  = floor(v + dot(v, C.yyy));
+    highp vec3 x0 = v -   i + dot(i, C.xxx);
+
+    // Other corners
+    highp vec3 g  = step(x0.yzx, x0.xyz);
+    highp vec3 l  = 1.0 - g;
+    highp vec3 i1 = min(g.xyz, l.zxy);
+    highp vec3 i2 = max(g.xyz, l.zxy);
+
+    //         x0 = x0 - 0.0 + 0.0 * C.xxx;
+    //         x1 = x0 - i1  + 1.0 * C.xxx;
+    //         x2 = x0 - i2  + 2.0 * C.xxx;
+    //         x3 = x0 - 1.0 + 3.0 * C.xxx;
+    highp vec3 x1 = x0 - i1 + C.xxx;
+    highp vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y
+    highp vec3 x3 = x0 - D.yyy; // -1.0+3.0*C.x = -0.5 = -D.y
+
+    // Permutations
+    i = mod(i, 289.0);
+    highp vec4 p =
+        permute289(
+            permute289(
+                permute289(
+                    i.z + vec4(0.0, i1.z, i2.z, 1.0)
+                    ) + i.y + vec4(0.0, i1.y, i2.y, 1.0)
+                ) + i.x + vec4(0.0, i1.x, i2.x, 1.0)
+            );
+
+    // Gradients: 7x7 points over a square, mapped onto an octahedron.
+    // The ring size 17*17 = 289 is close to a multiple of 49 (49*6 =
+    // 294)
+    const highp float n_ = 0.142857142857; // 1.0/7.0
+    highp vec3  ns = n_ * D.wyz - D.xzx;
+
+    highp vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p, 7*7)
+
+    highp vec4 x_ = floor(j * ns.z);
+    highp vec4 y_ = floor(j - 7.0 * x_);    // mod(j, N)
+
+    highp vec4 x = x_ * ns.x + ns.yyyy;
+    highp vec4 y = y_ * ns.x + ns.yyyy;
+    highp vec4 h = 1.0 - abs(x) - abs(y);
+
+    highp vec4 b0 = vec4(x.xy, y.xy);
+    highp vec4 b1 = vec4(x.zw, y.zw);
+
+    highp vec4 s0 = floor(b0) * 2.0 + 1.0;
+    highp vec4 s1 = floor(b1) * 2.0 + 1.0;
+    highp vec4 sh = -step(h, vec4(0.0));
+
+    highp vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+    highp vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+
+    highp vec3 p0 = normalize(vec3(a0.xy, h.x));
+    highp vec3 p1 = normalize(vec3(a0.zw, h.y));
+    highp vec3 p2 = normalize(vec3(a1.xy, h.z));
+    highp vec3 p3 = normalize(vec3(a1.zw, h.w));
+
+    // Mix final noise value
+    highp vec4 m = max(0.5 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
+    m = m * m;
+    return 42.0 *
+        dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
+}
+
 /* 4D simplex noise [-1, 1], based on https://github.com/stegu/webgl-noise/
  */
 highp float simplexNoise(highp vec4 v) {

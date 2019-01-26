@@ -6,6 +6,7 @@
   reflected sunlight and moonlight. Note that the direction of
   sunlight doesn't always match to the actual position of the sun due
   to a limitation in the current rendering engine.
+* When it's raining the ground now looks wet (#49).
 
 ## 1.5.0 -- 2019-01-21
 

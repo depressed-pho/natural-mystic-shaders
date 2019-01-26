@@ -41,8 +41,9 @@ varying vec4 fogColor;
 #include "util.h"
 #include "natural-mystic-color.h"
 #include "natural-mystic-config.h"
-#include "natural-mystic-light.h"
 #include "natural-mystic-hacks.h"
+#include "natural-mystic-light.h"
+#include "natural-mystic-rain.h"
 #include "natural-mystic-water.h"
 
 LAYOUT_BINDING(0) uniform sampler2D TEXTURE_0;
@@ -194,7 +195,8 @@ vec4 inColor = color;
 	 * light is always the same as the color of accumulated light. */
 	diffuse.rgb = pigment * (dirLight + undirLight);
 #if defined(MCPE40059) && defined(FANCY)
-	vec3 sNormal = normalize(cross(dFdx(wPos), dFdy(wPos)));
+	vec3  sNormal = normalize(cross(dFdx(wPos), dFdy(wPos)));
+	float wet     = wetness(clearWeather, uv1.y);
 	if (waterFlag > 0.5) {
 		/* Compute the specular light and the opacity of water. It is
 		 * tempting to do this only when defined(BLEND), but if we do
@@ -217,17 +219,24 @@ vec4 inColor = color;
 		diffuse.rgb *= 0.5; // Darken the base water color.
 		diffuse.rgb += specular.rgb;
 		diffuse.a    = specular.a;
+		if (wet > 0.0) {
+			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, TIME, fNormal);
+		}
 	}
 	else {
-		/* Specular lighting is currently disabled because it didn't look great. */
-#if   defined(ENABLE_SPECULAR_LIGHT)
 		const float fresnel   = 0.04;
 		const float shininess = 2.0;
 		vec3 specular = specularLight(fresnel, shininess, dirLight, undirLight, wPos, VIEW_POS, sNormal);
 
 		diffuse.rgb *= 1.0 - fresnel;
-		diffuse.rgb += specular;
-#  endif
+		/* Wet ground should have reduced diffuse light if it's made
+		 * of a rough material. But for now it's a constant value
+		 * because we don't know what a material it's made of. */
+		diffuse.rgb *= mix(1.0, 0.6, wet);
+		diffuse.rgb += specular * mix(1.0, 8.0, wet);
+		if (wet > 0.0) {
+			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, TIME, sNormal);
+		}
 	}
 #endif
 
