@@ -12,8 +12,8 @@
  */
 float wetness(float clearWeather, float sunLevel) {
     const float shadowFactor = 0.01;  // [0, 1]
-    const float shadowBorder = 0.84;  // [0, 1]
-    const float shadowBlur   = 0.04; // The higher the more blur.
+    const float shadowBorder = 0.80;  // [0, 1]
+    const float shadowBlur   = 0.06; // The higher the more blur.
 
     return (1.0 - clearWeather) * smoothstep(shadowBorder - shadowBlur, shadowBorder + shadowBlur, sunLevel);
 }

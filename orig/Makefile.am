@@ -2,6 +2,7 @@ EXTRA_DIST = \
 	materials/common.json \
 	materials/fancy.json \
 	materials/fancy.material \
+	materials/particles.material \
 	materials/sad.json \
 	materials/sad.material \
 	materials/sky.material \
