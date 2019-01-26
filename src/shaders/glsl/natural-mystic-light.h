@@ -178,4 +178,36 @@ vec3 moonlight(float sunLevel, float daylight) {
     }
 }
 
+/* Compute the specular light based on the surface normal and view
+ * position.
+ */
+vec3 specularLight(
+    float fresnel, float shininess, vec3 incomingDirLight, vec3 incomingUndirLight,
+    highp vec3 worldPos, highp vec3 viewPos, highp vec3 normal) {
+
+    vec3 incomingLight = incomingDirLight + incomingUndirLight;
+    vec3 dirLightRatio = incomingDirLight / (incomingLight + vec3(0.001));
+
+    /* The game doesn't tell us where the sun or the moon is, which is
+     * so unfortunate. We have to assume they are always at some fixed
+     * point. */
+    highp vec3 lightDir = normalize(vec3(-2.5, 5.5, 1.0));
+
+    /* The intensity of the specular light is determined with the
+     * angle between the Blinn-Phong half vector and the normal. See
+     * https://seblagarde.wordpress.com/2011/08/17/hello-world/
+     */
+    highp vec3  viewDir   = -normalize(worldPos - viewPos);
+    highp vec3  halfDir   = normalize(viewDir + lightDir);
+    highp float incident  = max(0.0, dot(lightDir, halfDir));
+    highp float reflAngle = max(0.0, dot(halfDir, normal));
+    highp float dotNL     = max(0.0, dot(normal, lightDir));
+    highp float reflCoeff = fresnel + (1.0 - fresnel) * pow(1.0 - incident, 5.0);
+    highp vec3  specular  = incomingLight * 2.0 * pow(reflAngle, shininess) * reflCoeff * dotNL;
+
+    highp float viewAngle = max(0.0, dot(normal, viewDir));
+    highp float viewCoeff = fresnel + (1.0 - fresnel) * pow(1.0 - viewAngle, 5.0);
+    return specular * dirLightRatio + viewCoeff * incomingLight * 0.03;
+}
+
 #endif

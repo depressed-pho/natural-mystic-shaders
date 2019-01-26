@@ -194,11 +194,13 @@ vec4 inColor = color;
 	 * light is always the same as the color of accumulated light. */
 	diffuse.rgb = pigment * (dirLight + undirLight);
 #if defined(MCPE40059) && defined(FANCY)
-	/* Compute the specular light and the opacity of water. It is
-	 * tempting to do this only when defined(BLEND), but if we do that
-	 * water in far terrain will have different colors. */
+	vec3 sNormal = normalize(cross(dFdx(wPos), dFdy(wPos)));
 	if (waterFlag > 0.5) {
-		/* We need a per-fragment normal here, which is an
+		/* Compute the specular light and the opacity of water. It is
+		 * tempting to do this only when defined(BLEND), but if we do
+		 * that water in far terrain will have different colors.
+		 *
+		 * We need a per-fragment normal here, which is an
 		 * interpolated vertex normal passed by our vertex
 		 * shader. However, we can't compute it correctly for anything
 		 * other than flat top surfaces because the game doesn't tell
@@ -209,12 +211,23 @@ vec4 inColor = color;
 		 * the surface becomes more and more flat. So to disguise the
 		 * problem we mix the flat surface normal with the smooth,
 		 * analytical but the incorrect one, using the volume. */
-		vec3 sNormal = normalize(cross(dFdx(wPos), dFdy(wPos)));
-		vec3 fNormal = normalize(mix(sNormal, vNormal, waterPlane));
+		vec3 fNormal  = normalize(mix(sNormal, vNormal, waterPlane));
 		vec4 specular = waterSpecularLight(diffuse.a, dirLight, undirLight, wPos, VIEW_POS, TIME, fNormal);
-		diffuse.rgb  *= 0.5; // Darken the base water color.
-		diffuse.rgb  += specular.rgb;
-		diffuse.a     = specular.a;
+
+		diffuse.rgb *= 0.5; // Darken the base water color.
+		diffuse.rgb += specular.rgb;
+		diffuse.a    = specular.a;
+	}
+	else {
+		/* Specular lighting is currently disabled because it didn't look great. */
+#if   defined(ENABLE_SPECULAR_LIGHT)
+		const float fresnel   = 0.04;
+		const float shininess = 2.0;
+		vec3 specular = specularLight(fresnel, shininess, dirLight, undirLight, wPos, VIEW_POS, sNormal);
+
+		diffuse.rgb *= 1.0 - fresnel;
+		diffuse.rgb += specular;
+#  endif
 	}
 #endif
 
