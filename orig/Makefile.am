@@ -7,6 +7,7 @@ EXTRA_DIST = \
 	materials/sky.material \
 	materials/terrain.material \
 	shaders/glsl/cloud.vertex \
+	shaders/glsl/rain_snow.fragment \
 	shaders/glsl/renderchunk.fragment \
 	shaders/glsl/renderchunk.vertex \
 	shaders/glsl/sky.vertex \
