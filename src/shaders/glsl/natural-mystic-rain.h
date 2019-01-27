@@ -32,11 +32,17 @@ vec3 ripples(vec3 incomingLight, highp vec3 worldPos, highp float cameraDist, hi
          * normal matches to (0, 1, 0). */
         float cosTheta = max(0.0, normal.y); // Equivalent to max(0.0, dot(normal, vec3(0, 1, 0)));
 
-        const highp vec3 resolution = vec3(vec2(0.15), 0.5);
+        const highp vec3 resolution = vec3(vec2(0.16), 0.5);
         const float amount = 0.1;
 
         highp vec3 st = vec3(worldPos.xz, time) / resolution;
-        float ripples = (simplexNoise(st) + 0.8) * 0.5;
+        float ripples = simplexNoise(st);
+
+        /* Shift the range of ripples. */
+        ripples = (ripples + 0.8) * 0.5;
+
+        /* Threshold and scale of ripples. */
+        ripples = smoothstep(0.3, 1.0, ripples);
 
         return mix(0.2, 1.0, cosTheta) * incomingLight * ripples * amount *
             (1.0 - smoothstep(distFadeStart, distThreshold, cameraDist));
