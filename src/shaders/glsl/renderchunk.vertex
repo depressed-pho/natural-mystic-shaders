@@ -17,6 +17,7 @@
 /* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
 #if defined(MCPE40059)
 varying highp vec3 wPos;
+varying float cameraDist;
 varying highp vec3 vNormal; // Vertex normal in the world space. Only
 							// defined when waterPlane > 0.0.
 varying float flickerFactor;
@@ -57,6 +58,9 @@ const float DIST_DESATURATION = 56.0 / 255.0; //WARNING this value is also hardc
 void main()
 {
     POS4 worldPos;
+#if !defined(MCPE40059)
+	float cameraDist;
+#endif
 #ifdef AS_ENTITY_RENDERER
 		POS4 pos = WORLDVIEWPROJ * POSITION;
 		worldPos = pos;
@@ -97,7 +101,7 @@ void main()
 ///// find distance from the camera
 	vec3 relPos = -worldPos.xyz;
 	float cameraDepth = length(relPos);
-	float cameraDist = cameraDepth / RENDER_DISTANCE;
+	cameraDist = cameraDepth / RENDER_DISTANCE;
 
 	/* Reduce the contrast of far objects (#5). The overall color
 	 * should lean towards the ambient. Note that cameraDist is a

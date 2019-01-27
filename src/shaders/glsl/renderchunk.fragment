@@ -23,6 +23,7 @@
 /* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
 #if defined(MCPE40059)
 varying highp vec3 wPos;
+varying float cameraDist;
 varying highp vec3 vNormal;
 varying float flickerFactor;
 varying float desatFactor;
@@ -216,7 +217,7 @@ vec4 inColor = color;
 		diffuse.rgb += specular.rgb;
 		diffuse.a    = specular.a;
 		if (wet > 0.0) {
-			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, TIME, fNormal);
+			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, cameraDist, TIME, fNormal);
 		}
 	}
 	else {
@@ -228,10 +229,10 @@ vec4 inColor = color;
 		/* Wet ground should have reduced diffuse light if it's made
 		 * of a rough material. But for now it's a constant value
 		 * because we don't know what a material it's made of. */
-		diffuse.rgb *= mix(1.0, 0.55, wet);
-		diffuse.rgb += specular * mix(1.0, 8.0, wet);
+		diffuse.rgb *= mix(1.0, 0.5, wet);
+		diffuse.rgb += specular * mix(1.0, 6.0, wet);
 		if (wet > 0.0) {
-			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, TIME, sNormal);
+			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, cameraDist, TIME, sNormal);
 		}
 	}
 #endif
