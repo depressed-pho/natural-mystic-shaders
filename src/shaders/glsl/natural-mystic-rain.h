@@ -44,7 +44,7 @@ vec3 ripples(vec3 incomingLight, highp vec3 worldPos, highp float cameraDist, hi
         /* Threshold and scale of ripples. */
         ripples = smoothstep(0.3, 1.0, ripples);
 
-        return mix(0.2, 1.0, cosTheta) * incomingLight * ripples * amount *
+        return incomingLight * mix(0.2, 1.0, cosTheta) * ripples * amount *
             (1.0 - smoothstep(distFadeStart, distThreshold, cameraDist));
     }
     else {

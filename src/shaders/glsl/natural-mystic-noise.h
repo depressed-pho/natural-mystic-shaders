@@ -162,10 +162,17 @@ highp float simplexNoise(highp vec3 v) {
     highp vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
     highp vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
 
-    highp vec3 p0 = normalize(vec3(a0.xy, h.x));
-    highp vec3 p1 = normalize(vec3(a0.zw, h.y));
-    highp vec3 p2 = normalize(vec3(a1.xy, h.z));
-    highp vec3 p3 = normalize(vec3(a1.zw, h.w));
+    highp vec3 p0 = vec3(a0.xy, h.x);
+    highp vec3 p1 = vec3(a0.zw, h.y);
+    highp vec3 p2 = vec3(a1.xy, h.z);
+    highp vec3 p3 = vec3(a1.zw, h.w);
+
+    // Normalise gradients
+    highp vec4 norm = inversesqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+    p0 *= norm.x;
+    p1 *= norm.y;
+    p2 *= norm.z;
+    p3 *= norm.w;
 
     // Mix final noise value
     highp vec4 m = max(0.5 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
@@ -247,11 +254,19 @@ highp float simplexNoise(highp vec4 v) {
         0.142857142857142857143, // 1/7
         0.0);
 
-    highp vec4 p0 = normalize(grad4(j0  , ip));
-    highp vec4 p1 = normalize(grad4(j1.x, ip));
-    highp vec4 p2 = normalize(grad4(j1.y, ip));
-    highp vec4 p3 = normalize(grad4(j1.z, ip));
-    highp vec4 p4 = normalize(grad4(j1.w, ip));
+    highp vec4 p0 = grad4(j0  , ip);
+    highp vec4 p1 = grad4(j1.x, ip);
+    highp vec4 p2 = grad4(j1.y, ip);
+    highp vec4 p3 = grad4(j1.z, ip);
+    highp vec4 p4 = grad4(j1.w, ip);
+
+    // Normalise gradients
+    highp vec4 norm = inversesqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+    p0 *= norm.x;
+    p1 *= norm.y;
+    p2 *= norm.z;
+    p3 *= norm.w;
+    p4 *= inversesqrt(dot(p4, p4));
 
     // Mix contributions from the five corners
     highp vec3 m0 = max(0.5 - vec3(dot(x0, x0), dot(x1, x1), dot(x2, x2)), 0.0);

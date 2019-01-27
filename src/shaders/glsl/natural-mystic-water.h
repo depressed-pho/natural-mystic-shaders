@@ -33,8 +33,8 @@ highp vec3 gerstnerWave(
     highp float theta    = wi * dot(Di, wPos.xz) + phi_i * time;
     highp float cosTheta = cos(theta);
     highp float sinTheta = sin(theta);
-    wPos.xz += Qi * Ai * Di * cosTheta;
-    wPos.y  +=      Ai      * sinTheta;
+    wPos.xz += Di * Qi * Ai * cosTheta;
+    wPos.y  +=           Ai * sinTheta;
 
     highp float wiAi = wi * Ai;
     normal.xz -= wiAi * Di * cosTheta;
@@ -124,7 +124,7 @@ highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal)
     normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0058, deg2dir(255.0), 0.725, 2.0);
     normal = gerstnerWaveN(wPos, time, normal, Q, numWaves, 0.0045, deg2dir( 65.0), 0.7, 2.0);
 
-    return normalize(normal);
+    return normal;
 }
 
 /* Compute the specular light on a water surface, and the opacity at
@@ -132,7 +132,7 @@ highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal)
  * absolute, not relative opacity.
  */
 vec4 waterSpecularLight(
-    float baseOpacity, vec3 incomingDirLight, vec3 incomingUndirLight,
+    float baseOpacity, vec3 incomingDirLight, vec3 incomingUndirLight, highp float cameraDist,
     highp vec3 worldPos, highp vec3 viewPos, highp float time, highp vec3 normal) {
 
     /* Compute the contribution of directional light (i.e. the sun and
@@ -143,11 +143,20 @@ vec4 waterSpecularLight(
     /* The game doesn't tell us where the sun or the moon is, which is
      * so unfortunate. We have to assume they are always at some fixed
      * point. */
-    highp vec3 lightDir = normalize(vec3(-2.5, 2.5, 1.0));
+    const highp vec3 lightDir = normalize(vec3(-2.5, 2.5, 1.0));
 
     /* Perturb the normal even more, but this time with much higher
      * frequencies. This is a kind of bump mapping. */
-    normal = waterWaveNormal(worldPos, time, normal);
+    const float distThreshold = 0.6;
+    const float distFadeStart = distThreshold * 0.8;
+    if (cameraDist < distThreshold) {
+        /* But perturbing the normal on far geometry doesn't
+         * contribute to the overall quality, and it may even cause
+         * aliasing. */
+        normal = mix(waterWaveNormal(worldPos, time, normal), normal,
+                     smoothstep(distFadeStart, distThreshold, cameraDist));
+    }
+    normal = normalize(normal);
 
     /* The intensity of the specular light is determined with the
      * angle between the Blinn-Phong half vector and the normal. See:
@@ -161,10 +170,13 @@ vec4 waterSpecularLight(
 
     /* Compute the Fresnel term between the view vector and the half
      * vector. When the angle is wide the water surface behaves more
-     * like a mirror than air. */
-    const float iorIn        = 1.0;  // The refraction index of air.
-    const float iorOut       = 1.33; // And water.
-    const float fresnel      = pow((iorIn - iorOut) / (iorIn + iorOut), 2.0);
+     * like a mirror than air. Note that constant "fresnel" is:
+     *
+     * [ iorIn - iorOut ]2
+     * | -------------- |   where iorIn = 1.0 (the refraction index
+     * [ iorIn + iorOut ]   of air) and iorOut = 1.33 (water).
+     */
+    const float fresnel      = 0.02;
     highp vec3  halfDir      = normalize(viewDir + lightDir);
     highp float incident     = max(0.0, dot(viewDir, halfDir)); // Cosine of the angle.
     highp float reflAngle    = max(0.0, dot(halfDir, normal));

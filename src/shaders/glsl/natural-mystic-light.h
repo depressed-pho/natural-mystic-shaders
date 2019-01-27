@@ -191,7 +191,7 @@ vec3 specularLight(
     /* The game doesn't tell us where the sun or the moon is, which is
      * so unfortunate. We have to assume they are always at some fixed
      * point. */
-    highp vec3 lightDir = normalize(vec3(-2.5, 5.5, 1.0));
+    const highp vec3 lightDir = normalize(vec3(-2.5, 5.5, 1.0));
 
     /* The intensity of the specular light is determined with the
      * angle between the Blinn-Phong half vector and the normal. See
@@ -207,7 +207,8 @@ vec3 specularLight(
 
     highp float viewAngle = max(0.0, dot(normal, viewDir));
     highp float viewCoeff = fresnel + (1.0 - fresnel) * pow(1.0 - viewAngle, 5.0);
-    return specular * dirLightRatio + viewCoeff * incomingLight * 0.03;
+    return specular * dirLightRatio +     // Reflected directional light
+        viewCoeff * incomingLight * 0.03; // Reflected undirectional light
 }
 
 #endif
