@@ -24,7 +24,7 @@ vec3 ripples(vec3 incomingLight, highp vec3 worldPos, highp float cameraDist, hi
     /* The visual effect of ripples is so subtle, and it won't be
      * visible on far terrain. We can skip the costly noise generation
      * unless worldPos isn't close to the camera. */
-    const float distThreshold = 0.05;
+    const float distThreshold = 0.1;
     const float distFadeStart = distThreshold * 0.8;
 
     if (cameraDist < distThreshold) {

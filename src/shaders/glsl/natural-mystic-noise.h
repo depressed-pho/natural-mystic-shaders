@@ -5,18 +5,38 @@
 // See also: https://www.shadertoy.com/view/4djSRW
 // Also https://briansharpe.wordpress.com/2011/10/01/gpu-texture-free-noise/
 // Also https://github.com/stegu/webgl-noise/
+// Also https://forum.unity.com/threads/2d-3d-4d-optimised-perlin-noise-cg-hlsl-library-cginc.218372/
+// Also https://gist.github.com/fadookie/25adf86ae7e2753d717c
 
 /* Permutation in mod 289. */
+#define NOISE_SIMPLEX_1_DIV_289 0.00346020761245674740484429065744
+
+highp float mod289(highp float x) {
+    return x - floor(x * NOISE_SIMPLEX_1_DIV_289) * 289.0;
+}
+
+highp vec2 mod289(highp vec2 x) {
+    return x - floor(x * NOISE_SIMPLEX_1_DIV_289) * 289.0;
+}
+
+highp vec3 mod289(highp vec3 x) {
+    return x - floor(x * NOISE_SIMPLEX_1_DIV_289) * 289.0;
+}
+
+highp vec4 mod289(highp vec4 x) {
+    return x - floor(x * NOISE_SIMPLEX_1_DIV_289) * 289.0;
+}
+
 highp float permute289(highp float x) {
-    return mod((x * 34.0 + 1.0) * x, 289.0);
+    return mod289((x * 34.0 + 1.0) * x);
 }
 
 highp vec3 permute289(highp vec3 x) {
-    return mod((x * 34.0 + 1.0) * x, 289.0);
+    return mod289((x * 34.0 + 1.0) * x);
 }
 
 highp vec4 permute289(highp vec4 x) {
-    return mod((x * 34.0 + 1.0) * x, 289.0);
+    return mod289((x * 34.0 + 1.0) * x);
 }
 
 /* A 4D gradient function, used for generating noise. */
@@ -50,7 +70,7 @@ highp float simplexNoise(highp vec2 v) {
     x12.xy -= i1;
 
     // Permutations
-    i = mod(i, 289.0); // Avoid truncation effects in permutation
+    i = mod289(i); // Avoid truncation effects in permutation
     highp vec3 p =
         permute289(
             permute289(
@@ -83,7 +103,9 @@ highp float simplexNoise(highp vec2 v) {
 /* 3D simplex noise [-1, 1], based on https://github.com/stegu/webgl-noise/
  */
 highp float simplexNoise(highp vec3 v) {
-    const highp vec2 C = vec2(1.0/6.0, 1.0/3.0);
+    const highp vec2 C = vec2(
+        0.166666666666666667,  // 1/6
+        0.333333333333333333); // 1/3
     const highp vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
 
     // First corner
@@ -105,7 +127,7 @@ highp float simplexNoise(highp vec3 v) {
     highp vec3 x3 = x0 - D.yyy; // -1.0+3.0*C.x = -0.5 = -D.y
 
     // Permutations
-    i = mod(i, 289.0);
+    i = mod289(i);
     highp vec4 p =
         permute289(
             permute289(
@@ -196,7 +218,7 @@ highp float simplexNoise(highp vec4 v) {
     highp vec4 x4 = x0       + C.wwww;
 
     // Permutations
-    i = mod(i, 289.0);
+    i = mod289(i);
     highp float j0 =
         permute289(
             permute289(
