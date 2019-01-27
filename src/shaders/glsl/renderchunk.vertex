@@ -21,8 +21,9 @@ varying highp vec3 vNormal; // Vertex normal in the world space. Only
 							// defined when waterPlane > 0.0.
 varying float flickerFactor;
 varying float desatFactor;
-flat varying float waterFlag;
-varying float waterPlane; // [0, 1]
+flat varying float clearWeather; // [0, 1]
+flat varying float waterFlag;    // 0.0 or 1.0
+varying float waterPlane;        // [0, 1]
 #endif
 
 #ifndef BYPASS_PIXEL_SHADER
@@ -104,6 +105,15 @@ void main()
 	 * terrain fog ends. */
 #if defined(FANCY) && defined(MCPE40059)
 	desatFactor = exponentialFog(vec2(0.0, 4.0), cameraDist);
+#endif
+
+	/* Detect the weather on the Overworld. */
+#if defined(MCPE40059)
+#  if defined(FOG)
+	clearWeather = isClearWeather(FOG_CONTROL);
+#  else
+	clearWeather = 1.0;
+#  endif
 #endif
 
 ///// apply fog

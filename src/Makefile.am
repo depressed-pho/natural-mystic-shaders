@@ -24,6 +24,7 @@ MCPACK_FILES = \
 	shaders/glsl/natural-mystic-rain.h \
 	shaders/glsl/natural-mystic-water.h \
 	shaders/glsl/particles.fragment \
+	shaders/glsl/particles.vertex \
 	shaders/glsl/rain_snow.fragment \
 	shaders/glsl/renderchunk.fragment \
 	shaders/glsl/renderchunk.vertex \

@@ -7,7 +7,6 @@
 #include "uniformShaderConstants.h"
 #include "uniformPerFrameConstants.h"
 #include "natural-mystic-color.h"
-#include "natural-mystic-hacks.h"
 
 LAYOUT_BINDING(0) uniform sampler2D TEXTURE_0;
 LAYOUT_BINDING(1) uniform sampler2D TEXTURE_1;
@@ -21,6 +20,8 @@ varying vec4 color;
 #ifdef ENABLE_FOG
 varying vec4 fogColor;
 #endif
+
+flat varying float clearWeather; // [0, 1]
 
 #ifdef GLINT
 	varying vec2 layer1UV;
@@ -102,7 +103,6 @@ void main()
 	/* When it's raining The color of particles should be highly
 	 * desaturated because it looks ugly when the rain drops look
 	 * blue. */
-	float clearWeather = isClearWeather(FOG_CONTROL);
 	diffuse.rgb = desaturate(diffuse.rgb, mix(0.95, 0.0, clearWeather));
 #endif
 

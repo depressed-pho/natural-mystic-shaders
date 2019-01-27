@@ -26,6 +26,7 @@ varying highp vec3 wPos;
 varying highp vec3 vNormal;
 varying float flickerFactor;
 varying float desatFactor;
+flat varying float clearWeather;
 flat varying float waterFlag;
 varying float waterPlane;
 #endif
@@ -117,14 +118,9 @@ vec4 inColor = color;
 #else
 	const bool isUnderwater = false;
 #endif /* defined(UNDERWATER) */
-#if defined(FOG)
-	float clearWeather = isClearWeather(FOG_CONTROL);
-#else
-	const float clearWeather = 1.0;
-#endif /* defined(FOG) */
 
 	vec3 ambientColor;
-#if defined(FOG)
+#if defined(FOG) && defined(MCPE40059)
 	if (isRenderDistanceFog(FOG_CONTROL)) {
 		/* Don't use the fog color in this case, as it would be
 		 * slightly different from the color of near terrain. */
@@ -161,7 +157,7 @@ vec4 inColor = color;
 	vec3 undirLight = vec3(0);
 
 	undirLight += ambientLight(ambientColor, ambientBrightness);
-#if defined(FOG)
+#if defined(FOG) && defined(MCPE40059)
 	/* When it's raining the sunlight shouldn't affect the scene
 	 * (#24), but we cannot treat the rain as a boolean switch as that
 	 * would cause #40. */

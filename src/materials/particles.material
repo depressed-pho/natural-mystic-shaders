@@ -3,7 +3,7 @@
     "version": "1.0.0",
 
     "particles_base": {
-      "vertexShader": "shaders/color_uv.vertex",
+      "vertexShader": "shaders/particles.vertex",
       "vrGeometryShader": "shaders/color_uv.geometry",
       "fragmentShader": "shaders/particles.fragment",
 
