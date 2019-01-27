@@ -230,7 +230,7 @@ vec4 inColor = color;
 		 * of a rough material. But for now it's a constant value
 		 * because we don't know what a material it's made of. */
 		diffuse.rgb *= mix(1.0, 0.5, wet);
-		diffuse.rgb += specular * mix(1.0, 6.0, wet);
+		diffuse.rgb += specular * mix(1.0, 5.0, wet);
 		if (wet > 0.0) {
 			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, cameraDist, TIME, sNormal);
 		}
