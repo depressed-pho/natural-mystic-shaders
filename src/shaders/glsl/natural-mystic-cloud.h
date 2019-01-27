@@ -5,7 +5,7 @@
 #include "natural-mystic-noise.h"
 
 /* Generate a pattern of clouds based on a world position. */
-highp float cloudMap(int octaves, highp float time, highp vec3 pos) {
+highp float cloudMap(int octaves, float lowerBound, float upperBound, highp float time, highp vec3 pos) {
     /* Use of highp is essential here, as the uniform TIME in mediump
      * starts to lose precision within 10 minutes.
      */
@@ -20,8 +20,6 @@ highp float cloudMap(int octaves, highp float time, highp vec3 pos) {
     /* We intentionally throw away some
      * of the precision so we get somewhat sparse noise.
      */
-    const float lowerBound = 0.5;
-    const float upperBound = 0.85;
     return fBM(octaves, lowerBound, upperBound, st * 3.0);
 }
 
