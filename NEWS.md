@@ -1,6 +1,6 @@
 # Release notes
 
-## 1.6.0 -- UNRELEASED
+## 1.6.0 -- 2019-01-30
 
 * Reworked the water again. Now it has a darker base color and shows
   reflected sunlight and moonlight. Note that the direction of
