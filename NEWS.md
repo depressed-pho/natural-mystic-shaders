@@ -4,6 +4,8 @@
 
 * The shader now abuses ambient occlusion factor to create more
   shadows, especially on the sides of blocks.
+* Fixed the direction of reflected sunlight which wasn't parallel to
+  the sun.
 
 ## 1.6.0 -- 2019-01-30
 

@@ -143,7 +143,7 @@ vec4 waterSpecularLight(
     /* The game doesn't tell us where the sun or the moon is, which is
      * so unfortunate. We have to assume they are always at some fixed
      * point. */
-    const highp vec3 lightDir = normalize(vec3(-2.5, 2.5, 1.0));
+    const highp vec3 lightDir = normalize(vec3(-2.5, 2.5, 0.0));
 
     /* Perturb the normal even more, but this time with much higher
      * frequencies. This is a kind of bump mapping. */
@@ -166,7 +166,7 @@ vec4 waterSpecularLight(
      * https://hal.inria.fr/inria-00443630/file/article-1.pdf
      */
     highp vec3  viewDir      = -normalize(worldPos - viewPos);
-    const float shininess    = 128.0;
+    const float shininess    = 80.0;
 
     /* Compute the Fresnel term between the view vector and the half
      * vector. When the angle is wide the water surface behaves more
