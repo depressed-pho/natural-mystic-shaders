@@ -265,10 +265,13 @@ vec4 inColor = color;
 	}
 #endif
 
-//#define SHOW_MATERIAL_COLOR 1
-#if defined(SHOW_MATERIAL_COLOR)
+#if defined(DEBUG_SHOW_VERTEX_COLOR)
 	diffuse = color;
-#endif
+
+#elif defined(DEBUG_SHOW_SUNLIGHT_LEVEL)
+	diffuse.rgb = vec3(uv1.y);
+
+#endif /* DEBUG */
 
 	gl_FragColor = diffuse;
 	

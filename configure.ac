@@ -90,6 +90,15 @@ AS_CASE(
     [AC_MSG_ERROR(
          [Unknown fog type `$with_fog_type'. See `configure --help'.])])
 
+# Debug options.
+AH_TEMPLATE(
+    [DEBUG_SHOW_VERTEX_COLOR],
+    [Define to show the color of vertices. This is not compatible with other debug options.])
+
+AH_TEMPLATE(
+    [DEBUG_SHOW_SUNLIGHT_LEVEL],
+    [Define to show the terrain-dependent sunlight level in grayscale. This is not compatible with other debug options.])
+
 # Checks for programs.
 AC_ARG_VAR([DIFF], [The diff command @<:@autodetected@:>@])
 AC_CHECK_PROGS([DIFF], [diff])
