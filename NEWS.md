@@ -1,5 +1,10 @@
 # Release notes
 
+## 1.7.0 -- FIXME
+
+* The shader now abuses ambient occlusion factor to create more
+  shadows, especially on the sides of blocks.
+
 ## 1.6.0 -- 2019-01-30
 
 * Reworked the water again. Now it has a darker base color and shows

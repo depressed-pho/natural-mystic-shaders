@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([Natural Mystic Shaders],
-        [1.6.0],
+        [1.7.0],
         [https://github.com/depressed-pho/natural-mystic-shaders/issues],
         [],
         [https://github.com/depressed-pho/natural-mystic-shaders])
@@ -98,6 +98,10 @@ AH_TEMPLATE(
 AH_TEMPLATE(
     [DEBUG_SHOW_SUNLIGHT_LEVEL],
     [Define to show the terrain-dependent sunlight level in grayscale. This is not compatible with other debug options.])
+
+AH_TEMPLATE(
+    [DEBUG_SHOW_OCCLUSION_FACTOR],
+    [Define to show the ambient occlusion factor. This is not compatible with other debug options.])
 
 # Checks for programs.
 AC_ARG_VAR([DIFF], [The diff command @<:@autodetected@:>@])

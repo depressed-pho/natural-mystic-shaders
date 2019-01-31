@@ -91,11 +91,17 @@ vec4 inColor = color;
 	#endif
 	
 	diffuse.rgb *= inColor.rgb;
+
+	/* The game appears to encode an ambient occlusion in the vertex
+	 * color in this case. Abuse it to create more shadows. */
+	float occlusion = occlusionFactor(inColor.rgb);
 #else
 	vec2 uv = inColor.xy;
 	diffuse.rgb *= mix(vec3(1.0,1.0,1.0), texture2D( TEXTURE_2, uv).rgb*2.0, inColor.b);
 	diffuse.rgb *= inColor.aaa;
 	diffuse.a = 1.0;
+
+	float occlusion = 1.0; /* Assume it's not occluded at all. */
 #endif
 
 	/* Fetch the level of daylight (i.e. the one which darkens at
@@ -190,7 +196,6 @@ vec4 inColor = color;
 	/* Now we finished accumulating light. Compute the diffuse light
 	 * and the specular light here. We assume the color of specular
 	 * light is always the same as the color of accumulated light. */
-	diffuse.rgb = pigment * (dirLight + undirLight);
 #if defined(MCPE40059) && defined(FANCY)
 	vec3  sNormal = normalize(cross(dFdx(wPos), dFdy(wPos)));
 	float wet     = wetness(clearWeather, uv1.y);
@@ -213,6 +218,7 @@ vec4 inColor = color;
 		vec3 fNormal  = normalize(mix(sNormal, vNormal, waterPlane));
 		vec4 specular = waterSpecularLight(diffuse.a, dirLight, undirLight, cameraDist, wPos, VIEW_POS, TIME, fNormal);
 
+		diffuse.rgb  = pigment * (dirLight + undirLight);
 		diffuse.rgb *= 0.5; // Darken the base water color.
 		diffuse.rgb += specular.rgb;
 		diffuse.a    = specular.a;
@@ -224,6 +230,10 @@ vec4 inColor = color;
 		const float fresnel   = 0.04;
 		const float shininess = 2.0;
 		vec3 specular = specularLight(fresnel, shininess, dirLight, undirLight, wPos, VIEW_POS, sNormal);
+
+		/* The intensity of directional light should be affected by the
+		 * occlusion factor. */
+		diffuse.rgb = pigment * (dirLight * mix(0.4, 1.0, occlusion) + undirLight);
 
 		diffuse.rgb *= 1.0 - fresnel;
 		/* Wet ground should have reduced diffuse light if it's made
@@ -270,6 +280,9 @@ vec4 inColor = color;
 
 #elif defined(DEBUG_SHOW_SUNLIGHT_LEVEL)
 	diffuse.rgb = vec3(uv1.y);
+
+#elif defined(DEBUG_SHOW_OCCLUSION_FACTOR)
+	diffuse.rgb = vec3(occlusion);
 
 #endif /* DEBUG */
 

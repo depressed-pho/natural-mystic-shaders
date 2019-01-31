@@ -66,4 +66,20 @@ float isClearWeather(vec2 fogControl) {
     return smoothstep(0.8, 1.0, fogControl.y);
 }
 
+/* Compute an occlusion factor [0, 1] based on the vertex color. 0.0
+ * means completely occluded, and 1.0 means not occluded at all. This
+ * works because the game appears to encode an ambient occlusion in
+ * the vertex color unless SEASONS is defined.
+ */
+float occlusionFactor(vec3 color) {
+    const float shadowBorder = 0.83;
+    const float shadowBlurLo = 0.05;
+    const float shadowBlurHi = 0.01;
+
+    /* Hackish adjustment for grass blocks! */
+    float luminance = color.g * 2.0 - (color.r < color.b ? color.r : color.b);
+
+    return smoothstep(shadowBorder - shadowBlurLo, shadowBorder + shadowBlurHi, luminance);
+}
+
 #endif /* NATURAL_MYSTIC_HACKS_H_INCLUDED */
