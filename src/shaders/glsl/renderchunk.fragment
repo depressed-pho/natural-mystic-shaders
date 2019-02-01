@@ -233,7 +233,8 @@ vec4 inColor = color;
 
 		/* The intensity of directional light should be affected by the
 		 * occlusion factor. */
-		diffuse.rgb = pigment * (dirLight * mix(0.4, 1.0, occlusion) + undirLight);
+		const float occlShadow = 0.35;
+		diffuse.rgb = pigment * (dirLight * mix(occlShadow, 1.0, occlusion) + undirLight);
 
 		diffuse.rgb *= 1.0 - fresnel;
 		/* Wet ground should have reduced diffuse light if it's made
