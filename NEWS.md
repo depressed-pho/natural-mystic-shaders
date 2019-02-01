@@ -6,6 +6,8 @@
   shadows, especially on the sides of blocks.
 * Fixed the direction of reflected sunlight which wasn't parallel to
   the sun.
+* Added a thin fog. Its color and density is currently constant
+  although it should ideally be biome-specific (#9).
 
 ## 1.6.0 -- 2019-01-30
 

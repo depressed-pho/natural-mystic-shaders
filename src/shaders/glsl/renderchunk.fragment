@@ -252,10 +252,18 @@ vec4 inColor = color;
 	diffuse.rgb = contrastFilter(diffuse.rgb, 1.25);
 
 	/* Reduce the contrast of far objects (#5). The overall color
-	 * should lean towards the ambient. */
+	 * should lean towards the ambient. And we also apply a permanent
+	 * fog. It should ideally be biome-specific (#9) but we can't do
+	 * that currently. */
 #if defined(FANCY) && defined(MCPE40059)
+	const float contrast   = 0.45;
+	const float fogDensity = 0.4;
 	diffuse.rgb = mix(
-		diffuse.rgb, contrastFilter(diffuse.rgb, 0.45) * ambientColor, desatFactor);
+		diffuse.rgb,
+		mix(contrastFilter(diffuse.rgb, contrast) * ambientColor,
+			FOG_COLOR.rgb,
+			fogDensity),
+		desatFactor);
 #endif
 
 	/* We can't apply fogs before doing tone mapping, because that
