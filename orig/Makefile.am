@@ -1,5 +1,6 @@
 EXTRA_DIST = \
 	materials/common.json \
+	materials/entity.material \
 	materials/fancy.json \
 	materials/fancy.material \
 	materials/particles.material \

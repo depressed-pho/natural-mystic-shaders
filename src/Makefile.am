@@ -4,6 +4,7 @@ MCPACK_INSTALLATION_DIRECTORY = $(MCPACK_INSTALLATION_DIRECTORY_resource)
 MCPACK_FILES = \
 	manifest.json \
 	materials/common.json \
+	materials/entity.material \
 	materials/fancy.json \
 	materials/fancy.material \
 	materials/particles.material \
