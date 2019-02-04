@@ -103,6 +103,14 @@ AH_TEMPLATE(
     [DEBUG_SHOW_OCCLUSION_FACTOR],
     [Define to show the ambient occlusion factor. This is not compatible with other debug options.])
 
+AH_TEMPLATE(
+    [DEBUG_SHOW_FOG_COLOR],
+    [Define to show the fog color. This is not compatible with other debug options.])
+
+AH_TEMPLATE(
+    [DEBUG_SHOW_FOG_CONTROL],
+    [Define to show the fog control parameters. This is not compatible with other debug options.])
+
 # Checks for programs.
 AC_ARG_VAR([DIFF], [The diff command @<:@autodetected@:>@])
 AC_CHECK_PROGS([DIFF], [diff])

@@ -293,6 +293,12 @@ vec4 inColor = color;
 #elif defined(DEBUG_SHOW_OCCLUSION_FACTOR)
 	diffuse.rgb = vec3(occlusion);
 
+#elif defined(DEBUG_SHOW_FOG_COLOR)
+	diffuse.rgb = FOG_COLOR.rgb;
+
+#elif defined(DEBUG_SHOW_FOG_CONTROL) && defined(MCPE40059)
+	diffuse.rgb = vec3(cameraDist < 0.5 ? FOG_CONTROL.x : FOG_CONTROL.y);
+
 #endif /* DEBUG */
 
 	gl_FragColor = diffuse;
