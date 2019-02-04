@@ -181,7 +181,8 @@ vec4 waterSpecularLight(
     highp float incident     = max(0.0, dot(viewDir, halfDir)); // Cosine of the angle.
     highp float reflAngle    = max(0.0, dot(halfDir, normal));
     highp float reflCoeff    = fresnel + (1.0 - fresnel) * pow(1.0 - incident, 5.0);
-    highp vec3  specular     = incomingLight * 180.0 * pow(reflAngle, shininess) * reflCoeff;
+    highp float specCoeff    = pow(reflAngle, shininess) * reflCoeff;
+    highp vec3  specular     = incomingLight * 180.0 * specCoeff;
 
     /* Compute the opacity of water. In real life when a light ray
      * hits a surface of water, some part of it will reflect away, and
@@ -202,7 +203,7 @@ vec4 waterSpecularLight(
     return vec4(
         specular * dirLightRatio * sharpOpac + // Reflected directional light
         opacCoeff * incomingLight * 0.15,      // Reflected undirectional light
-        opacity);
+        mix(opacity, 1.0, specCoeff));
 }
 
 #endif /* !defined(NATURAL_MYSTIC_WATER_H_INCLUDED) */
