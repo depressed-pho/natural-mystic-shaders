@@ -8,6 +8,8 @@
   the sun.
 * Added a thin fog. Its color and density is currently constant
   although it should ideally be biome-specific (#9).
+* Grass, fern, and vines now have a waving animation (#11). Other
+  plants still don't wave though.
 
 ## 1.6.0 -- 2019-01-30
 
