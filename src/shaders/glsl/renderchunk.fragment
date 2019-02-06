@@ -216,7 +216,23 @@ vec4 inColor = color;
 		 * problem we mix the flat surface normal with the smooth,
 		 * analytical but the incorrect one, using the volume. */
 		vec3 fNormal  = normalize(mix(sNormal, vNormal, waterPlane));
-		vec4 specular = waterSpecularLight(diffuse.a, dirLight, undirLight, cameraDist, wPos, VIEW_POS, TIME, fNormal);
+
+#  if defined(ENABLE_WAVES)
+		/* Perturb the normal even more, but this time with much higher
+		 * frequencies. This is a kind of bump mapping. */
+		const float distThreshold = 0.6;
+		const float distFadeStart = distThreshold * 0.8;
+		if (cameraDist < distThreshold) {
+			/* But perturbing the normal on far geometry doesn't
+			 * contribute to the overall quality, and it may even cause
+			 * aliasing. */
+			fNormal = mix(waterWaveNormal(wPos, TIME, fNormal), fNormal,
+						  smoothstep(distFadeStart, distThreshold, cameraDist));
+			fNormal = normalize(fNormal);
+		}
+#  endif /* defined(ENABLE_WAVES) */
+
+		vec4 specular = waterSpecularLight(diffuse.a, dirLight, undirLight, wPos, VIEW_POS, TIME, fNormal);
 
 		diffuse.rgb  = pigment * (dirLight + undirLight);
 		diffuse.rgb *= 0.5; // Darken the base water color.

@@ -132,7 +132,7 @@ highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal)
  * absolute, not relative opacity.
  */
 vec4 waterSpecularLight(
-    float baseOpacity, vec3 incomingDirLight, vec3 incomingUndirLight, highp float cameraDist,
+    float baseOpacity, vec3 incomingDirLight, vec3 incomingUndirLight,
     highp vec3 worldPos, highp vec3 viewPos, highp float time, highp vec3 normal) {
 
     /* Compute the contribution of directional light (i.e. the sun and
@@ -144,19 +144,6 @@ vec4 waterSpecularLight(
      * so unfortunate. We have to assume they are always at some fixed
      * point. */
     const highp vec3 lightDir = normalize(vec3(-2.5, 2.5, 0.0));
-
-    /* Perturb the normal even more, but this time with much higher
-     * frequencies. This is a kind of bump mapping. */
-    const float distThreshold = 0.6;
-    const float distFadeStart = distThreshold * 0.8;
-    if (cameraDist < distThreshold) {
-        /* But perturbing the normal on far geometry doesn't
-         * contribute to the overall quality, and it may even cause
-         * aliasing. */
-        normal = mix(waterWaveNormal(worldPos, time, normal), normal,
-                     smoothstep(distFadeStart, distThreshold, cameraDist));
-    }
-    normal = normalize(normal);
 
     /* The intensity of the specular light is determined with the
      * angle between the Blinn-Phong half vector and the normal. See:
