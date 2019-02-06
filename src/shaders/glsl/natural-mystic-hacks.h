@@ -10,8 +10,9 @@
  */
 bool isGrass(vec4 color) {
     /* Grass colors are affected by seasons and can turn red. */
-    vec4 hsv = rgb2hsv(color);
-    return hsv.y > 0.2 && (hsv.x < 149.0 && hsv.x > 12.0);
+    vec4  hsv = rgb2hsv(color);
+    float hue = hsv.x * 360.0;
+    return hsv.y > 0.1 && (hue < 149.0 && hue > 12.0);
 }
 
 /* Detect water based on the color of material. */
@@ -19,8 +20,9 @@ bool isWater(vec4 color) {
     /* Yikes. The color of water greatly changes in swampland so we
      * need an HSV value of the color to reliably detect water.
      */
-    vec4 hsv = rgb2hsv(color);
-    return hsv.x >= 149.0 && hsv.x <= 270.0;
+    vec4  hsv = rgb2hsv(color);
+    float hue = hsv.x * 360.0;
+    return hsv.y > 0.1 && hue >= 149.0 && hue <= 270.0;
 }
 
 /* Detect a water plane based on the world position of a vertex. */
