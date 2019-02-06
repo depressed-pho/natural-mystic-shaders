@@ -2,6 +2,7 @@
 
 ## 1.7.0 -- FIXME
 
+* Updated the base code from 1.8.0 to 1.9.0.
 * The shader now abuses ambient occlusion factor to create more
   shadows, especially on the sides of blocks.
 * Fixed the direction of reflected sunlight which wasn't parallel to

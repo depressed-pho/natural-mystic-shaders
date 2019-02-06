@@ -32,7 +32,7 @@ See [NEWS](NEWS.md).
 
 ## Tested on
 
-* Minecraft Bedrock 1.8.1, iPad Pro (MLMY2J/A), iOS 12.1 (16B92)
+* Minecraft Bedrock 1.9.0, iPad Pro (MLMY2J/A), iOS 12.1 (16B92)
 
 ## Changing configuration
 
