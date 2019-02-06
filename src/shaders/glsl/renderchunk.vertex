@@ -39,6 +39,7 @@ varying float waterPlane;        // [0, 1]
 #include "uniformPerFrameConstants.h"
 #include "uniformShaderConstants.h"
 #include "uniformRenderChunkConstants.h"
+#include "natural-mystic-color.h"
 #include "natural-mystic-config.h"
 #include "natural-mystic-fog.h"
 #include "natural-mystic-hacks.h"
@@ -143,15 +144,16 @@ void main()
 #endif /* FOG */
 
 	/* Waves */
+	vec3 hsvColor = rgb2hsv(COLOR.rgb);
 #if defined(MCPE40059)
-	waterFlag  = isWater(color) ? 1.0 : 0.0;
+	waterFlag  = isWater(hsvColor) ? 1.0 : 0.0;
 	waterPlane = 0.0;
 #endif
 #if !defined(BYPASS_PIXEL_SHADER) && !defined(AS_ENTITY_RENDERER) && defined(ENABLE_WAVES) && defined(MCPE40059)
 #  if defined(ALPHA_TEST)
 	/* ALPHA_TEST means that the block being rendered isn't a solid
 	 * opaque one. This excludes grass blocks especially. */
-	bool grassFlag = isGrass(color);
+	bool grassFlag = isGrass(hsvColor);
 #  else
 	const bool grassFlag = false;
 #  endif

@@ -4,23 +4,23 @@
 
 #include "natural-mystic-color.h"
 
-/* Detect grasses based on the color of material. This function also
- * returns true for grass blocks and leaves because it's impossible to
- * tell them from plants.
+/* Detect grasses based on the color of material. The color must be in
+ * HSV, not RGB. This function also returns true for grass blocks and
+ * leaves because it's impossible to tell them from plants.
  */
-bool isGrass(vec4 color) {
+bool isGrass(vec3 hsv) {
     /* Grass colors are affected by seasons and can turn red. */
-    vec4  hsv = rgb2hsv(color);
     float hue = hsv.x * 360.0;
     return hsv.y > 0.1 && (hue < 149.0 && hue > 12.0);
 }
 
-/* Detect water based on the color of material. */
-bool isWater(vec4 color) {
+/* Detect water based on the color of material. The color must be in
+ * HSV, not RGB.
+ */
+bool isWater(vec3 hsv) {
     /* Yikes. The color of water greatly changes in swampland so we
      * need an HSV value of the color to reliably detect water.
      */
-    vec4  hsv = rgb2hsv(color);
     float hue = hsv.x * 360.0;
     return hsv.y > 0.1 && hue >= 149.0 && hue <= 270.0;
 }
