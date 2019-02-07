@@ -11,6 +11,9 @@
   although it should ideally be biome-specific (#9).
 * Grass, fern, and vines now have a waving animation (#11). Other
   plants still don't wave though.
+* Fixed the configuration item "ENABLE_WAVES" not working properly.
+* Added a configuration item "ENABLE_SPECULAR" so you can disable
+  specular lighting which might be laggy.
 
 ## 1.6.0 -- 2019-01-30
 

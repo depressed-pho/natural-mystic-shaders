@@ -44,6 +44,15 @@ AS_IF([test x"$enable_waves" != x"no"],
                  [Define to enable waves of water and leaves.])])
 
 AC_ARG_ENABLE(
+    [specular],
+    [AS_HELP_STRING(
+         [--disable-specular],
+         [disable specular lighting])])
+AS_IF([test x"$enable_specular" != x"no"],
+      [AC_DEFINE([ENABLE_SPECULAR], [1],
+                 [Define to enable specular lighting.])])
+
+AC_ARG_ENABLE(
     [fbm-clouds],
     [AS_HELP_STRING(
          [--disable-fbm-clouds],
