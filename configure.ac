@@ -53,6 +53,15 @@ AS_IF([test x"$enable_specular" != x"no"],
                  [Define to enable specular lighting.])])
 
 AC_ARG_ENABLE(
+    [ripples],
+    [AS_HELP_STRING(
+         [--disable-ripples],
+         [disable the water ripple animation])])
+AS_IF([test x"$enable_ripples" != x"no"],
+      [AC_DEFINE([ENABLE_RIPPLES], [1],
+                 [Define to enable water ripple animation that appears on the ground when it's raining.])])
+
+AC_ARG_ENABLE(
     [fbm-clouds],
     [AS_HELP_STRING(
          [--disable-fbm-clouds],

@@ -242,9 +242,11 @@ vec4 inColor = color;
 		diffuse.a    = specular.a;
 #  endif /* defined(ENABLE_SPECULAR) */
 
+#  if defined(ENABLE_RIPPLES)
 		if (wet > 0.0) {
 			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, cameraDist, TIME, fNormal);
 		}
+#  endif /* defined(ENABLE_RIPPLES) */
 	}
 	else {
 		/* The intensity of directional light should be affected by the
@@ -267,9 +269,12 @@ vec4 inColor = color;
 		 * because we don't know what a material it's made of. */
 		diffuse.rgb *= mix(1.0, 0.5, wet);
 		diffuse.rgb += specular * mix(1.0, 5.0, wet);
+
+#  if defined(ENABLE_RIPPLES)
 		if (wet > 0.0) {
 			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, cameraDist, TIME, sNormal);
 		}
+#  endif /* defined(ENABLE_RIPPLES) */
 	}
 #else
 	diffuse.rgb = pigment * (dirLight + undirLight);

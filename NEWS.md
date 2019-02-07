@@ -14,8 +14,10 @@
 * Grass, fern, and vines now have a waving animation (#11). Other
   plants still don't wave though.
 * Fixed the configuration item ``ENABLE_WAVES`` not working properly.
-* Added a configuration item "ENABLE_SPECULAR" so you can disable
+* Added a configuration item ``ENABLE_SPECULAR`` so you can disable
   specular lighting which might be laggy.
+* Added a configuration item ``ENABLE_RIPPLES`` so you can disable a
+  water ripple animation that appears on the ground when it rains.
 
 ## 1.6.0 -- 2019-01-30
 
