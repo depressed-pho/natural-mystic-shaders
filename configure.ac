@@ -79,6 +79,15 @@ AS_IF([test x"$enable_random_stars" != x"no"],
       [AC_DEFINE([ENABLE_RANDOM_STARS], [1],
                  [Define to introduce randomness in the brighness of stars.])])
 
+AC_ARG_ENABLE(
+    [base-fog],
+    [AS_HELP_STRING(
+         [--disable-base-fog],
+         [disable a thin fog that always affects the scene.])])
+AS_IF([test x"$enable_base_fog" != x"no"],
+      [AC_DEFINE([ENABLE_BASE_FOG], [1],
+                 [Define to enable a thin fog that always affects the scene, not only when it's raining.])])
+
 AC_ARG_WITH(
     [fog-type],
     [AS_HELP_STRING(

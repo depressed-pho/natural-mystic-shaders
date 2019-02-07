@@ -282,7 +282,7 @@ vec4 inColor = color;
 	 * should lean towards the ambient. And we also apply a permanent
 	 * fog. It should ideally be biome-specific (#9) but we can't do
 	 * that currently. */
-#if defined(FANCY) && defined(MCPE40059)
+#if defined(ENABLE_BASE_FOG) && defined(MCPE40059)
 	const float contrast   = 0.45;
 	const float fogDensity = 0.4;
 	diffuse.rgb = mix(

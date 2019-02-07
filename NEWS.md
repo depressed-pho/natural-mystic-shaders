@@ -7,11 +7,13 @@
   shadows, especially on the sides of blocks.
 * Fixed the direction of reflected sunlight which wasn't parallel to
   the sun.
-* Added a thin fog. Its color and density is currently constant
-  although it should ideally be biome-specific (#9).
+* Added a thin fog that always affects the scene, not only when it's
+  raining. Its color and density is currently constant although it
+  should ideally be biome-specific (#9). It can be disabled via a
+  configuration item ``ENABLE_BASE_FOG``.
 * Grass, fern, and vines now have a waving animation (#11). Other
   plants still don't wave though.
-* Fixed the configuration item "ENABLE_WAVES" not working properly.
+* Fixed the configuration item ``ENABLE_WAVES`` not working properly.
 * Added a configuration item "ENABLE_SPECULAR" so you can disable
   specular lighting which might be laggy.
 
