@@ -196,7 +196,7 @@ vec4 inColor = color;
 	/* Now we finished accumulating light. Compute the diffuse light
 	 * and the specular light here. We assume the color of specular
 	 * light is always the same as the color of accumulated light. */
-#if defined(MCPE40059) && defined(FANCY)
+#if defined(MCPE40059)
 	vec3  sNormal = normalize(cross(dFdx(wPos), dFdy(wPos)));
 	float wet     = wetness(clearWeather, uv1.y);
 	if (waterFlag > 0.5) {
@@ -249,10 +249,14 @@ vec4 inColor = color;
 #  endif /* defined(ENABLE_RIPPLES) */
 	}
 	else {
+#  if defined(ENABLE_OCCLUSION_SHADOWS)
 		/* The intensity of directional light should be affected by the
 		 * occlusion factor. */
 		const float occlShadow = 0.35;
-		diffuse.rgb = pigment * (dirLight * mix(occlShadow, 1.0, occlusion) + undirLight);
+		dirLight *= mix(occlShadow, 1.0, occlusion);
+#  endif /* defined(ENABLE_OCCLUSION_SHADOWS) */
+
+		diffuse.rgb = pigment * (dirLight + undirLight);
 
 #  if defined(ENABLE_SPECULAR)
 		const float fresnel   = 0.04;
@@ -276,9 +280,7 @@ vec4 inColor = color;
 		}
 #  endif /* defined(ENABLE_RIPPLES) */
 	}
-#else
-	diffuse.rgb = pigment * (dirLight + undirLight);
-#endif /* defined(FANCY) */
+#endif /* defined(MCPE40059) */
 
 	diffuse.rgb = uncharted2ToneMap(diffuse.rgb, 112.0, 1.0);
 	diffuse.rgb = contrastFilter(diffuse.rgb, 1.25);

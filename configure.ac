@@ -44,6 +44,15 @@ AS_IF([test x"$enable_waves" != x"no"],
                  [Define to enable waves of water and leaves.])])
 
 AC_ARG_ENABLE(
+    [occlusion-shadows],
+    [AS_HELP_STRING(
+         [--disable-occlusion-shadows],
+         [disable fake shadows generated from the ambient occlusion])])
+AS_IF([test x"$enable_occlusion_shadows" != x"no"],
+      [AC_DEFINE([ENABLE_OCCLUSION_SHADOWS], [1],
+                 [Define to enable fake shadows generated from the ambient occlusion])])
+
+AC_ARG_ENABLE(
     [specular],
     [AS_HELP_STRING(
          [--disable-specular],

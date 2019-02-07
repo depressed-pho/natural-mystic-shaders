@@ -4,7 +4,8 @@
 
 * Updated the base code from 1.8.0 to 1.9.0.
 * The shader now abuses ambient occlusion factor to create more
-  shadows, especially on the sides of blocks.
+  shadows, especially on the sides of blocks. It can be disabled via a
+  configuration item ``ENABLE_OCCLUSION_SHADOWS``.
 * Fixed the direction of reflected sunlight which wasn't parallel to
   the sun.
 * Added a thin fog that always affects the scene, not only when it's
