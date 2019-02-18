@@ -56,4 +56,15 @@ float exponentialSquaredFog(vec2 control, float dist) {
     return 1.0 - fogFactor;
 }
 
+/* Compute the brightness [0, 1] of permanent fog as opposed to the
+ * bad weather fog. Fogs can scatter any of incoming light rays
+ * regardless of their source.
+ */
+float fogBrightness(float torchLevel, float sunLevel, float daylight) {
+    const float scatter = 1.2;
+
+    float brightness = max(torchLevel, sunLevel * daylight) * scatter;
+    return clamp(brightness, 0.0, 1.0);
+}
+
 #endif /* defined(NATURAL_MYSTIC_FOG_H_INCLUDED) */

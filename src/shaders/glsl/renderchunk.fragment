@@ -43,6 +43,7 @@ varying vec4 fogColor;
 #include "util.h"
 #include "natural-mystic-color.h"
 #include "natural-mystic-config.h"
+#include "natural-mystic-fog.h"
 #include "natural-mystic-hacks.h"
 #include "natural-mystic-light.h"
 #include "natural-mystic-rain.h"
@@ -285,14 +286,14 @@ vec4 inColor = color;
 	/* Reduce the contrast of far objects (#5). The overall color
 	 * should lean towards the ambient. And we also apply a permanent
 	 * fog. It should ideally be biome-specific (#9) but we can't do
-	 * that currently. */
+	 * that currently, so we always use the ambient color. */
 #if defined(ENABLE_BASE_FOG) && defined(MCPE40059)
 	const float contrast   = 0.45;
 	const float fogDensity = 0.4;
 	diffuse.rgb = mix(
 		diffuse.rgb,
 		mix(contrastFilter(diffuse.rgb, contrast) * ambientColor,
-			FOG_COLOR.rgb,
+			fogBrightness(uv1.x, uv1.y, daylight) * ambientColor,
 			fogDensity),
 		desatFactor);
 #endif
