@@ -1,6 +1,6 @@
 # Release notes
 
-## 1.7.0 -- FIXME
+## 1.7.0 -- 2019-02-20
 
 * Updated the base code from 1.8.0 to 1.9.0.
 * The shader now abuses ambient occlusion factor to create more
