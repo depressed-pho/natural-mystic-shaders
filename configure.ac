@@ -35,6 +35,15 @@ AS_IF([test x"$enable_torch_flicker" != x"no"],
                  [Define to enable torch light flickering effect.])])
 
 AC_ARG_ENABLE(
+    [fancy-water],
+    [AS_HELP_STRING(
+         [--disable-fancy-water],
+         [disable fancy water rendering])])
+AS_IF([test x"$enable_fancy_water" != x"no"],
+      [AC_DEFINE([ENABLE_FANCY_WATER], [1],
+                 [Define to enable fancy water rendering.])])
+
+AC_ARG_ENABLE(
     [waves],
     [AS_HELP_STRING(
          [--disable-waves],

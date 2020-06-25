@@ -4,7 +4,10 @@
 
 * Updated the base code from 1.9.0 to 1.16.0.
 - Fixed an issue with Minecraft Bedrock 1.16.0: Water in a swampland
-  was incorrectly rendered in some cases.
+  was sometimes not detected and was rendered in the vanilla way.
+- Added a configuration item ``ENABLE_FANCY_WATER`` which is enabled
+  by default. Now you can leave water unmodified by the shader if you
+  wish.
 
 ## 1.7.0 -- 2019-02-20
 

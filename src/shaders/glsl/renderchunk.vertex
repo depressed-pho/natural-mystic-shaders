@@ -172,7 +172,11 @@ void main()
 	/* Waves */
 	vec3 hsvColor = rgb2hsv(COLOR.rgb);
 #if defined(MCPE40059)
+#  if defined(ENABLE_FANCY_WATER)
 	waterFlag  = isWater(hsvColor) ? 1.0 : 0.0;
+#  else
+	waterFlag  = 0.0;
+#  endif
 	waterPlane = 0.0;
 #endif
 #if !defined(BYPASS_PIXEL_SHADER) && !defined(AS_ENTITY_RENDERER) && defined(ENABLE_WAVES) && defined(MCPE40059)
