@@ -15,6 +15,7 @@
  * compute the intensity of the specular light.
  *
  * See also: https://developer.nvidia.com/gpugems/GPUGems/gpugems_ch01.html
+ * And: https://hal.inria.fr/inria-00443630/file/article-1.pdf
  */
 
 /* Compute a Gerstner wave. See comments in waterWaveGeometric() for

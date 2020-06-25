@@ -46,6 +46,29 @@ varying float waterPlane;        // [0, 1]
 #include "natural-mystic-light.h"
 #include "natural-mystic-water.h"
 
+/* Notes on different kinds of positions:
+ *
+ * - attribute highp vec4 POSITION: Relative position to the current
+ *   chunk origin in [0.0, 16.0]. The purpose of its ".w" component is
+ *   unknown.
+ *
+ * - uniform highp vec4 CHUNK_ORIGIN_AND_SCALE: Its ".xyz" components
+ *   contain the origin of the current chunk in the world space
+ *   relative to the camera (see below). Its ".w" component is for
+ *   scaling chunk-relative positions into this space.
+ *
+ * - highp vec4 worldPos: Vertex position in the world space relative
+ *   to the camera in (-∞, ∞). Its ".w" component is always 1.0. This
+ *   isn't the same as the view space as the camera angle doesn't
+ *   affect it (see
+ *   http://www.codinglabs.net/article_world_view_projection_matrix.aspx).
+ *
+ * - highp vec4 pos: Vertex position in the projection space. This is
+ *   the final output from the vertex shader.
+ *
+ * - uniform vec3 VIEW_POS: Unknown, apparently all zero.
+ */
+
 attribute POS4 POSITION;
 attribute vec4 COLOR;
 attribute vec2 TEXCOORD_0;
