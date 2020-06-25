@@ -1,6 +1,6 @@
 # Release notes
 
-## 1.7.1 -- 2020-06-25
+## 1.8.0 -- 2020-06-25
 
 The 1.16.0 nether upgrade surprisingly didn't break my shaders too
 much so this is only a small fix and an improvement.
