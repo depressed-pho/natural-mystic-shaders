@@ -2,7 +2,7 @@
 
 ## 1.7.1 -- unreleased
 
-* Updated the base code from 1.9.0 to 1.10.0.
+* Updated the base code from 1.9.0 to 1.16.0.
 
 ## 1.7.0 -- 2019-02-20
 

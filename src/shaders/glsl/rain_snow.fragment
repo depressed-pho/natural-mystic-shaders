@@ -43,11 +43,13 @@ void main()
 #endif
 
 	// clamp the uvs
+#ifndef NO_OCCLUSION
 	if ( occlusionUV.x >= 0.0 && occlusionUV.x <= 1.0 && 
 		 occlusionUV.y >= 0.0 && occlusionUV.y <= 1.0 && 
 		 worldPosition.y OCCLUSION_OPERATOR OCCLUSION_HEIGHT) {
 		albedo.a = 0.0;
 	}
+#endif
 
 	float mixAmount = (worldPosition.y - OCCLUSION_HEIGHT)*25.0;
 	vec2 lightingUVs = vec2(OCCLUSION_LUMINANCE, 1.0);
