@@ -1,6 +1,9 @@
 # Release notes
 
-## 1.7.1 -- unreleased
+## 1.7.1 -- 2020-06-25
+
+The 1.16.0 nether upgrade surprisingly didn't break my shaders too
+much so this is only a small fix and an improvement.
 
 * Updated the base code from 1.9.0 to 1.16.0.
 - Fixed an issue with Minecraft Bedrock 1.16.0: Water in a swampland
