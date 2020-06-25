@@ -134,7 +134,7 @@ highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal)
  */
 vec4 waterSpecularLight(
     float baseOpacity, vec3 incomingDirLight, vec3 incomingUndirLight,
-    highp vec3 worldPos, highp vec3 viewPos, highp float time, highp vec3 normal) {
+    highp vec3 worldPos, highp float time, highp vec3 normal) {
 
     /* Compute the contribution of directional light (i.e. the sun and
      * the moon) to the entire incoming light. */
@@ -153,7 +153,7 @@ vec4 waterSpecularLight(
      * http://filmicworlds.com/blog/everything-has-fresnel/
      * https://hal.inria.fr/inria-00443630/file/article-1.pdf
      */
-    highp vec3  viewDir      = -normalize(worldPos - viewPos);
+    highp vec3  viewDir      = -normalize(worldPos);
     const float shininess    = 80.0;
 
     /* Compute the Fresnel term between the view vector and the half

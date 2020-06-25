@@ -50,7 +50,7 @@ varying float waterPlane;        // [0, 1]
  *
  * - attribute highp vec4 POSITION: Relative position to the current
  *   chunk origin in [0.0, 16.0]. The purpose of its ".w" component is
- *   unknown.
+ *   unknown (possibly unused).
  *
  * - uniform highp vec4 CHUNK_ORIGIN_AND_SCALE: Its ".xyz" components
  *   contain the origin of the current chunk in the world space
@@ -195,7 +195,7 @@ void main()
 			highp vec3 wPos1     = waterWaveGeometric(wPos, TIME, vNormal);
 			highp vec3 wPosDelta = (wPos1 - wPos) * volume;
 			worldPos.xyz += wPosDelta;
-			wPos          = worldPos.xyz + VIEW_POS;
+			wPos          = worldPos.xyz;
 			gl_Position   = PROJ * (WORLDVIEW * worldPos);
 		}
 

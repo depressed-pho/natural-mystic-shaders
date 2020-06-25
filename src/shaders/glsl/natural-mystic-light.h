@@ -183,7 +183,7 @@ vec3 moonlight(float sunLevel, float daylight) {
  */
 vec3 specularLight(
     float fresnel, float shininess, vec3 incomingDirLight, vec3 incomingUndirLight,
-    highp vec3 worldPos, highp vec3 viewPos, highp vec3 normal) {
+    highp vec3 worldPos, highp vec3 normal) {
 
     vec3 incomingLight = incomingDirLight + incomingUndirLight;
     vec3 dirLightRatio = incomingDirLight / (incomingLight + vec3(0.001));
@@ -197,7 +197,7 @@ vec3 specularLight(
      * angle between the Blinn-Phong half vector and the normal. See
      * https://seblagarde.wordpress.com/2011/08/17/hello-world/
      */
-    highp vec3  viewDir   = -normalize(worldPos - viewPos);
+    highp vec3  viewDir   = -normalize(worldPos);
     highp vec3  halfDir   = normalize(viewDir + lightDir);
     highp float incident  = max(0.0, dot(lightDir, halfDir));
     highp float reflAngle = max(0.0, dot(halfDir, normal));
