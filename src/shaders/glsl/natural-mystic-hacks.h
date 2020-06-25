@@ -22,7 +22,7 @@ bool isWater(vec3 hsv) {
      * need an HSV value of the color to reliably detect water.
      */
     float hue = hsv.x * 360.0;
-    return hsv.y > 0.1 && hue >= 149.0 && hue <= 270.0;
+    return hsv.y > 0.1 && hue >= 147.0 && hue <= 270.0;
 }
 
 /* Detect a water plane based on the world position of a vertex. */
