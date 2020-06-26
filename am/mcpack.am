@@ -1,10 +1,14 @@
 pack_base  = $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
 pack_name  = $(pack_base).mcpack
-pack_files = $(MCPACK_FILES:%.yaml=%.json) $(pack_base).diff
+pack_files = $(MCPACK_FILES:%.yaml=%.json)
 
-noinst_DATA += $(pack_name) $(pack_base).diff
+noinst_DATA += $(pack_name)
 CLEANFILES  += $(pack_name)
 EXTRA_DIST  += $(filter-out manifest.json,$(filter-out manifest.yaml,$(MCPACK_FILES)))
+
+if GENERATE_DIFF_FILE
+pack_files  += $(pack_base).diff
+noinst_DATA += $(pack_base).diff
 
 $(pack_base).diff: $(MCPACK_FILES)
 	$(AM_V_GEN)
@@ -25,6 +29,7 @@ $(pack_base).diff: $(MCPACK_FILES)
 			--exclude="manifest.*" \
 			orig src | \
 		$(SED) -e '/^Only in /d') > $@
+endif
 
 $(pack_name): $(pack_files) $(MCPACK_EXTRA_FILES)
 	$(AM_V_GEN)

@@ -24,6 +24,7 @@ AH_BOTTOM([#endif /* NATURAL_MYSTIC_CONFIG_H_INCLUDED */])
 
 # Checks for options.
 AX_MCPACK_INSTALLATION_DIRECTORY([resource])
+AX_MCPACK_GENERATE_DIFF_FILE([yes])
 
 AC_ARG_ENABLE(
     [torch-flicker],
