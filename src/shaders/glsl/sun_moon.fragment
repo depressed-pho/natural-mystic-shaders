@@ -24,17 +24,19 @@ varying vec2 uv;
 
 LAYOUT_BINDING(0) uniform sampler2D TEXTURE_0;
 
-varying highp vec2 localPos;
+varying vec2 localPos;
 
 vec4 renderSun(vec2 pos) {
-    const float radius    = 0.08;
-    const float sharpness = 0.2;  // The smaller the sharper the edge will be.
+    const float radius     = 0.08;
+    const float sharpness  = 0.2;  // The smaller the sharper the edge will be.
+    const float colorScale = 2.5;
+    const vec3  baseColor  = vec3(1.0, 0.55, 0.15);
 
     /* The fog color is white during the daytime and is red at dusk
      * and dawn. We use it as the color of the sun. We also hide the
      * sun when it's raining, hence the CURRENT_COLOR.a.
      */
-    vec4 sunColor = vec4(FOG_COLOR.rgb * 1.7, CURRENT_COLOR.a);
+    vec4 sunColor = vec4(FOG_COLOR.rgb * baseColor * colorScale, CURRENT_COLOR.a);
 
     /* The body of the sun in a Signed Distance Field. */
     float sdf        = length(pos) - radius;
@@ -48,13 +50,12 @@ vec4 renderSun(vec2 pos) {
     float halo = (1.0 - isDuskOrDawn(FOG_COLOR)) * 0.7;
     brightness = max(brightness, (1.0 - sdf) * halo);
 
-    return sunColor * brightness;
+    return clamp(sunColor * brightness, 0.0, 1.0);
 }
 
 // https://www.shadertoy.com/view/XsdGzX
 
-void main()
-{
+void main() {
 #if 0
 #if !defined(TEXEL_AA) || !defined(TEXEL_AA_FEATURE)
 	vec4 diffuse = texture2D( TEXTURE_0, uv );
