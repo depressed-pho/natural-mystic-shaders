@@ -1,0 +1,35 @@
+// __multiversion__
+// This signals the loading code to prepend either #version 100 or #version 300 es as apropriate.
+
+#include "vertexVersionCentroidUV.h"
+
+#include "uniformWorldConstants.h"
+
+attribute POS4 POSITION;
+attribute vec2 TEXCOORD_0;
+
+/* This is the vertex position is the model-local space whose origin
+ * is the center of the sun or the moon.
+ */
+varying vec2 localPos;
+
+void main()
+{
+    /* Enlarge the sun and the moon as the default size is too small
+     * for us. We are going to draw actual shape of the sun and the
+     * moon inside these vertices.
+     */
+    POS4 p = POSITION * vec2(10.0, 1.0).xyxy;
+    gl_Position = WORLDVIEWPROJ * p;
+
+    /* Apply some rotation to the moon.
+     */
+    localPos = mat2(0.8, 0.6, -0.6, 0.8) * p.xz;
+
+    uv = TEXCOORD_0;
+}
+
+// Local Variables:
+// mode: glsl
+// indent-tabs-mode: nil
+// End:

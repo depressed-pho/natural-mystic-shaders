@@ -1,0 +1,120 @@
+// __multiversion__
+// This signals the loading code to prepend either #version 100 or #version 300 es as apropriate.
+
+#include "fragmentVersionCentroid.h"
+
+#if __VERSION__ >= 300
+
+#if defined(TEXEL_AA) && defined(TEXEL_AA_FEATURE)
+_centroid in highp vec2 uv;
+#else
+_centroid in vec2 uv;
+#endif
+
+#else
+
+varying vec2 uv;
+
+#endif
+
+#include "uniformPerFrameConstants.h"
+#include "uniformShaderConstants.h"
+#include "util.h"
+#include "natural-mystic-hacks.h"
+
+LAYOUT_BINDING(0) uniform sampler2D TEXTURE_0;
+
+varying highp vec2 localPos;
+
+vec4 renderSun(vec2 pos) {
+    const float radius    = 0.08;
+    const float sharpness = 0.2;  // The smaller the sharper the edge will be.
+
+    /* The fog color is white during the daytime and is red at dusk
+     * and dawn. We use it as the color of the sun. We also hide the
+     * sun when it's raining, hence the CURRENT_COLOR.a.
+     */
+    vec4 sunColor = vec4(FOG_COLOR.rgb * 1.7, CURRENT_COLOR.a);
+
+    /* The body of the sun in a Signed Distance Field. */
+    float sdf        = length(pos) - radius;
+    float brightness = 1.0 - smoothstep(0.0, radius * sharpness, sdf);
+
+    /* Render halo, or sort of. When it's daytime and is clear, quite
+     * a large area around the sun should be rendered extremely
+     * brightly. We do this by using the distance between the current
+     * pixel and the border of the sun as the factor of the
+     * brightness, i.e. the closer the brighter. */
+    float halo = (1.0 - isDuskOrDawn(FOG_COLOR)) * 0.7;
+    brightness = max(brightness, (1.0 - sdf) * halo);
+
+    return sunColor * brightness;
+}
+
+// https://www.shadertoy.com/view/XsdGzX
+
+void main()
+{
+#if 0
+#if !defined(TEXEL_AA) || !defined(TEXEL_AA_FEATURE)
+	vec4 diffuse = texture2D( TEXTURE_0, uv );
+#else
+	vec4 diffuse = texture2D_AA(TEXTURE_0, uv );
+#endif
+
+#ifdef ALPHA_TEST
+	if(diffuse.a < 0.5)
+		discard;
+#endif
+
+	gl_FragColor = CURRENT_COLOR * diffuse;
+#endif
+
+#if 0
+    gl_FragColor = CURRENT_COLOR;
+#endif
+
+#if 1
+    gl_FragColor = renderSun(localPos);
+#endif
+
+#if 0
+    gl_FragColor = CURRENT_COLOR;
+#endif
+
+#if 0
+    gl_FragColor = FOG_COLOR;
+#endif
+
+#if 0
+    float l = length(localPos);
+    float s = max(cos(min(l * 12., 1.58)), (.5 - l * .7));
+    gl_FragColor = vec4(1., .95, .81, smoothstep(.7, 1., FOG_CONTROL.y)) * s;
+#endif
+
+#if 0
+    vec4 f_color   = FOG_COLOR;
+    vec4 l_f_color = max(f_color, vec4(1.0));
+
+    float dusk_f  = pow(clamp(1.0 - f_color.b * 1.2, 0.0, 1.0), 0.5); // 1.0 when it's dusk
+    float night_f = pow(clamp(1.0 - f_color.r * 1.5, 0.0, 1.0), 0.3); // 1.0 when it's night
+    float rain_f  = pow(FOG_CONTROL.y, 5.0); // 1.0 when it's clear, 0.0 when it's raining
+
+    float c0 = 1.0 - pow(length(localPos * 51.0), night_f * 9.0 + 0.6);
+    float c1 = 1.0 - pow(length(localPos *  2.0),
+                         0.5 * pow(f_color.g, 5.0) * (1.0 - dusk_f) + (1.0 - f_color.b) * 0.1);
+
+    vec4 sun_color = vec4(l_f_color.r * 0.9,
+                          1.65 - f_color.b,
+                          1.2  - f_color.b,
+                          1.0);
+
+    vec4 sun = vec4(sun_color.rgb, clamp(c1 * rain_f, 0.0, 1.0));
+    gl_FragColor = mix(sun, sun_color, clamp(c0 * rain_f, 0.0, 1.0));
+#endif
+}
+
+// Local Variables:
+// mode: glsl
+// indent-tabs-mode: nil
+// End:

@@ -60,6 +60,16 @@ float isClearWeather(vec2 fogControl) {
     return smoothstep(0.8, 1.0, fogControl.y);
 }
 
+/* When it's near dusk or dawn, the B component of the fog color
+ * gradually decreases. We exploit this fact to detect dusk and
+ * dawn. Terrain shaders don't need this function because they can
+ * directly fetch the daylight level. This function returns 1.0 when
+ * it's dusk or dawn, or 0.0 otherwise.
+ */
+float isDuskOrDawn(vec4 fogColor) {
+    return pow(clamp(1.0 - fogColor.b * 1.7, 0.0, 1.0), 0.3);
+}
+
 /* Compute an occlusion factor [0, 1] based on the vertex color. 0.0
  * means completely occluded, and 1.0 means not occluded at all. This
  * works because the game appears to encode an ambient occlusion in
