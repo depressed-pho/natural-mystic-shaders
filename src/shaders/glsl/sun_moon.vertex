@@ -2,8 +2,9 @@
 // This signals the loading code to prepend either #version 100 or #version 300 es as apropriate.
 
 #include "vertexVersionCentroidUV.h"
-
+#include "uniformPerFrameConstants.h"
 #include "uniformWorldConstants.h"
+#include "natural-mystic-hacks.h"
 
 attribute POS4 POSITION;
 attribute vec2 TEXCOORD_0;
@@ -12,6 +13,12 @@ attribute vec2 TEXCOORD_0;
  * is the center of the sun or the moon.
  */
 varying vec2 localPos;
+
+/* 1.0 when it's dusk or dawn. */
+varying float duskOrDown;
+
+/* 1.0 when it's night. */
+varying float night;
 
 void main()
 {
@@ -22,9 +29,12 @@ void main()
     POS4 p = POSITION * vec2(10.0, 1.0).xyxy;
     gl_Position = WORLDVIEWPROJ * p;
 
-    /* Apply some rotation to the moon.
-     */
+    /* Apply some rotation to the moon. */
     localPos = mat2(0.8, 0.6, -0.6, 0.8) * p.xz;
+
+    /* Hacky time detections. */
+    duskOrDown = isDuskOrDawn(FOG_COLOR);
+    night      = isNight(FOG_COLOR);
 
     uv = TEXCOORD_0;
 }

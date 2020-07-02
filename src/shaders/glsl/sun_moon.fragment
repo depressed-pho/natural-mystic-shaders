@@ -25,6 +25,8 @@ varying vec2 uv;
 LAYOUT_BINDING(0) uniform sampler2D TEXTURE_0;
 
 varying vec2 localPos;
+varying float duskOrDown;
+varying float night;
 
 vec4 renderSun(vec2 pos) {
     const float radius     = 0.08;
@@ -47,7 +49,7 @@ vec4 renderSun(vec2 pos) {
      * brightly. We do this by using the distance between the current
      * pixel and the border of the sun as the factor of the
      * brightness, i.e. the closer the brighter. */
-    float halo = (1.0 - isDuskOrDawn(FOG_COLOR)) * 0.7;
+    float halo = (1.0 - duskOrDown) * 0.7;
     brightness = max(brightness, (1.0 - sdf) * halo);
 
     return clamp(sunColor * brightness, 0.0, 1.0);
@@ -76,7 +78,13 @@ void main() {
 #endif
 
 #if 1
-    gl_FragColor = renderSun(localPos);
+    if (night < 0.5) {
+        gl_FragColor = renderSun(localPos);
+    }
+    else {
+        gl_FragColor = vec4(0.0);
+    }
+
 #endif
 
 #if 0
