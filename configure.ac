@@ -116,6 +116,15 @@ AS_IF([test x"$enable_base_fog" != x"no"],
       [AC_DEFINE([ENABLE_BASE_FOG], [1],
                  [Define to enable a thin fog that always affects the scene, not only when it's raining.])])
 
+AC_ARG_ENABLE(
+    [shader-sun-moon],
+    [AS_HELP_STRING(
+         [--disable-shader-sun-moon],
+         [disable the shader-generated sun and the moon])])
+AS_IF([test x"$enable_shader_sun_moon" != x"no"],
+      [AC_DEFINE([ENABLE_SHADER_SUN_MOON], [1],
+                 [Define to enable the shader-generated sun and the moon.])])
+
 AC_ARG_WITH(
     [fog-type],
     [AS_HELP_STRING(
