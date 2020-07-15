@@ -56,8 +56,9 @@ vec4 renderSun(vec2 pos) {
     return clamp(sunColor * brightness, 0.0, 1.0);
 }
 
-// Based on https://www.shadertoy.com/view/XsdGzX
-// and http://learnwebgl.brown37.net/09_lights/lights_diffuse.html
+/* Based on https://www.shadertoy.com/view/XsdGzX
+ * and http://learnwebgl.brown37.net/09_lights/lights_diffuse.html
+ */
 float diffuseSphere(vec2 pos, float radius, vec3 light) {
     float sq = radius*radius - pos.x*pos.x - pos.y*pos.y;
 
@@ -71,11 +72,22 @@ float diffuseSphere(vec2 pos, float radius, vec3 light) {
     }
 }
 
-// Huge thanks for ESBE-2G shaders. I took its moon renderer as a
-// reference (although I didn't use it directly).
+/* Translate the texture UV into the phase of moon. This function
+ * returns [0, 2π) where 0 is the new moon and π is the full
+ * moon. This is a hack.
+ */
+float moonPhase(vec2 texUV) {
+    float x = floor(texUV.x * 4.0) * 0.25; // {0, 0.25, 0.5, 0.75}
+    float y = step(0.5, texUV.y);          // {0, 1}
+    return (x + y) * 3.14159;
+}
+
+/* Huge thanks for ESBE-2G shaders. I took its moon renderer as a
+ * reference (although I didn't use it directly).
+ */
 vec4 renderMoon(vec2 pos, float phase) {
     const float radius    = 0.11;
-    const float sharpness = 0.25; // The smaller the sharper the edge will be.
+    const float sharpness = 0.15; // The smaller the sharper the edge will be.
     const vec3  baseColor = vec3(1.0, 0.95, 0.81);
     const vec2  resolution = vec2(0.06);
 
@@ -87,7 +99,6 @@ vec4 renderMoon(vec2 pos, float phase) {
     /* The body of the moon in a Signed Distance Field. */
     float pDistance  = length(pos);
     float sdf        = pDistance - radius;
-    float brightness = 1.0 - smoothstep(0.0, radius * sharpness, sdf);
 
     /* Compute the light vector based on the phase of moon. */
     vec3 light = vec3(sin(phase), 0.0, -cos(phase));
@@ -95,11 +106,14 @@ vec4 renderMoon(vec2 pos, float phase) {
     /* Perform a diffuse lighting to render the phase of moon. */
     float diffuse = diffuseSphere(pos, radius, light);
     /* Hacky adjustment of the diffuse light. */
-    brightness *= smoothstep(0.2, 0.8, min(diffuse + 0.3, 1.0));
+    float brightness = smoothstep(0.2, 0.8, min(diffuse + 0.3, 1.0));
 
     /* Generate the texture of the moon with 2D simplex noise. */
     float tex = simplexNoise(pos / resolution);
     brightness *= 1.0 - clamp(tex, 0.0, 1.0) * 0.05;
+
+    /* Apply the sharpness to the surface. */
+    brightness *= 1.0 - smoothstep(radius - radius * sharpness, radius, pDistance);
 
     return clamp(moonColor * brightness, 0.0, 1.0);
 }
@@ -129,7 +143,7 @@ void main() {
         gl_FragColor = renderSun(localPos);
     }
     else {
-        float phase  = 3.14159 * 0.6; // [0, 2π), 0: new moon, π: full moon
+        float phase  = moonPhase(uv);
         gl_FragColor = renderMoon(localPos, phase);
     }
 
