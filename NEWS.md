@@ -1,14 +1,22 @@
 # Release notes
 
+## 1.9.0 -- not released yet
+
+* Implemented shaders for shader-generated sun and moon. The moon
+  shader does a diffuse lighting to render lunar phases.
+* Added a configuration item ``ENABLE_SHADER_SUN_MOON`` which is
+  enabled by default. Disabling it will revert the sun and the moon to
+  the default texture-based rendering.
+
 ## 1.8.0 -- 2020-06-25
 
 The 1.16.0 nether upgrade surprisingly didn't break my shaders too
 much so this is only a small fix and an improvement.
 
 * Updated the base code from 1.9.0 to 1.16.0.
-- Fixed an issue with Minecraft Bedrock 1.16.0: Water in a swampland
+* Fixed an issue with Minecraft Bedrock 1.16.0: Water in a swampland
   was sometimes not detected and was rendered in the vanilla way.
-- Added a configuration item ``ENABLE_FANCY_WATER`` which is enabled
+* Added a configuration item ``ENABLE_FANCY_WATER`` which is enabled
   by default. Now you can leave water unmodified by the shader if you
   wish.
 
