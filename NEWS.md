@@ -2,8 +2,8 @@
 
 ## 1.9.0 -- not released yet
 
-* Implemented shaders for shader-generated sun and moon. The moon
-  shader does a diffuse lighting to render lunar phases.
+* Implemented shaders for shader-generated sun and moon (#52). The
+  moon shader does a diffuse lighting to render lunar phases.
 * Added a configuration item ``ENABLE_SHADER_SUN_MOON`` which is
   enabled by default. Disabling it will revert the sun and the moon to
   the default texture-based rendering.
