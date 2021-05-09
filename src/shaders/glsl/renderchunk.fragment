@@ -225,11 +225,14 @@ vec4 inColor = color;
 		const float distFadeStart = distThreshold * 0.8;
 		if (cameraDist < distThreshold) {
 			/* But perturbing the normal on far geometry doesn't
-			 * contribute to the overall quality, and it may even cause
-			 * aliasing. */
-			fNormal = mix(waterWaveNormal(wPos, TIME, fNormal), fNormal,
-						  smoothstep(distFadeStart, distThreshold, cameraDist));
-			fNormal = normalize(fNormal);
+			 * contribute to the overall quality, and it may even
+			 * cause aliasing. Also reduce the perturbance depending
+			 * on the sunlight level. */
+			vec3 perturbed = waterWaveNormal(wPos, TIME, fNormal);
+			perturbed = mix(perturbed, fNormal,
+							smoothstep(distFadeStart, distThreshold, cameraDist));
+			perturbed = mix(sNormal, perturbed, smoothstep(0.5, 1.0, uv1.y));
+			fNormal = normalize(perturbed);
 		}
 #  endif /* defined(ENABLE_WAVES) */
 

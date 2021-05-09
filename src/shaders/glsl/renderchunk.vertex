@@ -204,7 +204,10 @@ void main()
 		if (volume > 0.0) {
 			highp vec3 wPos1     = waterWaveGeometric(wPos, TIME, vNormal);
 			highp vec3 wPosDelta = (wPos1 - wPos) * volume;
-			worldPos.xyz += wPosDelta;
+			/* Also reduce the amplitude depending on the sunlight
+			 * level. We do the same for wave normal in the fragment
+			 * shader. */
+			worldPos.xyz += wPosDelta * smoothstep(0.5, 1.0, uv1.y);
 			wPos          = worldPos.xyz;
 			gl_Position   = PROJ * (WORLDVIEW * worldPos);
 		}
