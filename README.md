@@ -16,7 +16,7 @@ Features include:
 * Sunlight and moonlight colors with night time desaturation
 * Desaturation under a bad weather condition
 * Exposure adjustment, contrast filter, and tone mapping
-* Shader-based rendering of the moon.
+* Shader-based rendering of the sun and the moon.
 
 ## Download
 
