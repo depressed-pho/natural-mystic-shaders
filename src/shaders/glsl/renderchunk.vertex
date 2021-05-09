@@ -188,9 +188,12 @@ void main()
 	const bool grassFlag = false;
 #  endif
 	if (grassFlag) {
-		POS3 posw = POSITION.xyz;
+		POS3 posw = abs(POSITION.xyz - 8.0);
 		highp float wave = sin(TIME * 3.5 + 2.0 * posw.x + 2.0 * posw.z + posw.y);
-		gl_Position.x += wave * 0.015;
+		highp float amplitude = 0.015;
+		/* Reduce the amplitude if it's indoor, i.e. the sunlight
+		 * level is low (#85). */
+		gl_Position.x += wave * amplitude * smoothstep(0.7, 1.0, uv1.y);
 	}
 	else if (waterFlag > 0.5) {
 		/* We want water to swell in proportion to its volume. The more

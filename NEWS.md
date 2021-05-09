@@ -8,6 +8,10 @@
 * Added a configuration item ``ENABLE_SHADER_SUN_MOON`` which is
   enabled by default. Disabling it will revert the sun and the moon to
   the default texture-based rendering.
+* The waving animation of plants used to happen even indoors. It is
+  now fixed (#85).
+* The waving animation of plants used to have a discontinuity at each
+  of chunk borders. It is now fixed too (#85).
 
 ## 1.8.0 -- 2020-06-25
 
