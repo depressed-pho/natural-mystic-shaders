@@ -12,7 +12,7 @@
   now fixed (#85).
 * The waving animation of plants used to have a discontinuity at each
   of chunk borders. It is now fixed too (#85).
-* The perturbance of water also significantly decreases indoors.
+* The perturbance of water also significantly decreases indoors now.
 
 ## 1.8.0 -- 2020-06-25
 
