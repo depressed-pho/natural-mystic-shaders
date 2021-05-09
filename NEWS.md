@@ -1,6 +1,6 @@
 # Release notes
 
-## 1.9.0 -- not released yet
+## 1.9.0 -- 2021-05-09
 
 * Updated the base code from 1.16.0 to 1.16.221.
 * Implemented shaders for shader-generated sun and moon (#52). The
