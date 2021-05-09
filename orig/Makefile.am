@@ -1,16 +1,5 @@
-EXTRA_DIST = \
-	materials/common.json \
-	materials/entity.material \
-	materials/fancy.json \
-	materials/fancy.material \
-	materials/particles.material \
-	materials/sad.json \
-	materials/sad.material \
-	materials/sky.material \
-	materials/terrain.material \
-	shaders/glsl/cloud.vertex \
-	shaders/glsl/rain_snow.fragment \
-	shaders/glsl/renderchunk.fragment \
-	shaders/glsl/renderchunk.vertex \
-	shaders/glsl/sky.vertex \
-	shaders/glsl/uniformPerFrameConstants.h
+# If you add or remove a file here, update the file list in
+# original-files.am.
+include $(top_srcdir)/am/original-files.am
+
+EXTRA_DIST = $(ORIG_FILES)

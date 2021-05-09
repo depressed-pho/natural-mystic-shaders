@@ -2,6 +2,7 @@
 
 ## 1.9.0 -- not released yet
 
+* Updated the base code from 1.16.0 to 1.16.221.
 * Implemented shaders for shader-generated sun and moon (#52). The
   moon shader does a diffuse lighting to render lunar phases.
 * Added a configuration item ``ENABLE_SHADER_SUN_MOON`` which is

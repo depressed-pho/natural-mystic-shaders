@@ -1,0 +1,28 @@
+OUR_SRC_DIR  = $(top_srcdir)/src
+OUR_ORIG_DIR = $(top_srcdir)/orig
+
+.PHONY: rebase
+rebase:
+	@set -eu; \
+	if test -z "$(ORIG_MATERIALS_DIR)" -o -z "$(ORIG_SHADERS_DIR)"; then \
+		echo >&2; \
+		echo >&2 "Usage: $(MAKE) rebase ORIG_MATERIALS_DIR={DIR} ORIG_SHADERS_DIR={DIR}"; \
+		echo >&2; \
+		exit 1; \
+	fi; \
+	for f in $(ORIG_FILES); do \
+		our_file="$(OUR_SRC_DIR)/$${f}"; \
+		our_orig="$(OUR_ORIG_DIR)/$${f}"; \
+		case "$${f}" in \
+			materials/*) \
+				orig_file="$(ORIG_MATERIALS_DIR)/../$${f}";; \
+			shaders/*) \
+				orig_file="$(ORIG_SHADERS_DIR)/../$${f}";; \
+		esac; \
+		echo >&2 "Applying changes to $${f}..."; \
+		diff3 -m -e "$${our_file}" "$${our_orig}" "$${orig_file}" > tmp; \
+		mv -f tmp "$${our_file}"; \
+	done; \
+	echo >&2 "Done."
+
+include $(top_srcdir)/am/original-files.am

@@ -194,6 +194,19 @@
       ]
     },
 
+    "on_screen_effect:entity_alphatest": {
+      "+defines": [ "COLOR_BASED" ],
+      "+states": [
+        "Blending"
+      ],
+      "vertexFields": [
+        { "field": "Position" },
+        { "field": "Normal" },
+        { "field": "Color" },
+        { "field": "UV0" }
+      ]
+    },
+
     "item_in_hand_entity_alphatest:entity_alphatest": {
       "msaaSupport": "Both"
 
@@ -787,7 +800,9 @@
     },
 
     "entity_dissolve_layer1:entity": {
-      "depthFunc": "Equal"
+      "depthFunc": "Equal",
+      "+defines": [ "ALPHA_TEST" ],
+      "-defines": [ "USE_OVERLAY" ]
     },
 
     "banner": {
@@ -927,6 +942,8 @@
     "skeleton:entity_alphatest": {},
     "pillager:entity_alphatest": {},
     "piglin:entity_alphatest": {},
+    "piglin_brute:entity_alphatest": {},
+    "goat:entity_alphatest": {},
     "slime:entity_alphatest": {},
     "slime_outer:entity": {
       "+states": [ "Blending" ]
@@ -977,8 +994,8 @@
     "player_animated:entity_alphatest": {
       "+defines": [ "USE_UV_ANIM" ]
     },
-    "experience_orb:entity_custom": {
-      "+defines": [ "USE_UV_ANIM" ]
+    "experience_orb:entity": {
+      "+defines": [ "USE_UV_ANIM", "ALPHA_TEST", "Blending", "USE_OVERLAY", "USE_MASK" ]
     }
   }
 }
