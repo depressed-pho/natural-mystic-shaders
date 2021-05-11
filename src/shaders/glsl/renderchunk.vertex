@@ -23,7 +23,9 @@ varying highp vec3 vNormal; // Vertex normal in the world space. Only
 varying float flickerFactor;
 varying float desatFactor;
 flat varying float clearWeather; // [0, 1]
-flat varying float waterFlag;    // 0.0 or 1.0
+flat varying float waterFlag;    // 0.0 or 1.0. This should really be
+                                 // "flat varying bool" but it's not
+                                 // allowed in GLSL ES 1.00.
 varying float waterPlane;        // [0, 1]
 #endif
 
