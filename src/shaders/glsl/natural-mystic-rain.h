@@ -3,6 +3,7 @@
 #define NATURAL_MYSTIC_RAIN_H_INCLUDED 1
 
 #include "natural-mystic-noise.h"
+#include "natural-mystic-precision.h"
 
 /* See https://seblagarde.wordpress.com/2012/12/10/observe-rainy-world/
  */
@@ -20,7 +21,7 @@ float wetness(float clearWeather, float sunLevel) {
 
 /* Compute light reflected by water ripples on the ground.
  */
-vec3 ripples(vec3 incomingLight, highp vec3 worldPos, highp float cameraDist, highp float time, highp vec3 normal) {
+vec3 ripples(vec3 incomingLight, prec_hm vec3 worldPos, float cameraDist, prec_hm float time, prec_hm vec3 normal) {
     /* The visual effect of ripples is so subtle, and it won't be
      * visible on far terrain. We can skip the costly noise generation
      * unless worldPos isn't close to the camera. */
@@ -32,10 +33,10 @@ vec3 ripples(vec3 incomingLight, highp vec3 worldPos, highp float cameraDist, hi
          * normal matches to (0, 1, 0). */
         float cosTheta = max(0.0, normal.y); // Equivalent to max(0.0, dot(normal, vec3(0, 1, 0)));
 
-        const highp vec3 resolution = vec3(vec2(0.16), 0.5);
+        const prec_hm vec3 resolution = vec3(vec2(0.16), 0.5);
         const float amount = 0.1;
 
-        highp vec3 st = vec3(worldPos.xz, time) / resolution;
+        prec_hm vec3 st = vec3(worldPos.xz, time) / resolution;
         float ripples = simplexNoise(st);
 
         /* Shift the range of ripples. */

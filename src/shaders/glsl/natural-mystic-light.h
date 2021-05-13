@@ -4,6 +4,7 @@
 
 #include "natural-mystic-color.h"
 #include "natural-mystic-noise.h"
+#include "natural-mystic-precision.h"
 
 /* Light color constants. Should be private to this file.
  */
@@ -76,7 +77,7 @@ float torchLightFlicker(highp vec3 wPos, highp float time) {
 /* Compute the torch light. The argument "torchLevel" should be the
  * torch light level [0, 1].
  */
-vec3 torchLight(float torchLevel, float sunLevel, float daylight, highp float flickerFactor) {
+vec3 torchLight(float torchLevel, float sunLevel, float daylight, float flickerFactor) {
     const float baseIntensity = 180.0;
     const float decay         = 5.0;
 
@@ -99,7 +100,7 @@ vec3 torchLight(float torchLevel, float sunLevel, float daylight, highp float fl
 
 /* Compute the emissive light for light source objects.
  */
-vec3 emissiveLight(highp float flickerFactor) {
+vec3 emissiveLight(float flickerFactor) {
     /* The game doesn't tell us what kind of light source it is, so we
      * assume it's a torch. */
     const vec3  lightColor = torchlightColor;
@@ -183,7 +184,7 @@ vec3 moonlight(float sunLevel, float daylight) {
  */
 vec3 specularLight(
     float fresnel, float shininess, vec3 incomingDirLight, vec3 incomingUndirLight,
-    highp vec3 worldPos, highp vec3 normal) {
+    prec_hm vec3 worldPos, prec_hm vec3 normal) {
 
     vec3 incomingLight = incomingDirLight + incomingUndirLight;
     vec3 dirLightRatio = incomingDirLight / (incomingLight + vec3(0.001));
@@ -191,22 +192,22 @@ vec3 specularLight(
     /* The game doesn't tell us where the sun or the moon is, which is
      * so unfortunate. We have to assume they are always at some fixed
      * point. */
-    const highp vec3 lightDir = normalize(vec3(-2.5, 5.5, 1.0));
+    const prec_hm vec3 lightDir = normalize(vec3(-2.5, 5.5, 1.0));
 
     /* The intensity of the specular light is determined with the
      * angle between the Blinn-Phong half vector and the normal. See
      * https://seblagarde.wordpress.com/2011/08/17/hello-world/
      */
-    highp vec3  viewDir   = -normalize(worldPos);
-    highp vec3  halfDir   = normalize(viewDir + lightDir);
-    highp float incident  = max(0.0, dot(lightDir, halfDir));
-    highp float reflAngle = max(0.0, dot(halfDir, normal));
-    highp float dotNL     = max(0.0, dot(normal, lightDir));
-    highp float reflCoeff = fresnel + (1.0 - fresnel) * pow(1.0 - incident, 5.0);
-    highp vec3  specular  = incomingLight * 2.0 * pow(reflAngle, shininess) * reflCoeff * dotNL;
+    prec_hm vec3  viewDir   = -normalize(worldPos);
+    prec_hm vec3  halfDir   = normalize(viewDir + lightDir);
+    prec_hm float incident  = max(0.0, dot(lightDir, halfDir));
+    prec_hm float reflAngle = max(0.0, dot(halfDir, normal));
+    prec_hm float dotNL     = max(0.0, dot(normal, lightDir));
+    prec_hm float reflCoeff = fresnel + (1.0 - fresnel) * pow(1.0 - incident, 5.0);
+    prec_hm vec3  specular  = incomingLight * 2.0 * pow(reflAngle, shininess) * reflCoeff * dotNL;
 
-    highp float viewAngle = max(0.0, dot(normal, viewDir));
-    highp float viewCoeff = fresnel + (1.0 - fresnel) * pow(1.0 - viewAngle, 5.0);
+    prec_hm float viewAngle = max(0.0, dot(normal, viewDir));
+    prec_hm float viewCoeff = fresnel + (1.0 - fresnel) * pow(1.0 - viewAngle, 5.0);
     return specular * dirLightRatio +     // Reflected directional light
         viewCoeff * incomingLight * 0.03; // Reflected undirectional light
 }

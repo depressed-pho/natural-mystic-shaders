@@ -1,5 +1,10 @@
 # Release notes
 
+## 1.9.1 -- not released yet
+
+* Improved compatibility with GLSL ES implementations where fragment
+  shaders don't support ``highp`` (#86).
+
 ## 1.9.0 -- 2021-05-09
 
 * Updated the base code from 1.16.0 to 1.16.221.

@@ -2,6 +2,8 @@
 #if !defined(NATURAL_MYSTIC_WATER_H_INCLUDED)
 #define NATURAL_MYSTIC_WATER_H_INCLUDED 1
 
+#include "natural-mystic-precision.h"
+
 /* Overview of our water system:
  *
  * In the vertex shader we compute geometric undulations of a base
@@ -46,8 +48,8 @@ highp vec3 gerstnerWave(
 
 /* Similar to gerstnerWave() but this only computes the normal vector.
  */
-highp vec3 gerstnerWaveN(
-    highp vec3 wPos, highp float time, highp vec3 normal,
+prec_hm vec3 gerstnerWaveN(
+    prec_hm vec3 wPos, prec_hm float time, prec_hm vec3 normal,
     float Q, float numWaves, float Ai, vec2 Di, float Li, float Si) {
 
     const float wFactor = 9.80665 * 2.0 * 3.14159;
@@ -56,8 +58,8 @@ highp vec3 gerstnerWaveN(
     float Qi    = Q / (wi * Ai * numWaves);
     float phi_i = Si * 2.0 / Li;
 
-    highp float theta = wi * dot(Di, wPos.xz) + phi_i * time;
-    highp float wiAi  = wi * Ai;
+    prec_hm float theta = wi * dot(Di, wPos.xz) + phi_i * time;
+    prec_hm float wiAi  = wi * Ai;
     normal.xz -= wiAi * Di * cos(theta);
     normal.y  -= wiAi * Qi * sin(theta);
 
@@ -117,7 +119,7 @@ highp vec3 waterWaveGeometric(highp vec3 wPos, highp float time, out highp vec3 
     return wPos;
 }
 
-highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal) {
+prec_hm vec3 waterWaveNormal(prec_hm vec3 wPos, prec_hm float time, prec_hm vec3 normal) {
     const float Q        = 0.45;
     const float numWaves = float(3);
 
@@ -134,7 +136,7 @@ highp vec3 waterWaveNormal(highp vec3 wPos, highp float time, highp vec3 normal)
  */
 vec4 waterSpecularLight(
     float baseOpacity, vec3 incomingDirLight, vec3 incomingUndirLight,
-    highp vec3 worldPos, highp float time, highp vec3 normal) {
+    prec_hm vec3 worldPos, prec_hm float time, prec_hm vec3 normal) {
 
     /* Compute the contribution of directional light (i.e. the sun and
      * the moon) to the entire incoming light. */
@@ -144,7 +146,7 @@ vec4 waterSpecularLight(
     /* The game doesn't tell us where the sun or the moon is, which is
      * so unfortunate. We have to assume they are always at some fixed
      * point. */
-    const highp vec3 lightDir = normalize(vec3(-2.5, 2.5, 0.0));
+    const prec_hm vec3 lightDir = normalize(vec3(-2.5, 2.5, 0.0));
 
     /* The intensity of the specular light is determined with the
      * angle between the Blinn-Phong half vector and the normal. See:
@@ -153,8 +155,8 @@ vec4 waterSpecularLight(
      * http://filmicworlds.com/blog/everything-has-fresnel/
      * https://hal.inria.fr/inria-00443630/file/article-1.pdf
      */
-    highp vec3  viewDir      = -normalize(worldPos);
-    const float shininess    = 80.0;
+    prec_hm vec3  viewDir   = -normalize(worldPos);
+    const   float shininess = 80.0;
 
     /* Compute the Fresnel term between the view vector and the half
      * vector. When the angle is wide the water surface behaves more
@@ -164,13 +166,13 @@ vec4 waterSpecularLight(
      * | -------------- |   where iorIn = 1.0 (the refraction index
      * [ iorIn + iorOut ]   of air) and iorOut = 1.33 (water).
      */
-    const float fresnel      = 0.02;
-    highp vec3  halfDir      = normalize(viewDir + lightDir);
-    highp float incident     = max(0.0, dot(viewDir, halfDir)); // Cosine of the angle.
-    highp float reflAngle    = max(0.0, dot(halfDir, normal));
-    highp float reflCoeff    = fresnel + (1.0 - fresnel) * pow(1.0 - incident, 5.0);
-    highp float specCoeff    = pow(reflAngle, shininess) * reflCoeff;
-    highp vec3  specular     = incomingLight * 180.0 * specCoeff;
+    const   float fresnel   = 0.02;
+    prec_hm vec3  halfDir   = normalize(viewDir + lightDir);
+    prec_hm float incident  = max(0.0, dot(viewDir, halfDir)); // Cosine of the angle.
+    prec_hm float reflAngle = max(0.0, dot(halfDir, normal));
+    prec_hm float reflCoeff = fresnel + (1.0 - fresnel) * pow(1.0 - incident, 5.0);
+    prec_hm float specCoeff = pow(reflAngle, shininess) * reflCoeff;
+    prec_hm vec3  specular  = incomingLight * 180.0 * specCoeff;
 
     /* Compute the opacity of water. In real life when a light ray
      * hits a surface of water, some part of it will reflect away, and
@@ -183,11 +185,11 @@ vec4 waterSpecularLight(
      * incoming light rays (including ambient light and skylight), and
      * when that happens the water is opaque. This is of course a
      * crude hack and isn't based on the real optics. */
-    highp float viewAngle    = max(0.0, dot(normal, viewDir));
-    highp float opacCoeff    = fresnel + (1.0 - fresnel) * pow(1.0 - viewAngle, 5.0);
-    highp float opacity      = mix(baseOpacity, min(1.0, baseOpacity * 8.0), opacCoeff);
+    prec_hm float viewAngle = max(0.0, dot(normal, viewDir));
+    prec_hm float opacCoeff = fresnel + (1.0 - fresnel) * pow(1.0 - viewAngle, 5.0);
+    prec_hm float opacity   = mix(baseOpacity, min(1.0, baseOpacity * 8.0), opacCoeff);
 
-    highp float sharpOpac    = smoothstep(0.1, 0.2, opacCoeff);
+    prec_hm float sharpOpac = smoothstep(0.1, 0.2, opacCoeff);
     return vec4(
         specular * dirLightRatio * sharpOpac + // Reflected directional light
         opacCoeff * incomingLight * 0.15,      // Reflected undirectional light

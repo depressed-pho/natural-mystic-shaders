@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([Natural Mystic Shaders],
-        [1.9.0],
+        [1.9.1],
         [https://github.com/depressed-pho/natural-mystic-shaders/issues],
         [],
         [https://github.com/depressed-pho/natural-mystic-shaders])

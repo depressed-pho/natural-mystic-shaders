@@ -20,11 +20,13 @@
 	#endif
 #endif
 
+#include "natural-mystic-precision.h"
+
 /* Workaround for https://bugs.mojang.com/browse/MCPE-40059 */
 #if defined(MCPE40059)
-varying highp vec3 wPos;
+varying prec_hm vec3 wPos;
 varying float cameraDist;
-varying highp vec3 vNormal;
+varying prec_hm vec3 vNormal;
 varying float flickerFactor;
 varying float desatFactor;
 flat varying float clearWeather;

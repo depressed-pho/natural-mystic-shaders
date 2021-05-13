@@ -12,7 +12,10 @@ varying vec3 worldPos;
 varying float camDist;
 
 void main() {
-#if defined(ENABLE_FBM_CLOUDS)
+/* This shader-based clouds is known to cause problems when highp is
+ * not supported in fragment shaders.
+ */
+#if defined(ENABLE_FBM_CLOUDS) && defined(GL_FRAGMENT_PRECISION_HIGH)
 
     /* NOTE: It seems modifying materials/fancy.json takes no effect
      * on 1.8. We want to reduce the number of octaves when
@@ -71,7 +74,7 @@ void main() {
 
 #else
     gl_FragColor = skyColor;
-#endif /* ENABLE_FBM_CLOUDS */
+#endif /* defined(ENABLE_FBM_CLOUDS) && defined(GL_FRAGMENT_PRECISION_HIGH) */
 }
 
 // Local Variables:
