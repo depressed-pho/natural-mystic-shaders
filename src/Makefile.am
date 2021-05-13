@@ -35,7 +35,7 @@ MCPACK_FILES = \
 	shaders/glsl/stars.vertex \
 	shaders/glsl/sun_moon.fragment \
 	shaders/glsl/sun_moon.vertex \
-	shaders/glsl/uniformPerFrameConstants.h \
+	shaders/glsl/uniformInterFrameConstants.h \
 	splashes.json
 
 MCPACK_EXTRA_FILES = \

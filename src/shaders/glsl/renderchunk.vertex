@@ -40,6 +40,7 @@ varying float waterPlane;        // [0, 1]
 #endif
 
 #include "uniformWorldConstants.h"
+#include "uniformInterFrameConstants.h"
 #include "uniformPerFrameConstants.h"
 #include "uniformShaderConstants.h"
 #include "uniformRenderChunkConstants.h"
@@ -124,7 +125,7 @@ void main()
 	flickerFactor = 1.0;
 #  if defined(ENABLE_TORCH_FLICKER)
 	if (uv1.x > 0.0) {
-		flickerFactor = torchLightFlicker(worldPos.xyz, TIME);
+		flickerFactor = torchLightFlicker(worldPos.xyz, TOTAL_REAL_WORLD_TIME);
 	}
 #  endif
 #endif /* defined(MCPE40059) */
@@ -193,7 +194,7 @@ void main()
 #  endif
 	if (grassFlag) {
 		POS3 posw = abs(POSITION.xyz - 8.0);
-		highp float wave = sin(TIME * 3.5 + 2.0 * posw.x + 2.0 * posw.z + posw.y);
+		highp float wave = sin(TOTAL_REAL_WORLD_TIME * 3.5 + 2.0 * posw.x + 2.0 * posw.z + posw.y);
 		highp float amplitude = 0.015;
 		/* Reduce the amplitude if it's indoor, i.e. the sunlight
 		 * level is low (#85). */
@@ -206,7 +207,7 @@ void main()
 		 * tweak the water will leave the ground. */
 		highp float volume = fract(POSITION.y);
 		if (volume > 0.0) {
-			highp vec3 wPos1     = waterWaveGeometric(wPos, TIME, vNormal);
+			highp vec3 wPos1     = waterWaveGeometric(wPos, TOTAL_REAL_WORLD_TIME, vNormal);
 			highp vec3 wPosDelta = (wPos1 - wPos) * volume;
 			/* Also reduce the amplitude depending on the sunlight
 			 * level. We do the same for wave normal in the fragment

@@ -2,6 +2,7 @@
 // This signals the loading code to prepend either #version 100 or #version 300 es as apropriate.
 
 #include "fragmentVersionSimple.h"
+#include "uniformInterFrameConstants.h"
 #include "uniformPerFrameConstants.h"
 #include "natural-mystic-cloud.h"
 #include "natural-mystic-config.h"
@@ -29,7 +30,7 @@ void main() {
      * as we cannot precompute noises in a texture and instead we have
      * to generate them on the fly. See also
      * http://www.iquilezles.org/www/articles/dynclouds/dynclouds.htm */
-    highp float density = cloudMap(octaves, 0.5, 0.85, TIME, worldPos);
+    highp float density = cloudMap(octaves, 0.5, 0.85, TOTAL_REAL_WORLD_TIME, worldPos);
     vec4 shadedCloud = mix(vec4(cloudColor.rgb, 0.0), cloudColor, density);
 
 #  if defined(ENABLE_CLOUD_SHADE)
@@ -49,7 +50,7 @@ void main() {
         float       inside   = 0.0;
         for (int i = 0; i < numSteps; i++) {
             rayPos += rayStep;
-            highp float height = cloudMap(octaves / 2, 0.4, 1.0, TIME, rayPos);
+            highp float height = cloudMap(octaves / 2, 0.4, 1.0, TOTAL_REAL_WORLD_TIME, rayPos);
             inside += max(0.0, height - (rayPos.y - worldPos.y));
         }
         /* Average of height differences. This isn't a distance of ray

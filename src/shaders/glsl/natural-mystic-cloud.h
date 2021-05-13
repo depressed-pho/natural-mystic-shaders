@@ -6,8 +6,9 @@
 
 /* Generate a pattern of clouds based on a world position. */
 highp float cloudMap(int octaves, float lowerBound, float upperBound, highp float time, highp vec3 pos) {
-    /* Use of highp is essential here, as the uniform TIME in mediump
-     * starts to lose precision within 10 minutes.
+    /* Use of highp is essential here, as the uniform
+     * TOTAL_REAL_WORLD_TIME in mediump starts to lose precision
+     * within 10 minutes.
      */
     const highp vec2 resolution = vec2(1.4, 1.4);
 

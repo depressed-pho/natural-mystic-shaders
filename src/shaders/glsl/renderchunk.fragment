@@ -41,7 +41,7 @@ varying vec4 fogColor;
 #endif
 
 #include "uniformShaderConstants.h"
-#include "uniformPerFrameConstants.h"
+#include "uniformInterFrameConstants.h"
 #include "util.h"
 #include "natural-mystic-color.h"
 #include "natural-mystic-config.h"
@@ -230,7 +230,7 @@ vec4 inColor = color;
 			 * contribute to the overall quality, and it may even
 			 * cause aliasing. Also reduce the perturbance depending
 			 * on the sunlight level. */
-			vec3 perturbed = waterWaveNormal(wPos, TIME, fNormal);
+			vec3 perturbed = waterWaveNormal(wPos, TOTAL_REAL_WORLD_TIME, fNormal);
 			perturbed = mix(perturbed, fNormal,
 							smoothstep(distFadeStart, distThreshold, cameraDist));
 			perturbed = mix(sNormal, perturbed, smoothstep(0.5, 1.0, uv1.y));
@@ -242,7 +242,7 @@ vec4 inColor = color;
 		diffuse.rgb *= 0.5; // Darken the base water color.
 
 #  if defined(ENABLE_SPECULAR)
-		vec4 specular = waterSpecularLight(diffuse.a, dirLight, undirLight, wPos, TIME, fNormal);
+		vec4 specular = waterSpecularLight(diffuse.a, dirLight, undirLight, wPos, TOTAL_REAL_WORLD_TIME, fNormal);
 
 		diffuse.rgb += specular.rgb;
 		diffuse.a    = specular.a;
@@ -250,7 +250,7 @@ vec4 inColor = color;
 
 #  if defined(ENABLE_RIPPLES)
 		if (wet > 0.0) {
-			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, cameraDist, TIME, fNormal);
+			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, cameraDist, TOTAL_REAL_WORLD_TIME, fNormal);
 		}
 #  endif /* defined(ENABLE_RIPPLES) */
 	}
@@ -279,7 +279,7 @@ vec4 inColor = color;
 
 #  if defined(ENABLE_RIPPLES)
 		if (wet > 0.0) {
-			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, cameraDist, TIME, sNormal);
+			diffuse.rgb += wet * ripples(dirLight + undirLight, wPos, cameraDist, TOTAL_REAL_WORLD_TIME, sNormal);
 		}
 #  endif /* defined(ENABLE_RIPPLES) */
 	}

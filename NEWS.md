@@ -4,6 +4,7 @@
 
 * Improved compatibility with GLSL ES implementations where fragment
   shaders don't support ``highp`` (#86).
+* Replace all use of ``TIME`` with ``TOTAL_REAL_WORLD_TIME`` (#87).
 
 ## 1.9.0 -- 2021-05-09
 
