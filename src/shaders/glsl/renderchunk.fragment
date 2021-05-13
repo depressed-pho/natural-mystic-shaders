@@ -42,6 +42,7 @@ varying vec4 fogColor;
 
 #include "uniformShaderConstants.h"
 #include "uniformInterFrameConstants.h"
+#include "uniformPerFrameConstants.h"
 #include "util.h"
 #include "natural-mystic-color.h"
 #include "natural-mystic-config.h"
