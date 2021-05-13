@@ -5,6 +5,11 @@
 * Improved compatibility with GLSL ES implementations where fragment
   shaders don't support ``highp`` (#86).
 * Replace all use of ``TIME`` with ``TOTAL_REAL_WORLD_TIME`` (#87).
+* Added a configuration item ``ENABLE_CAMERA_MOVEMENT_MITIGATION``
+  which is disabled by default. It mitigates the problem where the
+  animation of water and leaves move along with players, but has a
+  side effect of causing a discontinuity when a player crosses chunk
+  borders (#85).
 
 ## 1.9.0 -- 2021-05-09
 

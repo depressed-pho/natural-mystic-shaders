@@ -117,9 +117,13 @@ void main()
 	/* THINKME: Ideally this should be the absolute position of the
 	 * vertex in the world space without getting affected by the
 	 * camera position, but there is apparently no way to reconstruct
-	 * the space from what we get from the game code (#36).
+	 * the space from what we get from the game code (#36, #85).
 	 */
+#  if defined(ENABLE_CAMERA_MOVEMENT_MITIGATION)
+	wPos = floor(CHUNK_ORIGIN_AND_SCALE.xyz / 16.0) * 16.0 + POSITION.xyz;
+#  else
 	wPos = worldPos.xyz;
+#  endif
 
 	vNormal = vec3(0);
 	flickerFactor = 1.0;

@@ -81,6 +81,15 @@ AS_IF([test x"$enable_ripples" != x"no"],
                  [Define to enable water ripple animation that appears on the ground when it's raining.])])
 
 AC_ARG_ENABLE(
+    [camera-movement-mitigation],
+    [AS_HELP_STRING(
+         [--enable-camera-movement-mitigation],
+         [mitigate the problem where animation of water and leaves move along with the camera])])
+AS_IF([test x"$enable_camera_movement_mitigation" = x"yes"],
+      [AC_DEFINE([ENABLE_CAMERA_MOVEMENT_MITIGATION], [1],
+                 [Define to imtigate the problem where the animation of water and leaves move along with the camera. This has a side effect of causing a discontinuity when crossing chunk borders.])])
+
+AC_ARG_ENABLE(
     [fbm-clouds],
     [AS_HELP_STRING(
          [--disable-fbm-clouds],
